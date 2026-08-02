@@ -1,17 +1,9 @@
-# ============================================================
-#  Nights – Premium Adult Stories
-#  GitHub Actions Workflow
-# ============================================================
-#  Trigger  → push to main / manual
-#  Steps    → Checkout → Setup Node → Build stories → Deploy Pages
-# ============================================================
-
 name: 🌙 Deploy Nights
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # Manual run from Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
@@ -38,6 +30,9 @@ jobs:
         with:
           node-version: "20"
 
+      - name: ⚙️ Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: 📚 Build stories (Markdown → JSON)
         run: |
           echo "Building stories from story-post/ ..."
@@ -49,9 +44,12 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html _site/
-          cp -r assets _site/
-          cp -r stories _site/
-          if [ -f README.md ]; then cp README.md _site/; fi
+          
+          # Added conditional checks to prevent silent failures if folders are missing
+          if [ -d "assets" ]; then cp -r assets _site/; fi
+          if [ -d "stories" ]; then cp -r stories _site/; fi
+          if [ -f "README.md" ]; then cp README.md _site/; fi
+          
           echo "Site structure:"
           find _site -type f | sort
 
