@@ -1,0 +1,76 @@
+# ============================================================
+#  Nights – Premium Adult Stories
+#  GitHub Actions Workflow
+# ============================================================
+#  Trigger  → push to main / manual
+#  Steps    → Checkout → Setup Node → Build stories → Deploy Pages
+# ============================================================
+
+name: 🌙 Deploy Nights
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # Manual run from Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────────
+  #  1. BUILD
+  # ─────────────────────────────────────────────
+  build:
+    name: Build Stories
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 📚 Build stories (Markdown → JSON)
+        run: |
+          echo "Building stories from story-post/ ..."
+          node script/blog-builder.js
+          echo "✓ stories/index.json ready"
+          ls -la stories/
+
+      - name: 📦 Prepare site artifact
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r assets _site/
+          cp -r stories _site/
+          if [ -f README.md ]; then cp README.md _site/; fi
+          echo "Site structure:"
+          find _site -type f | sort
+
+      - name: ⬆️ Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  # ─────────────────────────────────────────────
+  #  2. DEPLOY
+  # ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 🚀 Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
