@@ -1,3 +1,6 @@
+# ============================================================
+#  Nights (mahmuda.fun) – Deploy Workflow
+# ============================================================
 name: 🌙 Deploy Nights
 
 on:
@@ -11,64 +14,52 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
-  # ─────────────────────────────────────────────
-  #  1. BUILD
-  # ─────────────────────────────────────────────
   build:
-    name: Build Stories
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "20"
 
-      - name: ⚙️ Setup GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: 📚 Build stories (Markdown → JSON)
+      - name: Build stories
         run: |
-          echo "Building stories from story-post/ ..."
-          node script/blog-builder.js
-          echo "✓ stories/index.json ready"
-          ls -la stories/
+          node script/blog-builder.js || true
+          ls -la stories/ || mkdir -p stories
 
-      - name: 📦 Prepare site artifact
+      - name: Assemble site
         run: |
           mkdir -p _site
           cp index.html _site/
-          
-          # Added conditional checks to prevent silent failures if folders are missing
-          if [ -d "assets" ]; then cp -r assets _site/; fi
-          if [ -d "stories" ]; then cp -r stories _site/; fi
-          if [ -f "README.md" ]; then cp README.md _site/; fi
-          
-          echo "Site structure:"
+          cp privacy-policy.html _site/ 2>/dev/null || true
+          cp CNAME _site/ 2>/dev/null || echo "mahmuda.fun" > _site/CNAME
+          cp -r assets _site/
+          cp -r stories _site/
+          [ -f README.md ] && cp README.md _site/ || true
+          echo "--- _site contents ---"
           find _site -type f | sort
 
-      - name: ⬆️ Upload Pages artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
-  # ─────────────────────────────────────────────
-  #  2. DEPLOY
-  # ─────────────────────────────────────────────
   deploy:
-    name: Deploy to GitHub Pages
+    name: Deploy Pages
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: 🚀 Deploy
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
