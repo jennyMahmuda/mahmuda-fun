@@ -1,18 +1,1 @@
-[
-  {
-    "id": "senior-apu-ep01",
-    "title": "সিনিয়র আপু · পর্ব ১ · নিয়মের প্রথম কথা",
-    "slug": "senior-apu-ep01",
-    "excerpt": "লাইব্রেরির নির্জন কর্নার। সানজিদা আপুর চোখে খেলা। রাফির বুকের ভিতর ঝড়। এবং একটা নিয়ম যা সবকিছু বদলে দিল—বয়স ম্যাটার করে না, কিন্তু ইমোশন নয়। শুধু কেমিস্ট্রি।",
-    "category": "Forbidden",
-    "tags": ["University", "Senior", "Junior", "Teasing", "Chemistry", "Tension"],
-    "type": "text",
-    "series": "Senior Apu",
-    "episode": 1,
-    "date": "2026-08-05",
-    "readTime": "14 min",
-    "language": "bn",
-    "content": "<p>placeholder for length - full content is in senior-apu-ep01.json</p>",
-    "nextEpisodeId": "senior-apu-ep02"
-  }
-]
+[{"id":"senior-apu-ep03","title":"সিনিয়র আপু · পর্ব ৩ · আরও কাছে","excerpt":"কালকের প্রতিশ্রুতি। সানজিদা আপু বলেছিলেন—আরও কাছে।","category":"Forbidden","tags":["University","Senior","Junior","Teasing","Chemistry","Tension"],"type":"text","series":"Senior Apu","episode":3,"date":"2026-08-05","readTime":"32 min","language":"bn","nextEpisodeId":"senior-apu-ep04","content":""},{"id":"senior-apu-ep02","title":"সিনিয়র আপু · পর্ব ২ · সন্ধ্যার কর্নার","excerpt":"সন্ধ্যা সাতটা। একই কর্নার। সানজিদা আপু এসে দাঁড়ালেন।","category":"Forbidden","tags":["University","Senior","Junior","Teasing","Chemistry","Tension"],"type":"text","series":"Senior Apu","episode":2,"date":"2026-08-05","readTime":"28 min","language":"bn","nextEpisodeId":"senior-apu-ep03","content":""},{"id":"senior-apu-ep01","title":"সিনিয়র আপু · পর্ব ১ · নিয়মের প্রথম কথা","excerpt":"লাইব্রেরির নির্জন কর্নার। সানজিদা আপুর চোখে খেলা।","category":"Forbidden","tags":["University","Senior","Junior","Teasing","Chemistry","Tension"],"type":"text","series":"Senior Apu","episode":1,"date":"2026-08-05","readTime":"14 min","language":"bn","nextEpisodeId":"senior-apu-ep02","content":""},{"id":"university-madam-eyes","title":"চোখের দেখা · ম্যাম ও স্টুডেন্ট","excerpt":"ক্লাসে চোখ মিলল। শাড়ির আঁচল সরে গেল একটু।","category":"Forbidden","tags":["University","Madam","Romance"],"type":"text","date":"2026-08-05","readTime":"22 min","language":"bn","content":""},{"id":"university-mam-playful","title":"University Madam Playful","excerpt":"Playful intimate episode","category":"Forbidden","tags":["Romance","Playful"],"type":"text","date":"2026-08-05","readTime":"18 min","language":"bn","content":""},{"id":"bristir-rate-ep1","title":"বৃষ্টির রাতে – পর্ব ১","excerpt":"বাড়িতে কেউ নেই। বৃষ্টি নামছে।","category":"Forbidden","tags":["Romance","Fantasy"],"type":"text","series":"Bhabhi Devar Rain","episode":1,"date":"2026-08-02","readTime":"18 min","language":"bn","nextEpisodeId":"bristir-rate-ep2","content":""},{"id":"bristir-rate-ep2","title":"বৃষ্টির রাতে – পর্ব ২","excerpt":"পর্ব ২","category":"Forbidden","tags":["Romance"],"type":"text","series":"Bhabhi Devar Rain","episode":2,"date":"2026-08-02","readTime":"12 min","language":"bn","nextEpisodeId":"bristir-rate-ep3","content":""},{"id":"bristir-rate-ep3","title":"বৃষ্টির রাতে – পর্ব ৩","excerpt":"পর্ব ৩","category":"Forbidden","tags":["Romance"],"type":"text","series":"Bhabhi Devar Rain","episode":3,"date":"2026-08-02","readTime":"12 min","language":"bn","content":""}]
