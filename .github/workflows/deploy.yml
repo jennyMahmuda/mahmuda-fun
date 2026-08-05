@@ -41,12 +41,17 @@ jobs:
           mkdir -p _site
           cp index.html _site/
           cp privacy-policy.html _site/ 2>/dev/null || true
+          cp video.html _site/ 2>/dev/null || true
+          cp gallery.html _site/ 2>/dev/null || true
           cp sitemap.xml _site/ 2>/dev/null || true
           cp robots.txt _site/ 2>/dev/null || true
           cp CNAME _site/ 2>/dev/null || echo "mahmuda.fun" > _site/CNAME
           cp -r assets _site/
           cp -r stories _site/
           [ -f README.md ] && cp README.md _site/ || true
+          # also copy any media if present
+          [ -d video-slides ] && cp -r video-slides _site/ || true
+          [ -f university-madam-teaser.mp4 ] && cp university-madam-teaser.mp4 _site/ || true
           echo "--- _site contents ---"
           find _site -type f | sort
 
