@@ -80,6 +80,158 @@
     return out;
   }
 
+  async function ensureContent(id) {
+    if (contentCache[id]) return contentCache[id];
+    var story = allStories.find(function (s) { return s.id === id; });
+    if (story && story.content && String(story.content).length > 120) {
+      contentCache[id] = story.content;
+      return story.content;
+    }
+    try {
+      var r = await fetch('stories/' + id + '.json', { cache: 'no-store' });
+      if (r.ok) {
+        var full = await r.json();
+        contentCache[id] = full.content || '';
+        if (story) story.content = contentCache[id];
+        return contentCache[id];
+      }
+    } catch (err) {}
+    return story ? (story.content || '') : '';
+  }
+
+  function getFiltered() {
+    if (currentFilter === 'all') return allStories;
+    if (currentFilter === 'series') return allStories.filter(function (s) { return s.series; });
+    return allStories.filter(function (s) { return (s.type || 'text') === currentFilter; });
+  }
+
+  function typeIcon(t) {
+    if (t === 'audio') return '♪';
+    if (t === 'video') return '▶';
+    return '✎';
+  }
+
+  function typeLabel(t) {
+    if (t === 'audio') return 'Audio';
+    if (t === 'video') return 'Video';
+    return 'Text';
+  }
+
+  function renderFeed() {
+    if (!feedEl) return;
+    var list = getFiltered();
+    if (!list.length) {
+      feedEl.innerHTML = '<div class="loading-state"><p>কোনো স্টোরি নেই। একটু পর আবার চেষ্টা করুন।</p></div>';
+      if (feedEnd) feedEnd.hidden = true;
+      return;
+    }
+
+    feedEl.innerHTML = list.map(function (story) {
+      var t = story.type || 'text';
+      var openClass = expandedId === story.id ? ' expanded' : '';
+      var badge = story.series
+        ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
+        : '<span class="feed-type-badge">' + typeLabel(t) + '</span>';
+      var label = escapeHtml((story.category || 'Story').toUpperCase());
+      var body = expandedId === story.id ? (contentCache[story.id] || story.content || '<p>লোড হচ্ছে…</p>') : '';
+      var nextBtn = '';
+      if (story.nextEpisodeId) {
+        nextBtn = '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>';
+      }
+      return (
+        '<article class="feed-card' + openClass + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '">' +
+          '<div class="feed-card-header">' +
+            '<div class="feed-avatar">N</div>' +
+            '<div class="feed-meta">' +
+              '<div class="feed-author">Nights</div>' +
+              '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
+            '</div>' +
+            badge +
+          '</div>' +
+          '<h3 class="feed-title">' + escapeHtml(story.title) + '</h3>' +
+          '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>' +
+          '<div class="feed-full-content">' + body + '</div>' +
+          '<div class="feed-actions">' +
+            '<button class="read-more-btn">' + (expandedId === story.id ? 'বন্ধ করুন' : 'আরও পড়ুন') + '</button>' +
+            nextBtn +
+          '</div>' +
+          '<div class="feed-tags">' +
+            (story.tags || []).map(function (tg) {
+              return '<span class="feed-tag">#' + escapeHtml(tg) + '</span>';
+            }).join('') +
+            (story.category ? '<span class="feed-tag">#' + escapeHtml(story.category) + '</span>' : '') +
+          '</div>' +
+        '</article>'
+      );
+    }).join('');
+
+    feedEl.querySelectorAll('.read-more-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.feed-card');
+        if (!card) return;
+        toggleExpand(card.getAttribute('data-id'));
+      });
+    });
+
+    feedEl.querySelectorAll('.inline-next').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var nid = btn.getAttribute('data-next');
+        if (nid) toggleExpand(nid);
+      });
+    });
+
+    if (feedEnd) feedEnd.hidden = false;
+    if (window.NightsAds) window.NightsAds.onFeedRendered(feedEl);
+
+    if (expandedId) {
+      ensureContent(expandedId).then(function (html) {
+        var card = feedEl.querySelector('[data-id="' + expandedId + '"]');
+        if (card) {
+          var bodyEl = card.querySelector('.feed-full-content');
+          if (bodyEl) bodyEl.innerHTML = html || '<p>কনটেন্ট পাওয়া যায়নি।</p>';
+        }
+      });
+    }
+  }
+
+  function toggleExpand(id) {
+    if (expandedId === id) {
+      expandedId = null;
+    } else {
+      expandedId = id;
+    }
+    renderFeed();
+    if (expandedId) {
+      var el = document.getElementById('story-' + expandedId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function renderSeries() {
+    if (!seriesGrid) return;
+    var bySeries = {};
+    allStories.forEach(function (s) {
+      if (!s.series) return;
+      if (!bySeries[s.series]) bySeries[s.series] = [];
+      bySeries[s.series].push(s);
+    });
+    var keys = Object.keys(bySeries);
+    if (!keys.length) {
+      seriesGrid.innerHTML = '<p style="color:var(--text-muted)">কোনো সিরিজ নেই।</p>';
+      return;
+    }
+    seriesGrid.innerHTML = keys.map(function (name) {
+      var eps = bySeries[name].sort(function (a, b) { return (a.episode || 0) - (b.episode || 0); });
+      var first = eps[0];
+      return (
+        '<a class="series-card" href="?story=' + encodeURIComponent(first.id) + '">' +
+          '<div class="series-card-title">' + escapeHtml(name) + '</div>' +
+          '<div class="series-card-meta">' + eps.length + ' episodes</div>' +
+        '</a>'
+      );
+    }).join('');
+  }
+
   function renderFooterCats() {
     var listEl = document.getElementById('footerCatsList');
     if (!listEl || !allStories.length) return;
@@ -166,8 +318,31 @@
     });
   }
 
-  // ... rest of original functions (ensureContent, renderFeed, renderSeries, etc.) remain the same
-  // For brevity the full original render logic is preserved in the deployed version via rebuild
+  function openDeepLink() {
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('story');
+    if (id) {
+      currentFilter = 'all';
+      if (feedFilters) {
+        feedFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+        var allBtn = feedFilters.querySelector('[data-filter="all"]');
+        if (allBtn) allBtn.classList.add('active');
+      }
+      toggleExpand(id);
+    }
+  }
+
+  if (feedFilters) {
+    feedFilters.querySelectorAll('.filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        feedFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        expandedId = null;
+        renderFeed();
+      });
+    });
+  }
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -175,6 +350,13 @@
     d.textContent = str;
     return d.innerHTML;
   }
+
+  window.NightsBlog = {
+    loadStories: loadStories,
+    openReader: function (id) { toggleExpand(id); },
+    closeReader: function () { expandedId = null; renderFeed(); },
+    getStories: function () { return allStories; }
+  };
 
   document.addEventListener('DOMContentLoaded', loadStories);
 })();
