@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Nights | Premium Adult Stories – Feed, Series, Audio & Video</title>
 
   <meta name="description" content="Nights – Premium adult stories with text, audio, video & picture+audio. Forbidden romance, intimate fantasy, series episodes. Dark glossy feed like X/Twitter. 18+ only." />
@@ -28,7 +28,6 @@
   <link rel="canonical" href="https://mahmuda.fun" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/ads.css" />
-  <link rel="stylesheet" href="assets/css/pages.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -39,26 +38,23 @@
     "@type": "WebSite",
     "name": "Nights – Premium Adult Stories",
     "url": "https://mahmuda.fun",
-    "description": "Premium adult story platform with text, audio, video and series episodes.",
-    "inLanguage": ["en", "bn"],
-    "audience": { "@type": "Audience", "audienceType": "Adults" }
+    "description": "Premium adult stories with text, audio, video. Dark glossy X-style feed. 18+ only.",
+    "inLanguage": ["en", "bn"]
   }
   </script>
 </head>
 <body>
-  <header class="navbar">
+  <nav class="navbar">
     <div class="nav-container">
-      <a href="index.html" class="logo">
+      <a href="/" class="logo">
         <span class="logo-mark">N</span>
         <span class="logo-text">Nights</span>
       </a>
-      <nav class="nav-links" id="navLinks">
-        <a href="index.html" class="nav-item active">Feed</a>
+      <div class="nav-links" id="navLinks">
+        <a href="/?view=feed" class="nav-item active">Feed</a>
         <a href="video.html" class="nav-item">Video</a>
         <a href="gallery.html" class="nav-item">Gallery</a>
-        <a href="#categories" class="nav-item">Categories</a>
-        <a href="#series" class="nav-item">Series</a>
-      </nav>
+      </div>
       <div class="nav-actions">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
           <span class="icon-moon">☾</span>
@@ -69,125 +65,64 @@
         </button>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <div class="ad-leaderboard-wrap">
-    <div data-ad="leaderboard" class="ad-slot" aria-hidden="true"></div>
-  </div>
-  <div class="ad-mobile-wrap">
-    <div data-ad="mobile-banner" class="ad-slot" aria-hidden="true"></div>
-  </div>
-
-  <div class="ad-sky-wrap" aria-hidden="true">
-    <div data-ad="sky" class="ad-slot"></div>
-  </div>
-
-  <section class="hero hero-compact">
+  <header class="hero hero-compact">
+    <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Premium • Audio • Video • Series</p>
-      <h1 class="hero-title">Enter the Night</h1>
-      <p class="hero-subtitle">Scroll the feed. Read more. Dive deeper.</p>
+      <p class="hero-eyebrow">18+ · Premium Adult Stories</p>
+      <h1 class="hero-title">Nights</h1>
+      <p class="hero-subtitle">Dark glossy feed · Series · Audio · Video</p>
     </div>
-  </section>
+  </header>
 
   <section class="section feed-section" id="feed">
     <div class="container feed-container">
       <div class="feed-header">
-        <h2 class="section-title">Feed</h2>
         <div class="feed-filters" id="feedFilters">
           <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="text">Text</button>
-          <button class="filter-btn" data-filter="audio">Audio</button>
-          <button class="filter-btn" data-filter="video">Video</button>
-          <button class="filter-btn" data-filter="series">Series</button>
+          <button class="filter-btn" data-filter="Forbidden">Forbidden</button>
+          <button class="filter-btn" data-filter="Romance">Romance</button>
+          <button class="filter-btn" data-filter="University">University</button>
         </div>
       </div>
-      <div class="feed" id="storyFeed">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading feed…</p>
-        </div>
-      </div>
-      <div class="feed-end" id="feedEnd" hidden>
-        <p>— End of feed —</p>
+      <div class="feed" id="feed"></div>
+      <div class="loading-state" id="loadingState" style="display:none">
+        <div class="spinner"></div>
+        <p>Loading stories…</p>
       </div>
     </div>
   </section>
-
-  <div class="ad-between-sections">
-    <div data-ad="mid" class="ad-slot" id="adMidSection"></div>
-  </div>
-
-  <section class="section categories-section" id="categories">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Categories</h2>
-        <p class="section-desc">Browse by desire</p>
-      </div>
-      <div class="category-grid" id="categoryGrid">
-        <a href="#" class="category-card" data-cat="romance"><div class="cat-icon">♥</div><h3>Romance</h3><span>Slow burn & connection</span></a>
-        <a href="#" class="category-card" data-cat="forbidden"><div class="cat-icon">◈</div><h3>Forbidden</h3><span>Taboo & tension</span></a>
-        <a href="#" class="category-card" data-cat="fantasy"><div class="cat-icon">✦</div><h3>Fantasy</h3><span>Impossible desires</span></a>
-        <a href="#" class="category-card" data-cat="intimate"><div class="cat-icon">◉</div><h3>Intimate</h3><span>Close & sensual</span></a>
-        <a href="#" class="category-card" data-cat="audio"><div class="cat-icon">♪</div><h3>Audio</h3><span>Listen & feel</span></a>
-        <a href="#" class="category-card" data-cat="series"><div class="cat-icon">▣</div><h3>Series</h3><span>Episode by episode</span></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="series">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Series</h2>
-        <p class="section-desc">Continue the story</p>
-      </div>
-      <div class="series-grid" id="seriesGrid"></div>
-    </div>
-  </section>
-
-  <section class="section about-section" id="about">
-    <div class="container narrow">
-      <h2 class="section-title">About Nights</h2>
-      <p class="about-text">
-        Premium adult stories with text, audio, video and picture+audio.
-        X-style feed. Series with automatic next-episode links.
-        Dark glossy. Day & night. Pure fantasy.
-      </p>
-    </div>
-  </section>
-
-  <div class="reader-modal" id="readerModal" aria-hidden="true">
-    <div class="reader-backdrop" id="readerBackdrop"></div>
-    <div class="reader-panel">
-      <button class="reader-close" id="readerClose" aria-label="Close">×</button>
-      <div class="reader-content" id="readerContent"></div>
-    </div>
-  </div>
 
   <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand"><span class="logo-mark">N</span> Nights</div>
-        <p class="footer-note">Premium Adult Fiction • Audio • Video • Series • 18+ Only • mahmuda.fun</p>
-
-        <!-- Dynamic category / tag links filled by blog.js -->
-        <div class="footer-cats" id="footerCats">
-          <div class="footer-cats-title">Browse by Category & Tag</div>
-          <div class="footer-cats-list" id="footerCatsList"></div>
-        </div>
-
-        <p class="footer-copy">
-          <a href="privacy-policy.html" style="color:var(--text-muted)">Privacy</a> ·
-          <a href="video.html" style="color:var(--text-muted)">Video</a> ·
-          <a href="gallery.html" style="color:var(--text-muted)">Gallery</a> ·
-          © 2026 Nights · mahmuda.fun
-        </p>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-mark">N</span> Nights
       </div>
+      <div class="footer-cats" id="footerCats"></div>
+      <p class="footer-note">18+ only. Stories for mature audiences.</p>
+      <p class="footer-copy">© 2026 Nights · mahmuda.fun</p>
     </div>
   </footer>
 
-  <script src="assets/js/apps.js"></script>
-  <script src="assets/js/ads.js"></script>
   <script src="assets/js/blog.js"></script>
+  <script>
+    (function () {
+      var t = document.getElementById('themeToggle');
+      if (t) t.addEventListener('click', function () {
+        var html = document.documentElement;
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        try { localStorage.setItem('nights-theme', next); } catch (e) {}
+      });
+      try {
+        var saved = localStorage.getItem('nights-theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+      } catch (e) {}
+      var m = document.getElementById('menuToggle');
+      var links = document.getElementById('navLinks');
+      if (m && links) m.addEventListener('click', function () { links.classList.toggle('open'); });
+    })();
+  </script>
 </body>
 </html>

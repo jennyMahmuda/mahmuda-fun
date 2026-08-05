@@ -1,62 +1,54 @@
-/* mahmuda.fun – Ad slots */
-.ad-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 16px auto;
-  max-width: 100%;
-  overflow: hidden;
-}
-.ad-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  opacity: 0.7;
-}
-.ad-leaderboard-wrap {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 12px 0 4px;
-}
-.ad-mobile-wrap {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 8px 0;
-}
-.ad-sky-wrap {
-  position: fixed;
-  top: 100px;
-  right: 12px;
-  z-index: 50;
-  display: none;
-}
-@media (min-width: 1200px) {
-  .ad-sky-wrap { display: block; }
-}
-.feed-ad-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-left: none;
-  border-right: none;
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.reader-ad-slot {
-  margin: 28px auto 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  width: 100%;
-  max-width: 320px;
-}
-.ad-between-sections {
-  display: flex;
-  justify-content: center;
-  padding: 20px 12px;
+.ad-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 16px auto; max-width: 100%; overflow: hidden; }
+.ad-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 6px; opacity: 0.7; }
+.ad-leaderboard-wrap { width: 100%; display: flex; justify-content: center; padding: 12px 0 4px; background: transparent; }
+.ad-mobile-wrap { width: 100%; display: flex; justify-content: center; padding: 8px 0; }
+.reader-ad-slot { margin: 28px auto 12px; padding-top: 16px; border-top: 1px solid var(--border); width: 100%; max-width: 320px; }
+
+/* ========== MOBILE FULL-WIDTH READING FIX ========== */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .feed-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  .feed-section {
+    padding-top: 8px !important;
+  }
+  .feed-card {
+    padding: 16px 16px 20px !important;
+    border-radius: 0 !important;
+  }
+  .feed-card:first-child,
+  .feed-card:last-child,
+  .feed-card:only-child {
+    border-radius: 0 !important;
+  }
+  .feed-full-content {
+    margin-top: 14px;
+    font-size: 1.05rem !important;
+    line-height: 1.85 !important;
+    color: var(--text-primary, #f2f0eb) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .feed-card.expanded .feed-full-content {
+    display: block !important;
+  }
+  .feed-full-content p {
+    margin-bottom: 1.2em;
+  }
+  .feed-full-content a {
+    color: var(--accent, #c9a87c);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .nav-container {
+    padding: 0 16px !important;
+  }
 }
