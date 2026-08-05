@@ -1,6 +1,8 @@
 /**
- * Nights – Feed engine
- * Inline expand reading (no popup) · all stories from index.json
+ * Nights – Feed
+ * - All stories from index / individual JSON
+ * - Full text on expand (no popup)
+ * - CSS decor, no heavy images
  */
 (function () {
   'use strict';
@@ -13,18 +15,23 @@
   let allStories = [];
   let currentFilter = 'all';
   let expandedId = null;
+  const contentCache = {};
 
   async function loadStories() {
     try {
       const res = await fetch('stories/index.json', { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        allStories = Array.isArray(data) ? data : (data.stories || []);
-      } else {
-        allStories = [];
-      }
+      if (!res.ok) throw new Error('index missing');
+      const data = await res.json();
+      allStories = Array.isArray(data) ? data : (data.stories || []);
+      if (!allStories.length) throw new Error('empty');
     } catch (e) {
-      allStories = [];
+      allStories = await loadByIds([
+        'university-madam-eyes',
+        'university-mam-playful',
+        'bristir-rate-ep1',
+        'bristir-rate-ep2',
+        'bristir-rate-ep3'
+      ]);
     }
 
     allStories = allStories.map(function (s) {
@@ -34,8 +41,8 @@
         episode: s.episode != null ? Number(s.episode) : null,
         audio: s.audio || null,
         video: s.video || null,
-        images: s.images || [],
-        cover: s.cover || null
+        images: [],
+        cover: null
       }, s);
     });
 
@@ -48,6 +55,36 @@
     openDeepLink();
   }
 
+  async function loadByIds(ids) {
+    var out = [];
+    for (var i = 0; i < ids.length; i++) {
+      try {
+        var r = await fetch('stories/' + ids[i] + '.json', { cache: 'no-store' });
+        if (r.ok) out.push(await r.json());
+      } catch (err) {}
+    }
+    return out;
+  }
+
+  async function ensureContent(id) {
+    if (contentCache[id]) return contentCache[id];
+    var story = allStories.find(function (s) { return s.id === id; });
+    if (story && story.content && String(story.content).length > 80) {
+      contentCache[id] = story.content;
+      return story.content;
+    }
+    try {
+      var r = await fetch('stories/' + id + '.json', { cache: 'no-store' });
+      if (r.ok) {
+        var full = await r.json();
+        contentCache[id] = full.content || '';
+        if (story) story.content = contentCache[id];
+        return contentCache[id];
+      }
+    } catch (err) {}
+    return (story && story.content) || '<p>লোড হচ্ছে…</p>';
+  }
+
   function getFiltered() {
     if (currentFilter === 'all') return allStories;
     if (currentFilter === 'series') return allStories.filter(function (s) { return s.series; });
@@ -57,12 +94,11 @@
   function typeIcon(type) {
     if (type === 'video') return '▶';
     if (type === 'audio') return '♪';
-    if (type === 'picture-audio') return '◈';
     return '✦';
   }
 
   function buildDecor(story) {
-    var t = (story.type || 'text');
+    var t = story.type || 'text';
     var label = escapeHtml((story.category || 'Story').toUpperCase());
     return (
       '<div class="feed-decor feed-decor-' + t + '" aria-hidden="true">' +
@@ -98,7 +134,7 @@
     var list = getFiltered();
 
     if (!list.length) {
-      feedEl.innerHTML = '<div class="loading-state"><p>কোনো স্টোরি নেই এই ফিল্টারে।</p></div>';
+      feedEl.innerHTML = '<div class="loading-state"><p>কোনো স্টোরি নেই। একটু পর আবার চেষ্টা করুন।</p></div>';
       if (feedEnd) feedEnd.hidden = true;
       return;
     }
@@ -109,18 +145,30 @@
         ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
         : '<span class="feed-type-badge">' + typeLabel + '</span>';
 
-      var next = findNextEpisode(story);
-      var nextHtml = '';
-      if (next) {
-        nextHtml =
-          '<button type="button" class="inline-next" data-next="' + escapeHtml(next.id) + '">' +
-          'পরের পর্ব → ' + escapeHtml(next.title) +
-          '</button>';
-      }
-
       var isOpen = expandedId === story.id;
       var openClass = isOpen ? ' expanded' : '';
-      var btnLabel = isOpen ? '↑ সংক্ষেপ' : 'Read more →';
+      var btnLabel = isOpen ? '↑ বন্ধ করুন' : 'সম্পূর্ণ পড়ুন →';
+
+      var body = '';
+      if (isOpen) {
+        body =
+          buildMediaInline(story) +
+          '<div class="story-body" data-body-for="' + escapeHtml(story.id) + '">' +
+            (contentCache[story.id] || story.content || '<p class="loading-inline">পড়া হচ্ছে…</p>') +
+          '</div>';
+        var next = findNextEpisode(story);
+        if (next) {
+          body +=
+            '<button type="button" class="inline-next" data-next="' + escapeHtml(next.id) + '">' +
+            'পরের পর্ব → ' + escapeHtml(next.title) +
+            '</button>';
+        }
+        body +=
+          '<div class="feed-extra-links">' +
+            (story.type === 'video' ? '<a href="video.html">সব ভিডিও →</a> ' : '') +
+            '<a href="gallery.html">Gallery →</a>' +
+          '</div>';
+      }
 
       return (
         '<article class="feed-card' + openClass + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '">' +
@@ -135,15 +183,7 @@
           buildDecor(story) +
           '<h3 class="feed-title">' + escapeHtml(story.title) + '</h3>' +
           '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>' +
-          '<div class="feed-full-content">' +
-            buildMediaInline(story) +
-            '<div class="story-body">' + (story.content || '<p>শীঘ্রই আসছে…</p>') + '</div>' +
-            nextHtml +
-            '<div class="feed-extra-links">' +
-              (story.type === 'video' ? '<a href="video.html">সব ভিডিও →</a>' : '') +
-              '<a href="gallery.html">Gallery →</a>' +
-            '</div>' +
-          '</div>' +
+          '<div class="feed-full-content">' + body + '</div>' +
           '<div class="feed-actions">' +
             '<button type="button" class="read-more-btn" data-id="' + escapeHtml(story.id) + '">' + btnLabel + '</button>' +
           '</div>' +
@@ -167,14 +207,10 @@
 
     feedEl.querySelectorAll('.feed-card').forEach(function (card) {
       card.addEventListener('click', function (e) {
-        if (e.target.closest('.read-more-btn')) return;
-        if (e.target.closest('a')) return;
-        if (e.target.closest('audio')) return;
-        if (e.target.closest('video')) return;
-        if (e.target.closest('.inline-next')) return;
-        if (!card.classList.contains('expanded')) {
-          toggleExpand(card.dataset.id);
-        }
+        if (e.target.closest('.read-more-btn') || e.target.closest('a') ||
+            e.target.closest('audio') || e.target.closest('video') ||
+            e.target.closest('.inline-next')) return;
+        if (!card.classList.contains('expanded')) toggleExpand(card.dataset.id);
       });
     });
 
@@ -185,56 +221,53 @@
         var nid = btn.getAttribute('data-next');
         if (nid) {
           toggleExpand(nid);
-          var el = document.getElementById('story-' + nid);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setTimeout(function () {
+            var el = document.getElementById('story-' + nid);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
         }
       });
     });
 
     if (feedEnd) feedEnd.hidden = false;
     if (window.NightsAds) window.NightsAds.onFeedRendered(feedEl);
+
+    if (expandedId) {
+      ensureContent(expandedId).then(function (html) {
+        var box = feedEl.querySelector('[data-body-for="' + expandedId + '"]');
+        if (box) box.innerHTML = html;
+      });
+    }
   }
 
   function toggleExpand(id) {
     if (expandedId === id) {
       expandedId = null;
-    } else {
-      expandedId = id;
+      renderFeed();
+      try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+      return;
     }
+    expandedId = id;
     renderFeed();
-    if (expandedId) {
-      var el = document.getElementById('story-' + expandedId);
-      if (el) {
-        setTimeout(function () {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 50);
-      }
-      try {
-        history.replaceState(null, '', '?story=' + encodeURIComponent(expandedId));
-      } catch (e) {}
-    } else {
-      try {
-        history.replaceState(null, '', window.location.pathname);
-      } catch (e) {}
-    }
+    ensureContent(id).then(function (html) {
+      var box = document.querySelector('[data-body-for="' + id + '"]');
+      if (box) box.innerHTML = html;
+    });
+    setTimeout(function () {
+      var el = document.getElementById('story-' + id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+    try {
+      history.replaceState(null, '', '?story=' + encodeURIComponent(id));
+    } catch (e) {}
   }
 
   function openDeepLink() {
     try {
-      var params = new URLSearchParams(window.location.search);
-      var id = params.get('story');
+      var id = new URLSearchParams(window.location.search).get('story');
       if (!id) return;
-      var match = allStories.find(function (s) {
-        return s.id === id || s.slug === id;
-      });
-      if (match) {
-        expandedId = match.id;
-        renderFeed();
-        setTimeout(function () {
-          var el = document.getElementById('story-' + match.id);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-      }
+      var match = allStories.find(function (s) { return s.id === id || s.slug === id; });
+      if (match) toggleExpand(match.id);
     } catch (e) {}
   }
 
@@ -265,7 +298,6 @@
         '</div>'
       );
     }).join('');
-
     seriesGrid.querySelectorAll('.series-card').forEach(function (card) {
       card.addEventListener('click', function () {
         var id = card.getAttribute('data-first');
@@ -276,12 +308,7 @@
           var allBtn = feedFilters.querySelector('[data-filter="all"]');
           if (allBtn) allBtn.classList.add('active');
         }
-        expandedId = id;
-        renderFeed();
-        setTimeout(function () {
-          var el = document.getElementById('story-' + id);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 80);
+        toggleExpand(id);
       });
     });
   }
