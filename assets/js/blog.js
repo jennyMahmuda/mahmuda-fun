@@ -1,6 +1,7 @@
 /**
  * Nights – Feed + Media + Series Engine
  * X-style scrolling feed, Read More, Audio/Video, Episode linking
+ * Ads: NightsAds.onFeedRendered / onReaderOpen
  */
 (function () {
   'use strict';
@@ -81,38 +82,39 @@
         const data = await res.json();
         allStories = Array.isArray(data) ? data : (data.stories || []);
       } else allStories = SAMPLE;
-    } catch { allStories = SAMPLE; }
-    allStories = allStories.map(s => ({
-      type: s.type || 'text',
-      series: s.series || null,
-      episode: s.episode != null ? Number(s.episode) : null,
-      audio: s.audio || null,
-      video: s.video || null,
-      images: s.images || [],
-      ...s
-    }));
+    } catch (e) { allStories = SAMPLE; }
+    allStories = allStories.map(function (s) {
+      return Object.assign({
+        type: s.type || 'text',
+        series: s.series || null,
+        episode: s.episode != null ? Number(s.episode) : null,
+        audio: s.audio || null,
+        video: s.video || null,
+        images: s.images || []
+      }, s);
+    });
     renderFeed();
     renderSeries();
   }
 
   function getFiltered() {
     if (currentFilter === 'all') return allStories;
-    if (currentFilter === 'series') return allStories.filter(s => s.series);
-    return allStories.filter(s => (s.type || 'text') === currentFilter);
+    if (currentFilter === 'series') return allStories.filter(function (s) { return s.series; });
+    return allStories.filter(function (s) { return (s.type || 'text') === currentFilter; });
   }
 
   function renderFeed() {
     if (!feedEl) return;
-    const list = getFiltered();
+    var list = getFiltered();
     if (!list.length) {
       feedEl.innerHTML = '<div class="loading-state"><p>No stories in this filter.</p></div>';
       if (feedEnd) feedEnd.hidden = true;
       return;
     }
-    feedEl.innerHTML = list.map(story => {
-      const mediaHtml = buildMediaPreview(story);
-      const typeLabel = (story.type || 'text').toUpperCase();
-      const seriesBadge = story.series
+    feedEl.innerHTML = list.map(function (story) {
+      var mediaHtml = buildMediaPreview(story);
+      var typeLabel = (story.type || 'text').toUpperCase();
+      var seriesBadge = story.series
         ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
         : '<span class="feed-type-badge">' + typeLabel + '</span>';
       return '<article class="feed-card" data-id="' + story.id + '">' +
@@ -126,21 +128,24 @@
         mediaHtml +
         '<div class="feed-actions"><button class="read-more-btn" data-id="' + story.id + '">Read more →</button></div>' +
         '<div class="feed-tags">' +
-        (story.tags || []).map(t => '<span class="feed-tag"><a href="#" data-cat="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</a></span>').join('') +
+        (story.tags || []).map(function (t) {
+          return '<span class="feed-tag"><a href="#" data-cat="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</a></span>';
+        }).join('') +
         (story.category ? '<span class="feed-tag"><a href="#" data-cat="' + escapeHtml(story.category) + '">#' + escapeHtml(story.category) + '</a></span>' : '') +
         '</div></article>';
     }).join('');
 
-    feedEl.querySelectorAll('.read-more-btn').forEach(btn => {
-      btn.addEventListener('click', e => { e.stopPropagation(); openReader(btn.dataset.id); });
+    feedEl.querySelectorAll('.read-more-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) { e.stopPropagation(); openReader(btn.dataset.id); });
     });
-    feedEl.querySelectorAll('.feed-card').forEach(card => {
-      card.addEventListener('click', e => {
+    feedEl.querySelectorAll('.feed-card').forEach(function (card) {
+      card.addEventListener('click', function (e) {
         if (e.target.closest('.read-more-btn') || e.target.closest('a') || e.target.closest('audio') || e.target.closest('video')) return;
         openReader(card.dataset.id);
       });
     });
     if (feedEnd) feedEnd.hidden = false;
+    if (window.NightsAds) window.NightsAds.onFeedRendered(feedEl);
   }
 
   function buildMediaPreview(story) {
@@ -152,46 +157,56 @@
   }
 
   function buildMediaFull(story) {
-    let html = '';
+    var html = '';
     if (story.video) html += '<div class="reader-media"><video controls src="' + escapeHtml(story.video) + '"></video></div>';
     if (story.audio) html += '<div class="reader-media"><audio controls src="' + escapeHtml(story.audio) + '"></audio></div>';
-    if (story.images && story.images.length) story.images.forEach(img => { html += '<div class="reader-media"><img src="' + escapeHtml(img) + '" alt="" /></div>'; });
+    if (story.images && story.images.length) story.images.forEach(function (img) {
+      html += '<div class="reader-media"><img src="' + escapeHtml(img) + '" alt="" /></div>';
+    });
     else if (story.cover) html += '<div class="reader-media"><img src="' + escapeHtml(story.cover) + '" alt="" /></div>';
     return html;
   }
 
   function findNextEpisode(story) {
     if (!story.series || story.episode == null) return null;
-    const nextNum = Number(story.episode) + 1;
-    return allStories.find(s => s.series === story.series && Number(s.episode) === nextNum) || null;
+    var nextNum = Number(story.episode) + 1;
+    return allStories.find(function (s) {
+      return s.series === story.series && Number(s.episode) === nextNum;
+    }) || null;
   }
 
   function getRelated(story, limit) {
     limit = limit || 4;
-    return allStories.filter(s => s.id !== story.id && (
-      s.category === story.category ||
-      (story.tags || []).some(t => (s.tags || []).includes(t)) ||
-      (story.series && s.series === story.series)
-    )).slice(0, limit);
+    return allStories.filter(function (s) {
+      return s.id !== story.id && (
+        s.category === story.category ||
+        (story.tags || []).some(function (t) { return (s.tags || []).indexOf(t) !== -1; }) ||
+        (story.series && s.series === story.series)
+      );
+    }).slice(0, limit);
   }
 
   function openReader(id) {
-    const story = allStories.find(s => s.id === id);
+    var story = allStories.find(function (s) { return s.id === id; });
     if (!story || !readerModal || !readerContent) return;
-    const next = findNextEpisode(story);
-    const related = getRelated(story);
-    let nextHtml = '';
+    var next = findNextEpisode(story);
+    var related = getRelated(story);
+    var nextHtml = '';
     if (next) {
       nextHtml = '<a href="#" class="next-episode" data-id="' + next.id + '">' +
         '<span>Next Episode → ' + escapeHtml(next.title) + '</span><span class="arrow">→</span></a>';
     }
-    let relatedHtml = '';
+    var relatedHtml = '';
     if (related.length || story.category) {
       relatedHtml = '<div class="related-section"><h3>Related</h3><div class="related-cats">' +
         (story.category ? '<a href="#" class="related-cat" data-cat="' + escapeHtml(story.category) + '">#' + escapeHtml(story.category) + '</a>' : '') +
-        (story.tags || []).map(t => '<a href="#" class="related-cat" data-cat="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</a>').join('') +
+        (story.tags || []).map(function (t) {
+          return '<a href="#" class="related-cat" data-cat="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</a>';
+        }).join('') +
         '</div><div class="related-stories">' +
-        related.map(r => '<div class="related-item" data-id="' + r.id + '"><strong>' + escapeHtml(r.title) + '</strong><span>' + (r.category || '') + ' · ' + (r.readTime || '') + '</span></div>').join('') +
+        related.map(function (r) {
+          return '<div class="related-item" data-id="' + r.id + '"><strong>' + escapeHtml(r.title) + '</strong><span>' + (r.category || '') + ' · ' + (r.readTime || '') + '</span></div>';
+        }).join('') +
         '</div></div>';
     }
     readerContent.innerHTML =
@@ -202,10 +217,14 @@
       '<div class="reader-body">' + (story.content || '<p>Content coming soon.</p>') + '</div>' +
       nextHtml + relatedHtml;
 
-    readerContent.querySelectorAll('.next-episode, .related-item').forEach(el => {
-      el.addEventListener('click', e => { e.preventDefault(); if (el.dataset.id) openReader(el.dataset.id); });
+    readerContent.querySelectorAll('.next-episode, .related-item').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (el.dataset.id) openReader(el.dataset.id);
+      });
     });
     readerModal.classList.add('open');
+    if (window.NightsAds) window.NightsAds.onReaderOpen(readerContent);
     readerModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
   }
@@ -219,39 +238,42 @@
 
   function renderSeries() {
     if (!seriesGrid) return;
-    const map = {};
-    allStories.forEach(s => {
+    var map = {};
+    allStories.forEach(function (s) {
       if (!s.series) return;
       if (!map[s.series]) map[s.series] = { title: s.series, episodes: [], category: s.category };
       map[s.series].episodes.push(s);
     });
-    const seriesList = Object.values(map).map(s => {
-      s.episodes.sort((a, b) => (a.episode || 0) - (b.episode || 0));
+    var seriesList = Object.keys(map).map(function (k) {
+      var s = map[k];
+      s.episodes.sort(function (a, b) { return (a.episode || 0) - (b.episode || 0); });
       return s;
     });
     if (!seriesList.length) {
       seriesGrid.innerHTML = '<p style="color:var(--text-muted);text-align:center">No series yet.</p>';
       return;
     }
-    seriesGrid.innerHTML = seriesList.map(s =>
-      '<div class="series-card" data-series="' + escapeHtml(s.title) + '">' +
-      '<h3>' + escapeHtml(s.title) + '</h3>' +
-      '<div class="ep-count">' + s.episodes.length + ' episode' + (s.episodes.length > 1 ? 's' : '') + '</div>' +
-      '<p>' + escapeHtml(s.category || '') + ' · Start from Ep 1</p></div>'
-    ).join('');
-    seriesGrid.querySelectorAll('.series-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const name = card.dataset.series;
-        const first = allStories.filter(s => s.series === name).sort((a, b) => (a.episode || 0) - (b.episode || 0))[0];
+    seriesGrid.innerHTML = seriesList.map(function (s) {
+      return '<div class="series-card" data-series="' + escapeHtml(s.title) + '">' +
+        '<h3>' + escapeHtml(s.title) + '</h3>' +
+        '<div class="ep-count">' + s.episodes.length + ' episode' + (s.episodes.length > 1 ? 's' : '') + '</div>' +
+        '<p>' + escapeHtml(s.category || '') + ' · Start from Ep 1</p></div>';
+    }).join('');
+    seriesGrid.querySelectorAll('.series-card').forEach(function (card) {
+      card.addEventListener('click', function () {
+        var name = card.dataset.series;
+        var first = allStories.filter(function (s) { return s.series === name; }).sort(function (a, b) {
+          return (a.episode || 0) - (b.episode || 0);
+        })[0];
         if (first) openReader(first.id);
       });
     });
   }
 
   if (feedFilters) {
-    feedFilters.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        feedFilters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    feedFilters.querySelectorAll('.filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        feedFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
         currentFilter = btn.dataset.filter;
         renderFeed();
@@ -264,11 +286,16 @@
 
   function escapeHtml(str) {
     if (!str) return '';
-    const d = document.createElement('div');
+    var d = document.createElement('div');
     d.textContent = str;
     return d.innerHTML;
   }
 
-  window.NightsBlog = { loadStories, openReader, closeReader, getStories: function () { return allStories; } };
+  window.NightsBlog = {
+    loadStories: loadStories,
+    openReader: openReader,
+    closeReader: closeReader,
+    getStories: function () { return allStories; }
+  };
   document.addEventListener('DOMContentLoaded', loadStories);
 })();
