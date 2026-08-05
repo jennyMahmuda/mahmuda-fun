@@ -1,8 +1,6 @@
 /**
  * Nights – Feed
- * - All stories from index / individual JSON
- * - Full text on expand (no popup)
- * - CSS decor, no heavy images
+ * Full text loads from stories/{id}.json when expanding
  */
 (function () {
   'use strict';
@@ -68,21 +66,25 @@
 
   async function ensureContent(id) {
     if (contentCache[id]) return contentCache[id];
-    var story = allStories.find(function (s) { return s.id === id; });
-    if (story && story.content && String(story.content).length > 80) {
-      contentCache[id] = story.content;
-      return story.content;
-    }
+    // Always try individual story file first (has full text)
     try {
       var r = await fetch('stories/' + id + '.json', { cache: 'no-store' });
       if (r.ok) {
         var full = await r.json();
-        contentCache[id] = full.content || '';
-        if (story) story.content = contentCache[id];
-        return contentCache[id];
+        if (full.content && String(full.content).length > 20) {
+          contentCache[id] = full.content;
+          var story = allStories.find(function (s) { return s.id === id; });
+          if (story) story.content = full.content;
+          return full.content;
+        }
       }
     } catch (err) {}
-    return (story && story.content) || '<p>লোড হচ্ছে…</p>';
+    var story = allStories.find(function (s) { return s.id === id; });
+    if (story && story.content && String(story.content).length > 20) {
+      contentCache[id] = story.content;
+      return story.content;
+    }
+    return '<p>গল্প লোড হচ্ছে… একটু অপেক্ষা করে আবার চেষ্টা করুন।</p>';
   }
 
   function getFiltered() {
@@ -154,7 +156,7 @@
         body =
           buildMediaInline(story) +
           '<div class="story-body" data-body-for="' + escapeHtml(story.id) + '">' +
-            (contentCache[story.id] || story.content || '<p class="loading-inline">পড়া হচ্ছে…</p>') +
+            (contentCache[story.id] || story.content || '<p>গল্প লোড হচ্ছে…</p>') +
           '</div>';
         var next = findNextEpisode(story);
         if (next) {
