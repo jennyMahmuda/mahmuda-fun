@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1020"/>
+      <stop offset="100%" stop-color="#0c0810"/>
+    </linearGradient>
+    <linearGradient id="saree3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8a3d72"/>
+      <stop offset="100%" stop-color="#5a2548"/>
+    </linearGradient>
+    <linearGradient id="skin3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#edcbb0"/>
+      <stop offset="100%" stop-color="#dcb094"/>
+    </linearGradient>
+    <radialGradient id="glow3" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#3a2040" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0c0810" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#bg3)"/>
+  <ellipse cx="200" cy="200" rx="160" ry="180" fill="url(#glow3)"/>
+  <ellipse cx="160" cy="220" rx="40" ry="90" fill="#1a1220" opacity="0.4"/>
+  <path d="M130 145 Q105 65 175 55 Q200 45 225 55 Q295 65 270 145 Q285 210 250 255 Q230 205 200 200 Q170 205 150 255 Q115 210 130 145" fill="#1a0e18"/>
+  <path d="M140 150 Q120 85 180 75 Q200 68 220 75 Q280 85 260 150" fill="#2c1628"/>
+  <ellipse cx="200" cy="155" rx="48" ry="58" fill="url(#skin3)"/>
+  <ellipse cx="182" cy="148" rx="8" ry="5" fill="#1a1010"/>
+  <ellipse cx="218" cy="148" rx="8" ry="5" fill="#1a1010"/>
+  <circle cx="184" cy="147" r="2" fill="#f8ead8"/>
+  <circle cx="220" cy="147" r="2" fill="#f8ead8"/>
+  <path d="M188 172 Q200 182 212 172" fill="#b05065"/>
+  <path d="M175 210 Q200 222 225 210 L230 270 Q200 285 170 270 Z" fill="url(#skin3)"/>
+  <path d="M155 255 Q200 270 245 255 L255 350 Q200 375 145 350 Z" fill="#5c2a48"/>
+  <path d="M135 300 Q85 370 105 470 Q200 505 295 470 Q315 370 265 300 Q200 335 135 300" fill="url(#saree3)" opacity="0.9"/>
+  <circle cx="300" cy="120" r="2" fill="#c9a0d0" opacity="0.7"/>
+  <circle cx="310" cy="135" r="1.5" fill="#c9a0d0" opacity="0.5"/>
+  <text x="200" y="485" text-anchor="middle" fill="#9a7aaa" font-size="13" font-family="system-ui">Intimate · Close Gaze</text>
+</svg>

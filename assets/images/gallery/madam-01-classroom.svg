@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1225"/>
+      <stop offset="100%" stop-color="#0d0a12"/>
+    </linearGradient>
+    <linearGradient id="saree1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6b2d5c"/>
+      <stop offset="100%" stop-color="#3d1a35"/>
+    </linearGradient>
+    <linearGradient id="skin1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8c4a8"/>
+      <stop offset="100%" stop-color="#d4a88a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#bg1)"/>
+  <ellipse cx="200" cy="180" rx="120" ry="140" fill="#2a1a30" opacity="0.6"/>
+  <path d="M120 140 Q100 80 160 70 Q200 55 240 70 Q300 80 280 140 Q290 200 270 240 Q250 200 200 195 Q150 200 130 240 Q110 200 120 140" fill="#1a0f18"/>
+  <path d="M130 145 Q115 95 170 85 Q200 75 230 85 Q285 95 270 145" fill="#2a1525"/>
+  <ellipse cx="200" cy="155" rx="52" ry="62" fill="url(#skin1)"/>
+  <ellipse cx="180" cy="148" rx="9" ry="6" fill="#1a1210"/>
+  <ellipse cx="220" cy="148" rx="9" ry="6" fill="#1a1210"/>
+  <circle cx="182" cy="147" r="2.5" fill="#f5e6d3"/>
+  <circle cx="222" cy="147" r="2.5" fill="#f5e6d3"/>
+  <path d="M185 175 Q200 185 215 175" fill="none" stroke="#a84a5c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M175 215 Q200 230 225 215 L235 280 Q200 295 165 280 Z" fill="url(#skin1)"/>
+  <path d="M155 260 Q200 275 245 260 L255 340 Q200 360 145 340 Z" fill="#4a2040"/>
+  <path d="M140 300 Q100 350 120 450 Q200 480 280 450 Q300 350 260 300 Q200 320 140 300" fill="url(#saree1)" opacity="0.95"/>
+  <path d="M160 310 Q200 330 240 310" fill="none" stroke="#8b4a7a" stroke-width="2" opacity="0.5"/>
+  <rect x="30" y="40" width="80" height="50" rx="4" fill="#1e2a22" opacity="0.7"/>
+  <text x="70" y="72" text-anchor="middle" fill="#5a7a6a" font-size="11" font-family="serif">চোখের দেখা</text>
+  <text x="200" y="485" text-anchor="middle" fill="#8a6a9a" font-size="13" font-family="system-ui">Classroom · Eye Contact</text>
+</svg>

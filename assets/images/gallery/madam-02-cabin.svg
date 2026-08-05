@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#15101c"/>
+      <stop offset="100%" stop-color="#0a080f"/>
+    </linearGradient>
+    <linearGradient id="saree2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7a3568"/>
+      <stop offset="100%" stop-color="#4a1f40"/>
+    </linearGradient>
+    <linearGradient id="skin2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ebc9ad"/>
+      <stop offset="100%" stop-color="#d9ad90"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#bg2)"/>
+  <ellipse cx="200" cy="190" rx="130" ry="150" fill="#221830" opacity="0.5"/>
+  <rect x="60" y="30" width="12" height="200" fill="#2a2035" opacity="0.6"/>
+  <rect x="328" y="30" width="12" height="200" fill="#2a2035" opacity="0.6"/>
+  <path d="M115 150 Q90 70 165 60 Q200 48 235 60 Q310 70 285 150 Q300 220 265 260 Q240 210 200 205 Q160 210 135 260 Q100 220 115 150" fill="#1c101c"/>
+  <path d="M125 155 Q105 90 175 80 Q200 72 225 80 Q295 90 275 155" fill="#2e1828"/>
+  <ellipse cx="198" cy="158" rx="50" ry="60" fill="url(#skin2)"/>
+  <ellipse cx="178" cy="150" rx="8" ry="5.5" fill="#1a1210"/>
+  <ellipse cx="218" cy="150" rx="8" ry="5.5" fill="#1a1210"/>
+  <path d="M170 168 Q198 178 226 168" fill="none" stroke="#b85a6c" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M172 215 Q198 228 224 215 L232 275 Q198 290 164 275 Z" fill="url(#skin2)"/>
+  <path d="M148 255 Q198 272 248 255 L258 345 Q198 370 138 345 Z" fill="#552848"/>
+  <path d="M130 310 Q80 380 110 470 Q200 500 290 470 Q320 380 270 310 Q198 340 130 310" fill="url(#saree2)"/>
+  <circle cx="340" cy="80" r="14" fill="none" stroke="#6a4a7a" stroke-width="2"/>
+  <rect x="333" y="80" width="14" height="12" rx="2" fill="#6a4a7a" opacity="0.7"/>
+  <text x="200" y="485" text-anchor="middle" fill="#8a6a9a" font-size="13" font-family="system-ui">Cabin · Locked Door</text>
+</svg>
