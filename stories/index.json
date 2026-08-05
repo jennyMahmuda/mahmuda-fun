@@ -1,1 +1,18 @@
-PLACEHOLDER
+[
+  {
+    "id": "senior-apu-ep01",
+    "title": "সিনিয়র আপু · পর্ব ১ · নিয়মের প্রথম কথা",
+    "slug": "senior-apu-ep01",
+    "excerpt": "লাইব্রেরির নির্জন কর্নার। সানজিদা আপুর চোখে খেলা। রাফির বুকের ভিতর ঝড়। এবং একটা নিয়ম যা সবকিছু বদলে দিল—বয়স ম্যাটার করে না, কিন্তু ইমোশন নয়। শুধু কেমিস্ট্রি।",
+    "category": "Forbidden",
+    "tags": ["University", "Senior", "Junior", "Teasing", "Chemistry", "Tension"],
+    "type": "text",
+    "series": "Senior Apu",
+    "episode": 1,
+    "date": "2026-08-05",
+    "readTime": "14 min",
+    "language": "bn",
+    "content": "<p>placeholder for length - full content is in senior-apu-ep01.json</p>",
+    "nextEpisodeId": "senior-apu-ep02"
+  }
+]
