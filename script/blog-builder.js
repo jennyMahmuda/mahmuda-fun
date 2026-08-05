@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
  * Nights Blog Builder v2
- * Markdown → JSON with Series / Episode support
- * Auto-detects next episode and sets nextEpisodeId
+ * Markdown → JSON + auto sitemap.xml / robots.txt
  */
 const fs = require('fs');
 const path = require('path');
@@ -10,9 +9,12 @@ const ROOT = path.resolve(__dirname, '..');
 const SOURCE_DIR = path.join(ROOT, 'story-post');
 const OUTPUT_DIR = path.join(ROOT, 'stories');
 const INDEX_FILE = path.join(OUTPUT_DIR, 'index.json');
+const SITEMAP_FILE = path.join(ROOT, 'sitemap.xml');
+const ROBOTS_FILE = path.join(ROOT, 'robots.txt');
+const SITE_URL = 'https://mahmuda.fun';
 
 function mdToHtml(md) {
-  let html = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let html = md.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
@@ -21,7 +23,7 @@ function mdToHtml(md) {
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
   html = html.replace(/^---$/gm, '<hr />');
-  html = html.split(/\n{2,}/).map(block => {
+  html = html.split(/\n{2,}/).map(function (block) {
     block = block.trim();
     if (!block) return '';
     if (block.startsWith('<h') || block.startsWith('<hr')) return block;
@@ -34,17 +36,19 @@ function parseFrontMatter(raw) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return { meta: {}, body: raw };
   const meta = {};
-  match[1].split(/\r?\n/).forEach(line => {
+  match[1].split(/\r?\n/).forEach(function (line) {
     const m = line.match(/^(\w+):\s*(.+)$/);
     if (m) {
       let val = m[2].trim();
       if (val.startsWith('[') && val.endsWith(']')) {
-        val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^["']|["']$/g, ''));
+        val = val.slice(1, -1).split(',').map(function (s) {
+          return s.trim().replace(/^["']|["']$/g, '');
+        });
       } else val = val.replace(/^["']|["']$/g, '');
       meta[m[1]] = val;
     }
   });
-  return { meta, body: match[2] };
+  return { meta: meta, body: match[2] };
 }
 
 function slugify(text) {
@@ -55,15 +59,60 @@ function estimateReadTime(text) {
   return Math.max(1, Math.ceil(text.split(/\s+/).length / 200)) + ' min';
 }
 
+function escapeXml(str) {
+  return String(str || '')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
+    .replace(/'/g, ''');
+}
+
+function writeSitemap(stories) {
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = [];
+  urls.push({ loc: SITE_URL + '/', lastmod: today, changefreq: 'daily', priority: '1.0' });
+  urls.push({ loc: SITE_URL + '/index.html', lastmod: today, changefreq: 'daily', priority: '1.0' });
+  urls.push({ loc: SITE_URL + '/privacy-policy.html', lastmod: today, changefreq: 'monthly', priority: '0.3' });
+  (stories || []).forEach(function (s) {
+    const slug = s.id || s.slug;
+    urls.push({
+      loc: SITE_URL + '/?story=' + encodeURIComponent(slug),
+      lastmod: (s.date || today).slice(0, 10),
+      changefreq: 'weekly',
+      priority: '0.8'
+    });
+  });
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  urls.forEach(function (u) {
+    xml += '  <url>\n';
+    xml += '    <loc>' + escapeXml(u.loc) + '</loc>\n';
+    xml += '    <lastmod>' + u.lastmod + '</lastmod>\n';
+    xml += '    <changefreq>' + u.changefreq + '</changefreq>\n';
+    xml += '    <priority>' + u.priority + '</priority>\n';
+    xml += '  </url>\n';
+  });
+  xml += '</urlset>\n';
+  fs.writeFileSync(SITEMAP_FILE, xml, 'utf8');
+  console.log('✓ sitemap.xml (' + urls.length + ' URLs)');
+  const robots = 'User-agent: *\nAllow: /\n\nSitemap: ' + SITE_URL + '/sitemap.xml\n';
+  fs.writeFileSync(ROBOTS_FILE, robots, 'utf8');
+  console.log('✓ robots.txt');
+}
+
 function buildStory(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8');
-  const { meta, body } = parseFrontMatter(raw);
+  const parsed = parseFrontMatter(raw);
+  const meta = parsed.meta;
+  const body = parsed.body;
   const htmlContent = mdToHtml(body);
   const baseName = path.basename(filePath, path.extname(filePath));
   const id = meta.id || baseName;
   const title = meta.title || baseName.replace(/[-_]/g, ' ');
   const story = {
-    id, title,
+    id: id,
+    title: title,
     slug: meta.slug || slugify(title),
     excerpt: meta.excerpt || body.substring(0, 160).replace(/\n/g, ' ').trim() + '…',
     category: meta.category || 'Story',
@@ -88,13 +137,14 @@ function buildStory(filePath) {
 
 function linkEpisodes(stories) {
   const bySeries = {};
-  stories.forEach(s => {
+  stories.forEach(function (s) {
     if (!s.series || s.episode == null) return;
     if (!bySeries[s.series]) bySeries[s.series] = [];
     bySeries[s.series].push(s);
   });
-  Object.values(bySeries).forEach(eps => {
-    eps.sort((a, b) => a.episode - b.episode);
+  Object.keys(bySeries).forEach(function (k) {
+    const eps = bySeries[k];
+    eps.sort(function (a, b) { return a.episode - b.episode; });
     for (let i = 0; i < eps.length - 1; i++) {
       eps[i].nextEpisodeId = eps[i + 1].id;
       fs.writeFileSync(path.join(OUTPUT_DIR, eps[i].id + '.json'), JSON.stringify(eps[i], null, 2), 'utf8');
@@ -103,31 +153,37 @@ function linkEpisodes(stories) {
 }
 
 function build() {
-  console.log('\n🌙 Nights Blog Builder v2 (Series + Media)\n');
+  console.log('\n🌙 Nights Blog Builder v2 (Series + Sitemap)\n');
   if (!fs.existsSync(SOURCE_DIR)) fs.mkdirSync(SOURCE_DIR, { recursive: true });
   if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-  const files = fs.readdirSync(SOURCE_DIR).filter(f => f.endsWith('.md') || f.endsWith('.markdown'));
+  const files = fs.readdirSync(SOURCE_DIR).filter(function (f) {
+    return f.endsWith('.md') || f.endsWith('.markdown');
+  });
   const stories = [];
   console.log('Building:');
-  files.forEach(file => {
+  files.forEach(function (file) {
     try { stories.push(buildStory(path.join(SOURCE_DIR, file))); }
     catch (err) { console.error('  ✗ ' + file + ': ' + err.message); }
   });
   linkEpisodes(stories);
-  stories.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  stories.sort(function (a, b) { return (b.date || '').localeCompare(a.date || ''); });
   fs.writeFileSync(INDEX_FILE, JSON.stringify(stories, null, 2), 'utf8');
   console.log('\n✓ stories/index.json (' + stories.length + ' stories)');
-  console.log('  Series episodes auto-linked.\nDone.\n');
+  writeSitemap(stories);
+  console.log('Done.\n');
 }
 
 function watch() {
   build();
   console.log('Watching story-post/ …\n');
-  fs.watch(SOURCE_DIR, { recursive: false }, (e, f) => {
-    if (f && (f.endsWith('.md') || f.endsWith('.markdown'))) { console.log('Changed: ' + f); build(); }
+  fs.watch(SOURCE_DIR, { recursive: false }, function (e, f) {
+    if (f && (f.endsWith('.md') || f.endsWith('.markdown'))) {
+      console.log('Changed: ' + f);
+      build();
+    }
   });
 }
 
 const args = process.argv.slice(2);
-if (args.includes('--watch') || args.includes('-w')) watch();
+if (args.indexOf('--watch') !== -1 || args.indexOf('-w') !== -1) watch();
 else build();
