@@ -1,12 +1,12 @@
 # ============================================================
-#  Nights (mahmuda.fun) – Deploy Workflow
+#  Nights (mahmuda.fun) – Auto Build & Deploy Workflow
 # ============================================================
 name: 🌙 Deploy Nights
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main] # main ব্রাঞ্চে পুশ করলেই এটি রান হবে
+  workflow_dispatch: # ম্যানুয়ালি রান করার অপশন
 
 permissions:
   contents: read
@@ -19,67 +19,64 @@ concurrency:
 
 jobs:
   build:
-    name: Build
+    name: Build Stories & Site
     runs-on: ubuntu-latest
     steps:
-      # Using official stable tags to prevent "Action Not Found" crashes.
-      - name: Checkout
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Build stories + sitemap
-        # Removed '|| true' on the node script. 
-        # If the build fails, the action MUST fail so you don't deploy a broken site.
+      - name: 🏗️ Build Stories (MD to JSON) & Sitemap
+        # এই কমান্ডটি আপনার মার্কডাউন ফাইলগুলোকে প্রসেস করে JSON বানাবে
         run: |
           node script/blog-builder.js
-          ls -la stories/ sitemap.xml robots.txt || true
+          echo "Build completed. Verifying generated files..."
+          ls -la stories/ || echo "No stories folder generated!"
 
-      - name: Assemble site
-        # Added conditional checks ([ -f ... ] and [ -d ... ]) to prevent workflow crashes 
-        # if a file or directory is temporarily missing from the repository.
+      - name: 📂 Assemble Static Site
+        # সাইটের সব প্রয়োজনীয় ফাইল _site ফোল্ডারে গুছিয়ে রাখা হচ্ছে
         run: |
           mkdir -p _site
           
-          # Core Files
+          # Core HTML files
           cp index.html _site/
-          [ -f privacy-policy.html ] && cp privacy-policy.html _site/ || true
           [ -f video.html ] && cp video.html _site/ || true
           [ -f gallery.html ] && cp gallery.html _site/ || true
+          [ -f privacy-policy.html ] && cp privacy-policy.html _site/ || true
+          
+          # SEO & Config
           [ -f sitemap.xml ] && cp sitemap.xml _site/ || true
           [ -f robots.txt ] && cp robots.txt _site/ || true
-          
-          # CNAME Generation
           [ -f CNAME ] && cp CNAME _site/ || echo "mahmuda.fun" > _site/CNAME
           
-          # Directories
+          # Directories (CSS, JS, Images, Generated JSON Stories)
           [ -d assets ] && cp -r assets _site/ || true
           [ -d stories ] && cp -r stories _site/ || true
           [ -d video-slides ] && cp -r video-slides _site/ || true
           
-          # Media / Misc
-          [ -f README.md ] && cp README.md _site/ || true
+          # Standalone media if any
           [ -f university-madam-teaser.mp4 ] && cp university-madam-teaser.mp4 _site/ || true
           
-          echo "--- _site contents ---"
-          find _site -type f | sort
+          echo "--- Content of _site directory ---"
+          ls -la _site/
 
-      - name: Upload artifact
+      - name: 📤 Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
   deploy:
-    name: Deploy Pages
+    name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy
+      - name: 🚀 Deploy Site
         id: deployment
         uses: actions/deploy-pages@v4
