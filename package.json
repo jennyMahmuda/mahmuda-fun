@@ -1,0 +1,13 @@
+{
+  "name": "nights-blog",
+  "version": "2.0.0",
+  "description": "Nights Blog (mahmuda.fun) static site generator",
+  "private": true,
+  "scripts": {
+    "build": "node script/blog-builder.js",
+    "watch": "node script/blog-builder.js --watch"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
