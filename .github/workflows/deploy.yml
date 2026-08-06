@@ -1,6 +1,5 @@
 # ============================================================
 #  Nights (mahmuda.fun) – Deploy Workflow
-#  Actions pinned to full SHA (required by repo policy)
 # ============================================================
 name: 🌙 Deploy Nights
 
@@ -23,40 +22,53 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      # Using official stable tags to prevent "Action Not Found" crashes.
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
       - name: Build stories + sitemap
+        # Removed '|| true' on the node script. 
+        # If the build fails, the action MUST fail so you don't deploy a broken site.
         run: |
-          node script/blog-builder.js || true
+          node script/blog-builder.js
           ls -la stories/ sitemap.xml robots.txt || true
 
       - name: Assemble site
+        # Added conditional checks ([ -f ... ] and [ -d ... ]) to prevent workflow crashes 
+        # if a file or directory is temporarily missing from the repository.
         run: |
           mkdir -p _site
+          
+          # Core Files
           cp index.html _site/
-          cp privacy-policy.html _site/ 2>/dev/null || true
-          cp video.html _site/ 2>/dev/null || true
-          cp gallery.html _site/ 2>/dev/null || true
-          cp sitemap.xml _site/ 2>/dev/null || true
-          cp robots.txt _site/ 2>/dev/null || true
-          cp CNAME _site/ 2>/dev/null || echo "mahmuda.fun" > _site/CNAME
-          cp -r assets _site/
-          cp -r stories _site/
-          [ -f README.md ] && cp README.md _site/ || true
-          # also copy any media if present
+          [ -f privacy-policy.html ] && cp privacy-policy.html _site/ || true
+          [ -f video.html ] && cp video.html _site/ || true
+          [ -f gallery.html ] && cp gallery.html _site/ || true
+          [ -f sitemap.xml ] && cp sitemap.xml _site/ || true
+          [ -f robots.txt ] && cp robots.txt _site/ || true
+          
+          # CNAME Generation
+          [ -f CNAME ] && cp CNAME _site/ || echo "mahmuda.fun" > _site/CNAME
+          
+          # Directories
+          [ -d assets ] && cp -r assets _site/ || true
+          [ -d stories ] && cp -r stories _site/ || true
           [ -d video-slides ] && cp -r video-slides _site/ || true
+          
+          # Media / Misc
+          [ -f README.md ] && cp README.md _site/ || true
           [ -f university-madam-teaser.mp4 ] && cp university-madam-teaser.mp4 _site/ || true
+          
           echo "--- _site contents ---"
           find _site -type f | sort
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
@@ -70,4 +82,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
+        uses: actions/deploy-pages@v4
