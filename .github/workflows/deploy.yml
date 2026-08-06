@@ -1,12 +1,12 @@
 # ============================================================
-#  Nights (mahmuda.fun) – Auto Build & Deploy Workflow
+#  Nights – Fully Dynamic Build & Deploy
 # ============================================================
 name: 🌙 Deploy Nights
 
 on:
   push:
-    branches: [main] # main ব্রাঞ্চে পুশ করলেই এটি রান হবে
-  workflow_dispatch: # ম্যানুয়ালি রান করার অপশন
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Stories & Site
+    name: Build & Assemble
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout Repository
@@ -30,41 +30,31 @@ jobs:
         with:
           node-version: "20"
 
-      - name: 🏗️ Build Stories (MD to JSON) & Sitemap
-        # এই কমান্ডটি আপনার মার্কডাউন ফাইলগুলোকে প্রসেস করে JSON বানাবে
+      - name: 🏗️ Convert All Markdown to Stories
         run: |
           node script/blog-builder.js
-          echo "Build completed. Verifying generated files..."
-          ls -la stories/ || echo "No stories folder generated!"
+          echo "Markdown converted dynamically!"
 
-      - name: 📂 Assemble Static Site
-        # সাইটের সব প্রয়োজনীয় ফাইল _site ফোল্ডারে গুছিয়ে রাখা হচ্ছে
+      - name: 📂 Assemble Dynamic Site
         run: |
           mkdir -p _site
           
-          # Core HTML files
-          cp index.html _site/
-          [ -f video.html ] && cp video.html _site/ || true
-          [ -f gallery.html ] && cp gallery.html _site/ || true
-          [ -f privacy-policy.html ] && cp privacy-policy.html _site/ || true
+          # ১. যেকোনো HTML ফাইল অটোমেটিক কপি করবে (index, video, gallery বা নতুন যেকোনো পেজ)
+          cp *.html _site/ 2>/dev/null || true
           
-          # SEO & Config
+          # ২. কনফিগারেশন ফাইল
           [ -f sitemap.xml ] && cp sitemap.xml _site/ || true
           [ -f robots.txt ] && cp robots.txt _site/ || true
           [ -f CNAME ] && cp CNAME _site/ || echo "mahmuda.fun" > _site/CNAME
           
-          # Directories (CSS, JS, Images, Generated JSON Stories)
+          # ৩. ফোল্ডারগুলো কপি করবে
           [ -d assets ] && cp -r assets _site/ || true
           [ -d stories ] && cp -r stories _site/ || true
-          [ -d video-slides ] && cp -r video-slides _site/ || true
           
-          # Standalone media if any
-          [ -f university-madam-teaser.mp4 ] && cp university-madam-teaser.mp4 _site/ || true
-          
-          echo "--- Content of _site directory ---"
-          ls -la _site/
+          # ৪. story-post ফোল্ডারটিও কপি করবে, যাতে এর ভেতরের ছবি/ভিডিওগুলো লাইভ সাইটে কাজ করে
+          [ -d story-post ] && cp -r story-post _site/ || true
 
-      - name: 📤 Upload Pages Artifact
+      - name: 📤 Upload Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
