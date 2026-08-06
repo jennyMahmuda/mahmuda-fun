@@ -1,9 +1,8 @@
 /**
- * Nights – Feed
- * - All stories from index / individual JSON
- * - Full text on expand (no popup)
- * - CSS decor, no heavy images
- * - Robust fallback so feed never empties after deploy
+ * Nights – Feed (Redesigned)
+ * - First story shows FULL content as Hero Post.
+ * - Rest of the stories show in a Grid (Image, Title, Excerpt).
+ * - "Read More" button expands grid items to full story.
  */
 (function () {
   'use strict';
@@ -58,6 +57,7 @@
       }, s);
     });
 
+    // Sort by latest
     allStories.sort(function (a, b) {
       return String(b.date || '').localeCompare(String(a.date || ''));
     });
@@ -105,12 +105,6 @@
     return allStories.filter(function (s) { return (s.type || 'text') === currentFilter; });
   }
 
-  function typeIcon(t) {
-    if (t === 'audio') return '♪';
-    if (t === 'video') return '▶';
-    return '✎';
-  }
-
   function typeLabel(t) {
     if (t === 'audio') return 'Audio';
     if (t === 'video') return 'Video';
@@ -126,45 +120,103 @@
       return;
     }
 
-    feedEl.innerHTML = list.map(function (story) {
-      var t = story.type || 'text';
-      var openClass = expandedId === story.id ? ' expanded' : '';
-      var badge = story.series
-        ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
-        : '<span class="feed-type-badge">' + typeLabel(t) + '</span>';
-      var label = escapeHtml((story.category || 'Story').toUpperCase());
-      var body = expandedId === story.id ? (contentCache[story.id] || story.content || '<p>লোড হচ্ছে…</p>') : '';
-      var nextBtn = '';
-      if (story.nextEpisodeId) {
-        nextBtn = '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>';
-      }
-      return (
-        '<article class="feed-card' + openClass + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '">' +
-          '<div class="feed-card-header">' +
-            '<div class="feed-avatar">N</div>' +
-            '<div class="feed-meta">' +
-              '<div class="feed-author">Nights</div>' +
-              '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
-            '</div>' +
-            badge +
-          '</div>' +
-          '<h3 class="feed-title">' + escapeHtml(story.title) + '</h3>' +
-          '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>' +
-          '<div class="feed-full-content">' + body + '</div>' +
-          '<div class="feed-actions">' +
-            '<button class="read-more-btn">' + (expandedId === story.id ? 'বন্ধ করুন' : 'আরও পড়ুন') + '</button>' +
-            nextBtn +
-          '</div>' +
-          '<div class="feed-tags">' +
-            (story.tags || []).map(function (tg) {
-              return '<span class="feed-tag">#' + escapeHtml(tg) + '</span>';
-            }).join('') +
-            (story.category ? '<span class="feed-tag">#' + escapeHtml(story.category) + '</span>' : '') +
-          '</div>' +
-        '</article>'
-      );
-    }).join('');
+    // 1. Separate First Post (Hero) and Rest of the Posts
+    var heroStory = list[0];
+    var otherStories = list.slice(1);
 
+    var html = '';
+
+    // ==========================================
+    // HERO POST (Always fully expanded)
+    // ==========================================
+    var heroType = heroStory.type || 'text';
+    var heroBadge = heroStory.series
+      ? '<span class="feed-type-badge">' + escapeHtml(heroStory.series) + ' · Ep ' + (heroStory.episode || '?') + '</span>'
+      : '<span class="feed-type-badge">' + typeLabel(heroType) + '</span>';
+
+    var heroCover = heroStory.cover || (heroStory.images && heroStory.images[0]);
+    var heroCoverHtml = heroCover 
+      ? '<div style="width: 100%; height: 350px; overflow: hidden; border-radius: 12px; margin-bottom: 20px;"><img src="' + escapeHtml(heroCover) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Hero Cover"></div>' 
+      : '';
+
+    html += '<div class="hero-section" style="margin-bottom: 50px; border-bottom: 2px solid var(--border-color, #e0e0e0); padding-bottom: 30px;">';
+    html += '<article class="feed-card expanded" data-id="' + escapeHtml(heroStory.id) + '" id="story-' + escapeHtml(heroStory.id) + '" style="border: none; padding: 0; box-shadow: none;">';
+    html += heroCoverHtml;
+    
+    html += '<div class="feed-card-header">' +
+              '<div class="feed-avatar">N</div>' +
+              '<div class="feed-meta">' +
+                '<div class="feed-author">Nights (Featured)</div>' +
+                '<div class="feed-time">' + escapeHtml(heroStory.date || '') + ' · ' + escapeHtml(heroStory.readTime || '') + '</div>' +
+              '</div>' + heroBadge +
+            '</div>';
+            
+    html += '<h1 class="feed-title" style="font-size: 2.2em; margin-bottom: 15px; line-height: 1.3;">' + escapeHtml(heroStory.title) + '</h1>';
+    
+    // Injecting full content for Hero Post
+    html += '<div class="feed-full-content" id="content-' + heroStory.id + '"><p style="color: #888;">ফুল স্টোরি লোড হচ্ছে...</p></div>';
+    
+    if (heroStory.nextEpisodeId) {
+      html += '<div class="feed-actions"><button class="inline-next" data-next="' + escapeHtml(heroStory.nextEpisodeId) + '">পরের পর্ব →</button></div>';
+    }
+    
+    html += '<div class="feed-tags">' +
+              (heroStory.tags || []).map(function (tg) { return '<span class="feed-tag">#' + escapeHtml(tg) + '</span>'; }).join('') +
+            '</div>';
+    html += '</article></div>';
+
+    // ==========================================
+    // OTHER POSTS (Grid Layout)
+    // ==========================================
+    if (otherStories.length > 0) {
+      html += '<div class="regular-stories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">';
+      
+      html += otherStories.map(function(story) {
+        var t = story.type || 'text';
+        var isExpanded = expandedId === story.id;
+        
+        var badge = story.series
+          ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
+          : '<span class="feed-type-badge">' + typeLabel(t) + '</span>';
+        
+        var coverImg = story.cover || (story.images && story.images[0]);
+        var coverHtml = (coverImg && !isExpanded) 
+          ? '<div style="height: 160px; overflow: hidden; border-radius: 8px 8px 0 0; margin: -15px -15px 15px -15px;"><img src="' + escapeHtml(coverImg) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover"></div>' 
+          : '';
+
+        var bodyPlaceholder = isExpanded ? '<div class="feed-full-content" id="content-' + story.id + '" style="margin-top:15px;"><p style="color: #888;">লোড হচ্ছে...</p></div>' : '';
+        var nextBtn = (isExpanded && story.nextEpisodeId) ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>' : '';
+
+        // If expanded, it takes full width of the grid row
+        var gridStyle = isExpanded ? 'grid-column: 1 / -1; transform: scale(1);' : 'display: flex; flex-direction: column;';
+
+        return (
+          '<article class="feed-card ' + (isExpanded ? 'expanded' : '') + '" style="border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 15px; ' + gridStyle + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '">' +
+            coverHtml +
+            '<div class="feed-card-header">' +
+              '<div class="feed-avatar" style="width:30px;height:30px;">N</div>' +
+              '<div class="feed-meta">' +
+                '<div class="feed-author" style="font-size:0.9em;">Nights</div>' +
+                '<div class="feed-time" style="font-size:0.8em;">' + escapeHtml(story.date || '') + '</div>' +
+              '</div>' + badge +
+            '</div>' +
+            '<h3 class="feed-title" style="margin: 10px 0; font-size: 1.2em;">' + escapeHtml(story.title) + '</h3>' +
+            (!isExpanded ? '<p class="feed-excerpt" style="flex-grow: 1; font-size:0.9em; color: var(--text-muted, #666);">' + escapeHtml(story.excerpt || '') + '</p>' : '') +
+            bodyPlaceholder +
+            '<div class="feed-actions" style="margin-top: auto; padding-top:15px;">' +
+              '<button class="read-more-btn" style="width: 100%; text-align: center;">' + (isExpanded ? 'বন্ধ করুন' : 'আরও পড়ুন') + '</button>' +
+              nextBtn +
+            '</div>' +
+          '</article>'
+        );
+      }).join('');
+      
+      html += '</div>';
+    }
+
+    feedEl.innerHTML = html;
+
+    // Attach Listeners
     feedEl.querySelectorAll('.read-more-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var card = btn.closest('.feed-card');
@@ -176,34 +228,46 @@
     feedEl.querySelectorAll('.inline-next').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var nid = btn.getAttribute('data-next');
-        if (nid) toggleExpand(nid);
+        if (nid) {
+            expandedId = nid;
+            renderFeed();
+            var el = document.getElementById('story-' + nid);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     });
 
-    if (feedEnd) feedEnd.hidden = false;
-    if (window.NightsAds) window.NightsAds.onFeedRendered(feedEl);
+    // Load FULL HTML content asynchronously for Hero Post
+    ensureContent(heroStory.id).then(function(html) {
+      var el = document.getElementById('content-' + heroStory.id);
+      if (el) el.innerHTML = html || '<p>কনটেন্ট পাওয়া যায়নি।</p>';
+    });
 
-    if (expandedId) {
+    // Load FULL HTML content asynchronously for Expanded Grid Posts
+    if (expandedId && expandedId !== heroStory.id) {
       ensureContent(expandedId).then(function (html) {
-        var card = feedEl.querySelector('[data-id="' + expandedId + '"]');
-        if (card) {
-          var bodyEl = card.querySelector('.feed-full-content');
-          if (bodyEl) bodyEl.innerHTML = html || '<p>কনটেন্ট পাওয়া যায়নি।</p>';
-        }
+        var el = document.getElementById('content-' + expandedId);
+        if (el) el.innerHTML = html || '<p>কনটেন্ট পাওয়া যায়নি।</p>';
       });
     }
+
+    if (feedEnd) feedEnd.hidden = false;
+    if (window.NightsAds) window.NightsAds.onFeedRendered(feedEl);
   }
 
   function toggleExpand(id) {
     if (expandedId === id) {
-      expandedId = null;
+      expandedId = null; // Close if already open
     } else {
-      expandedId = id;
+      expandedId = id; // Open the clicked one
     }
     renderFeed();
     if (expandedId) {
       var el = document.getElementById('story-' + expandedId);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Wait slightly for DOM to render, then scroll to the expanded story
+      setTimeout(function() {
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
     }
   }
 
