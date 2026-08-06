@@ -7,7 +7,7 @@ tags: [Romance, Fantasy, Intimate, Slow Burn]
 type: text
 date: 2026-08-02
 language: bn
-readTime: 18 min
+readTime: 3 min
 excerpt: বাড়িতে কেউ নেই। বৃষ্টি নামছে। রিয়া আর আদিত্য—একটা নজর, একটা নীরবতা, আর তারপর এমন এক রাত যা কেউ ভুলতে পারবে না।
 ---
 
