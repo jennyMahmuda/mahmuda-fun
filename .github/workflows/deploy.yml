@@ -1,11 +1,8 @@
-# ============================================================
-#  Nights – Fully Dynamic Build & Deploy
-# ============================================================
-name: 🌙 Deploy Nights
+name: Deploy night story
 
 on:
   push:
-    branches: [main]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -14,59 +11,45 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
-    name: Build & Assemble
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: ⚙️ Setup Node.js
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-
-      - name: 🏗️ Convert All Markdown to Stories
-        run: |
-          node script/blog-builder.js
-          echo "Markdown converted dynamically!"
-
-      - name: 📂 Assemble Dynamic Site
-        run: |
-          mkdir -p _site
+          node-version: '20'
           
-          # ১. যেকোনো HTML ফাইল অটোমেটিক কপি করবে (index, video, gallery বা নতুন যেকোনো পেজ)
-          cp *.html _site/ 2>/dev/null || true
-          
-          # ২. কনফিগারেশন ফাইল
-          [ -f sitemap.xml ] && cp sitemap.xml _site/ || true
-          [ -f robots.txt ] && cp robots.txt _site/ || true
-          [ -f CNAME ] && cp CNAME _site/ || echo "mahmuda.fun" > _site/CNAME
-          
-          # ৩. ফোল্ডারগুলো কপি করবে
-          [ -d assets ] && cp -r assets _site/ || true
-          [ -d stories ] && cp -r stories _site/ || true
-          
-          # ৪. story-post ফোল্ডারটিও কপি করবে, যাতে এর ভেতরের ছবি/ভিডিওগুলো লাইভ সাইটে কাজ করে
-          [ -d story-post ] && cp -r story-post _site/ || true
-
-      - name: 📤 Upload Pages
+      - name: Create .nojekyll bypass
+        run: touch .nojekyll
+        
+      - name: Install NPM Dependencies
+        run: npm install
+        
+      - name: Build story HTML & JSON
+        run: npm run build
+        
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: '.'
 
   deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: 🚀 Deploy Site
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
