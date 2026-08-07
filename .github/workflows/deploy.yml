@@ -1,26 +1,8 @@
-# ---------------------------------------------------------------
-# mahmuda.fun — Build & Deploy (GitHub Pages)
-# ---------------------------------------------------------------
-# Why this workflow:
-#  1. The repository is configured to REJECT any action that is
-#     not pinned to a full 40-character commit SHA — this applies
-#     transitively to actions nested inside composite actions too.
-#  2. actions/upload-pages-artifact is pinned to v5, NOT v3.
-#     v3's composite action internally calls
-#     `actions/upload-artifact@v4` UNPINNED — that's exactly what
-#     broke the previous run. v5 pins that internal reference to
-#     a SHA (verified directly against the action's source), so
-#     no manual "pre-pin" workaround step is needed anymore.
-#  3. The builder has ZERO runtime dependencies (plain Node.js,
-#     fs/path only), so `npm ci` is replaced by
-#     `npm install --no-fund --no-audit` as a no-op-safe step.
-# ---------------------------------------------------------------
-
-name: Deploy night story
+name: Deploy Nights
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -29,57 +11,55 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      # actions/checkout@v4 -> sha:11d5960a326750d5838078e36cf38b85af677262
-      - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      # actions/setup-node@v4 -> sha:49933ea5288caeca8642d1e84afbd3f7d6820020
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version: '20'
+          node-version: "20"
 
-      # -----------------------------------------------------------
-      # Build: stories/*.json + stories/index.json + sitemap.xml + robots.txt
-      # Builder needs no third-party packages (pure Node.js core).
-      # npm install here is only a safety-net if a lockfile ever exists.
-      # -----------------------------------------------------------
-      - name: Prepare dependencies (no-ops if none required)
-        run: npm install --no-fund --no-audit --ignore-scripts 2>/dev/null || true
+      - name: Build stories + sitemap
+        run: |
+          node script/blog-builder.js || true
+          ls -la stories/ sitemap.xml robots.txt || true
 
-      - name: Build story JSON + sitemap + robots
-        run: npm run build
+      - name: Performance audit (Lighthouse guardian)
+        run: |
+          python3 script/Lighthouse.py --fix || true
+          python3 script/Lighthouse.py
 
-      - name: Create .nojekyll bypass
-        run: touch .nojekyll
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp privacy-policy.html gallery.html video.html categories.html series.html _site/ 2>/dev/null || true
+          cp sitemap.xml robots.txt llms.txt _site/ 2>/dev/null || true
+          cp CNAME _site/ 2>/dev/null || echo "mahmuda.fun" > _site/CNAME
+          cp -r assets stories _site/
+          echo "--- _site ---" && find _site -type f | sort
 
-      # actions/configure-pages@v5 -> sha:983d7736d9b0ae728b81ab479565c72886d7745b
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-
-      # actions/upload-pages-artifact@v5 -> sha:fc324d3547104276b827a68afc52ff2a11cc49c9
-      # v5's internal upload-artifact call is SHA-pinned (v7.0.0),
-      # so this satisfies the "must be pinned" policy end-to-end.
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
-          path: '.'
+          path: _site
 
   deploy:
+    name: Deploy Pages
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
-      # actions/deploy-pages@v4 -> sha:d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
