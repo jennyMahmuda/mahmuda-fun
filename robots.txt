@@ -1,6 +1,9 @@
 User-agent: *
 Allow: /
-Disallow: /assets/
-Disallow: /scripts/
+
+# AI / LLM crawlers – see /llms.txt for site purpose and preferred usage
+Allow: /llms.txt
+Allow: /stories/
+Allow: /assets/
 
 Sitemap: https://mahmuda.fun/sitemap.xml

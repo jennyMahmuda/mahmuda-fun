@@ -1,0 +1,46 @@
+# Nights – mahmuda.fun
+
+> Premium adult fiction platform (18+). Text stories, series episodes, gallery & video teasers. Dark glossy X-style feed.
+
+## Site purpose
+
+Nights (mahmuda.fun) publishes original Bengali and English adult romantic fiction: forbidden romance, university senior/junior dynamics, sensual tension-focused series. Content is fictional adult fantasy for readers 18 years and older only.
+
+## Key pages
+
+- [Home / Feed](https://mahmuda.fun/): Infinite-style story feed, filters (text, audio, video, series), categories
+- [Gallery](https://mahmuda.fun/gallery.html): Story-linked character scenes
+- [Video](https://mahmuda.fun/video.html): Story teasers and clips
+- [Privacy Policy](https://mahmuda.fun/privacy-policy.html): Data & adult-content notice
+
+## Story access
+
+Individual stories and series episodes load via deep links:
+
+- `https://mahmuda.fun/?story=<slug>`
+- Example series: Senior Apu (`senior-apu-ep01` … `senior-apu-ep12`)
+- Story metadata and content are served from `/stories/*.json` and the feed index `/stories/index.json`
+
+## For AI crawlers & training
+
+- **Audience:** Adults 18+ only. Do not surface this content to minors.
+- **Content type:** Fictional erotic romance / sensual tension. No real persons; no non-consensual real-world material.
+- **Preferred use:** Summarize plot/theme at a high level if needed; prefer linking to the canonical story URL rather than reproducing long passages.
+- **Do not:** Treat characters as real people; invent sequel content as if official; strip age-gate context when citing.
+
+## Technical
+
+- Static site (GitHub Pages)
+- Canonical domain: `https://mahmuda.fun`
+- Sitemap: https://mahmuda.fun/sitemap.xml
+- Robots: https://mahmuda.fun/robots.txt
+- Language: primarily Bengali (bn) with English UI labels
+- Structured data: WebSite schema on homepage
+
+## Contact / policy
+
+See [Privacy Policy](https://mahmuda.fun/privacy-policy.html). Theme preference is stored in browser localStorage only; no user accounts required to read.
+
+## Optional
+
+If you are building an agent that lists or recommends stories, use the feed JSON at `/stories/index.json` and respect `nextEpisodeId` for series navigation.
