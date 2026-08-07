@@ -2,15 +2,6 @@
 /**
  * Nights Blog Builder v3 (mahmuda.fun)
  * Markdown → JSON + auto sitemap.xml / robots.txt + per-story SEO metadata
- *
- * Media pipeline:
- *  - story-post/image/          → local images (referenced as image/file.jpg in markdown)
- *  - story-post/video/          → local videos (referenced as video/file.mp4 in markdown)
- *  - Absolute URLs (http/https) → external images/videos passed through unchanged
- *  - Front matter: cover / image / images / video / audio all supported
- *
- * Every story JSON now ships full SEO metadata + ads metadata so the
- * front-end can auto-inject ad slots inside new post content.
  */
 const fs = require('fs');
 const path = require('path');
@@ -22,16 +13,6 @@ const SITEMAP_FILE = path.join(ROOT, 'sitemap.xml');
 const ROBOTS_FILE = path.join(ROOT, 'robots.txt');
 const SITE_URL = 'https://mahmuda.fun';
 
-// ---------------------------------------------------------------
-// Markdown → HTML converter (full media + link support)
-// ---------------------------------------------------------------
-
-/**
- * Resolve a media reference into a usable URL.
- * Rules:
- *  1. Absolute http(s):// or data: → keep as-is
- *  2. Starts with "image/" or "video/" or "/" → treat as project-relative
- */
 function resolveMediaUrl(ref) {
   if (!ref) return '';
   ref = ref.trim();
@@ -43,36 +24,23 @@ function resolveMediaUrl(ref) {
 
 function mdToHtml(md) {
   let html = md;
-
-  // Headers (h1 first so later replaces don't double-match)
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-
-  // Videos: ![video caption](path.mp4) or explicit [video](path.mp4)
-  // We detect video extensions so local "video/file.mp4" becomes a <video> tag.
   html = html.replace(/!\[([^\]]*)\]\(([^)]*?\.(?:mp4|webm|ogg))(?:\s*"[^"]*")?\)/gi, function (m, alt, src) {
     const url = resolveMediaUrl(src);
     return '<video controls playsinline preload="metadata" alt="' + escapeAttr(alt) + '">' +
       '<source src="' + escapeAttr(url) + '" type="' + videoType(url) + '">Your browser does not support the video tag.</video>';
   });
-
-  // Audio: ![audio](path.mp3|m4a|wav|ogg)
   html = html.replace(/!\[([^\]]*)\]\(([^)]*?\.(?:mp3|m4a|wav|ogg))(?:\s*"[^"]*")?\)/gi, function (m, alt, src) {
     const url = resolveMediaUrl(src);
     return '<audio controls preload="metadata">' +
       '<source src="' + escapeAttr(url) + '" type="' + audioType(url) + '">Your browser does not support the audio tag.</audio>';
   });
-
-  // Images: ![alt](url) — everything else is an image.
   html = html.replace(/!\[([^\]]*)\]\(([^)]+)(?:\s*"[^"]*")?\)/g, function (m, alt, src) {
     const url = resolveMediaUrl(src);
     return '<img src="' + escapeAttr(url) + '" alt="' + escapeAttr(alt) + '" loading="lazy" decoding="async" />';
   });
-
-  // Explicit HTML <video>/<audio> wrappers written directly in markdown pass through untouched.
-
-  // Links: [text](url) — supports story deep links (?story=id), categories and external links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (m, text, href) {
     const url = resolveMediaUrl(href);
     const isStory = /[?&]story=/.test(url) || /\.json$/.test(url);
@@ -82,11 +50,7 @@ function mdToHtml(md) {
     }
     return '<a href="' + escapeAttr(url) + '" target="_blank" rel="noopener noreferrer nofollow">' + text + '</a>';
   });
-
-  // Horizontal Rule
   html = html.replace(/^---$/gm, '<hr />');
-
-  // Paragraph formatting (avoids wrapping block-level HTML like <video>/<img> in <p>)
   html = html.split(/\n{2,}/).map(function (block) {
     block = block.trim();
     if (!block) return '';
@@ -95,7 +59,6 @@ function mdToHtml(md) {
     }
     return '<p>' + block.replace(/\n/g, '<br />\n') + '</p>';
   }).join('\n\n');
-
   return html;
 }
 
@@ -119,10 +82,6 @@ function audioType(url) {
   if (/\.m4a$/i.test(url)) return 'audio/mp4';
   return 'audio/mpeg';
 }
-
-// ---------------------------------------------------------------
-// Front matter parser
-// ---------------------------------------------------------------
 
 function parseFrontMatter(raw) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
@@ -163,7 +122,6 @@ function escapeXml(str) {
     .replace(/'/g, '&apos;');
 }
 
-// Keep original file date so rebuilds never mutate dates
 function getFileDate(filePath) {
   try {
     const stats = fs.statSync(filePath);
@@ -173,10 +131,6 @@ function getFileDate(filePath) {
     return new Date().toISOString().slice(0, 10);
   }
 }
-
-// ---------------------------------------------------------------
-// SEO helpers
-// ---------------------------------------------------------------
 
 const CATEGORY_KEYWORDS = {
   'romance': ['romance', 'slow burn', 'love story', 'bengali romance story'],
@@ -208,32 +162,16 @@ function buildDescription(story) {
   return (tail || story.title) + ' — ' + cat + ' story on mahmuda.fun. Read free premium adult fiction.';
 }
 
-// ---------------------------------------------------------------
-// Automatic ad-injection markers for new post content
-// ---------------------------------------------------------------
-/**
- * Wraps story HTML so the front-end can inject ads automatically:
- *  - first paragraph → inline-native ad slot
- *  - middle of content → mid-content ad slot
- *  - end of content → end-of-post ad slot
- * The front-end (ads.js) moves these containers to real positions.
- */
 function injectAdMarkers(htmlContent) {
   const marker = '<div data-ad-container="inline-native" class="ad-slot ad-inline" aria-hidden="true"></div>';
   const midMarker = '<div data-ad-container="mid-content" class="ad-slot ad-inline" aria-hidden="true"></div>';
   const endMarker = '<div data-ad-container="end-of-post" class="ad-slot ad-inline" aria-hidden="true"></div>';
-
-  // Split into paragraph blocks
   const blocks = htmlContent.split(/\n\n+/);
   const textBlocks = blocks.filter(function (b) { return /^<p>/i.test(b.trim()); });
   if (textBlocks.length === 0) return htmlContent + '\n\n' + marker + '\n' + endMarker;
-
   let out = htmlContent;
-  // After first paragraph
   const firstIdx = out.indexOf(textBlocks[0]) + textBlocks[0].length;
   out = out.slice(0, firstIdx) + '\n\n' + marker + out.slice(firstIdx);
-
-  // Middle block (only if content is long enough)
   const plainLen = out.replace(/<[^>]*>/g, '').length;
   if (plainLen > 900 && textBlocks.length > 4) {
     const midBlock = textBlocks[Math.floor(textBlocks.length / 2)];
@@ -242,15 +180,9 @@ function injectAdMarkers(htmlContent) {
       out = out.slice(0, midIdx) + '\n\n' + midMarker + '\n' + out.slice(midIdx);
     }
   }
-
-  // End of post
   out = out.trim() + '\n\n' + endMarker + '\n';
   return out;
 }
-
-// ---------------------------------------------------------------
-// Sitemap + robots
-// ---------------------------------------------------------------
 
 function writeSitemap(stories) {
   const today = new Date().toISOString().slice(0, 10);
@@ -260,6 +192,7 @@ function writeSitemap(stories) {
   urls.push({ loc: SITE_URL + '/video.html', lastmod: today, changefreq: 'weekly', priority: '0.8' });
   urls.push({ loc: SITE_URL + '/gallery.html', lastmod: today, changefreq: 'weekly', priority: '0.7' });
   urls.push({ loc: SITE_URL + '/privacy-policy.html', lastmod: today, changefreq: 'monthly', priority: '0.3' });
+  urls.push({ loc: SITE_URL + '/llms.txt', lastmod: today, changefreq: 'monthly', priority: '0.2' });
 
   (stories || []).forEach(function (s) {
     const slug = s.id || s.slug;
@@ -285,14 +218,23 @@ function writeSitemap(stories) {
 
   fs.writeFileSync(SITEMAP_FILE, xml, 'utf8');
   console.log('✓ sitemap.xml (' + urls.length + ' URLs)');
-  const robots = 'User-agent: *\nAllow: /\nDisallow: /assets/\nDisallow: /scripts/\n\nSitemap: ' + SITE_URL + '/sitemap.xml\n';
+
+  // Correct robots: allow assets (CSS/JS/images), point AI crawlers to llms.txt
+  const robots = [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    '# AI / LLM crawlers – see /llms.txt for site purpose and preferred usage',
+    'Allow: /llms.txt',
+    'Allow: /stories/',
+    'Allow: /assets/',
+    '',
+    'Sitemap: ' + SITE_URL + '/sitemap.xml',
+    ''
+  ].join('\n');
   fs.writeFileSync(ROBOTS_FILE, robots, 'utf8');
   console.log('✓ robots.txt');
 }
-
-// ---------------------------------------------------------------
-// Story builder
-// ---------------------------------------------------------------
 
 function buildStory(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8');
@@ -303,8 +245,6 @@ function buildStory(filePath) {
   const baseName = path.basename(filePath, path.extname(filePath));
   const id = meta.id || baseName;
   const title = meta.title || baseName.replace(/[-_]/g, ' ');
-
-  // Unified media resolution (legacy "image" key, plus cover/images/video/audio)
   const cover = meta.cover || meta.image ||
     (Array.isArray(meta.images) && meta.images.length ? meta.images[0] : null) || null;
   const images = (Array.isArray(meta.images) ? meta.images : (meta.image ? [meta.image] : []))
