@@ -25,15 +25,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm' # Caching image and build assets
+          cache: 'npm'
+
+      # Markdown files convert korar environment setup
+      - name: Convert Markdown to HTML
+        run: |
+          npm install -g marked
+          # Automatic find all .md files and generate html format 
+          for file in stories/*.md; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file" .md)
+              marked -i "$file" -o "stories/${filename}.html"
+              echo "Converted $file to stories/${filename}.html"
+            fi
+          done
           
       - name: Create .nojekyll bypass
         run: touch .nojekyll
         
       - name: Install NPM Dependencies
-        run: npm ci # Faster and clean install for production
+        run: npm ci
         
-      - name: Build story HTML, JSON & Images
+      - name: Build story HTML & JSON
         run: npm run build
         
       - name: Setup GitHub Pages
@@ -42,9 +55,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Jodi build er por 'dist' ba 'build' folder-e code jay, seta select korben
-          # default code root directories direct copy korbe images shohor
-          path: '.' 
+          path: '.'
 
   deploy:
     environment:
