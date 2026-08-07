@@ -3,14 +3,17 @@
 # ---------------------------------------------------------------
 # Why this workflow:
 #  1. The repository is configured to REJECT any action that is
-#     not pinned to a full 40-character commit SHA.
-#     Old tags like `actions/checkout@v4` are blocked, which is
-#     exactly what broke the previous pipeline.
-#  2. All actions below are pinned to the exact commit SHA of
-#     the same major version (verified via the actions repos).
+#     not pinned to a full 40-character commit SHA — this applies
+#     transitively to actions nested inside composite actions too.
+#  2. actions/upload-pages-artifact is pinned to v5, NOT v3.
+#     v3's composite action internally calls
+#     `actions/upload-artifact@v4` UNPINNED — that's exactly what
+#     broke the previous run. v5 pins that internal reference to
+#     a SHA (verified directly against the action's source), so
+#     no manual "pre-pin" workaround step is needed anymore.
 #  3. The builder has ZERO runtime dependencies (plain Node.js,
-#     fs/path only), so `npm ci` is replaced by `npm install --no-fund --no-audit`
-#     as a no-op-safe step — it creates package-lock only when missing.
+#     fs/path only), so `npm ci` is replaced by
+#     `npm install --no-fund --no-audit` as a no-op-safe step.
 # ---------------------------------------------------------------
 
 name: Deploy night story
@@ -33,7 +36,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # actions/checkout@v4  ->  sha:11d5960a326750d5838078e36cf38b85af677262
+      # actions/checkout@v4 -> sha:11d5960a326750d5838078e36cf38b85af677262
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -54,18 +57,6 @@ jobs:
       - name: Build story JSON + sitemap + robots
         run: npm run build
 
-      # GitHub Pages needs .nojekyll so paths like assets/css/blog.css
-      # and story-post/image/ are served untouched.
-      # Explicitly pin the upload-artifact dependency that
-      # actions/upload-pages-artifact@v3 uses internally —
-      # otherwise the runner rejects the nested `actions/upload-artifact@v4`.
-      - name: Pin upload-artifact@v4 (required by upload-pages-artifact)
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pages-artifact
-          path: .nojekyll
-          retention-days: 0
-
       - name: Create .nojekyll bypass
         run: touch .nojekyll
 
@@ -73,9 +64,11 @@ jobs:
       - name: Setup GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
 
-      # actions/upload-pages-artifact@v3 -> sha:56afc609e74202658d3ffba0e8f6dda462b719fa
+      # actions/upload-pages-artifact@v5 -> sha:fc324d3547104276b827a68afc52ff2a11cc49c9
+      # v5's internal upload-artifact call is SHA-pinned (v7.0.0),
+      # so this satisfies the "must be pinned" policy end-to-end.
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: '.'
 
