@@ -2,44 +2,55 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) Measurement ID: G-1Z0TLKJZ9R -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1Z0TLKJZ9R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1Z0TLKJZ9R');
+  </script>
+
+  <!-- Force HTTPS (GitHub Pages + client fallback) -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <script>
+    (function () {
+      if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        location.replace('https://' + location.host + location.pathname + location.search + location.hash);
+      }
+    })();
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Video Stories | mahmuda.fun – Premium Adult Video Fiction</title>
-  <meta name="description" content="Watch premium adult video teasers & story clips on mahmuda.fun. University Madam, forbidden romance, series episodes. Simple reading, 18+ only." />
-  <meta name="keywords" content="adult video stories, bangla video golpo, university madam video, erotic teaser, story clips, mahmuda.fun" />
-  <meta name="author" content="mahmuda.fun" />
-  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <title>Video Stories | Nights – mahmuda.fun</title>
+  <meta name="description" content="Watch premium adult video teasers & story clips. University Madam, forbidden romance, series episodes. 18+ only. mahmuda.fun" />
+  <meta name="keywords" content="adult video stories, university madam video, erotic teaser, nights video, mahmuda.fun" />
   <meta name="rating" content="adult" />
-  <meta name="theme-color" content="#050505" />
+  <meta name="theme-color" content="#0a0a0c" />
   <link rel="canonical" href="https://mahmuda.fun/video.html" />
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/navigation.css" />
-  <link rel="stylesheet" href="assets/css/blog.css" />
   <link rel="stylesheet" href="assets/css/ads.css" />
   <link rel="stylesheet" href="assets/css/pages.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>html{scroll-behavior:smooth}</style>
 </head>
 <body>
   <header class="navbar">
     <div class="nav-container">
       <a href="index.html" class="logo" aria-label="mahmuda.fun home">
-        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" />
+        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" loading="eager" />
       </a>
-      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
-        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
-        <a href="video.html" class="nav-item active"><span class="nav-icon">▶</span>Video</a>
-        <a href="categories.html" class="nav-item"><span class="nav-icon">◈</span>Category</a>
-        <a href="gallery.html" class="nav-item"><span class="nav-icon">🖼</span>Gallery</a>
-        <a href="series.html" class="nav-item"><span class="nav-icon">▣</span>Series</a>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="video.html" class="nav-item active">Video</a>
+        <a href="categories.html" class="nav-item">Category</a>
+        <a href="gallery.html" class="nav-item">Gallery</a>
+        <a href="series.html" class="nav-item">Series</a>
       </nav>
       <div class="nav-actions">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-          <span class="icon-moon">☾</span>
-          <span class="icon-sun">☀</span>
-        </button>
-        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
     </div>
   </header>
@@ -47,58 +58,32 @@
   <div class="ad-leaderboard-wrap"><div data-ad="leaderboard" class="ad-slot"></div></div>
   <div class="ad-mobile-wrap"><div data-ad="mobile-banner" class="ad-slot"></div></div>
 
-  <main class="section" style="padding-top: 80px;">
+  <main class="section" style="padding-top:80px">
     <div class="container">
       <div class="section-header">
         <h1 class="section-title">Video</h1>
-        <p class="section-desc">Teasers &amp; story clips · linked to full stories</p>
+        <p class="section-desc">Story teasers & clips · 18+ only</p>
       </div>
-
-      <div class="video-grid" id="videoGrid">
-        <article class="video-card">
-          <div class="video-thumb">
-            <video controls playsinline preload="metadata">
-              <source src="assets/video/university-madam-teaser.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <div class="video-info">
-            <h2>University Madam · Teaser</h2>
-            <p>Classroom tension · cabin door · eye contact that does not look away.</p>
-            <div class="video-meta">
-              <a href="index.html?story=university-madam-eyes" class="btn btn-ghost">Read full story →</a>
-              <a href="gallery.html" class="btn btn-ghost">Gallery →</a>
-            </div>
-          </div>
-        </article>
+      <div id="videoGrid" class="video-grid">
+        <p style="color:var(--text-muted);text-align:center">Video teasers load from story feed. Open a series episode for linked media.</p>
+        <p style="text-align:center;margin-top:24px"><a href="index.html" style="color:var(--accent)">← Back to Feed</a></p>
       </div>
-
-      <p style="text-align:center;margin-top:48px;color:var(--text-muted);font-size:0.9rem;">
-        More clips appear as series grow. · <a href="index.html" style="color:var(--accent);">Back to Feed</a>
-      </p>
     </div>
   </main>
 
   <footer class="footer">
     <div class="container">
       <div class="footer-inner">
-        <div class="footer-brand">
-          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" style="height: 30px; width: auto;" />
-        </div>
-        <p class="footer-note">Premium Adult Fiction • Video • Gallery • 18+ Only · mahmuda.fun</p>
+        <p class="footer-note">Premium Adult Fiction • Video • 18+ Only · mahmuda.fun</p>
         <p class="footer-copy">
           <a href="index.html" style="color:var(--text-muted)">Home</a> ·
-          <a href="video.html" style="color:var(--text-muted)">Video</a> ·
-          <a href="categories.html" style="color:var(--text-muted)">Category</a> ·
           <a href="gallery.html" style="color:var(--text-muted)">Gallery</a> ·
-          <a href="series.html" style="color:var(--text-muted)">Series</a> ·
           <a href="privacy-policy.html" style="color:var(--text-muted)">Privacy</a> · © 2026 mahmuda.fun
         </p>
       </div>
     </div>
   </footer>
-
-  <script src="assets/js/navigation.js"></script>
-  <script src="assets/js/ads.js"></script>
+  <script src="assets/js/navigation.js" defer></script>
+  <script src="assets/js/ads.js" defer></script>
 </body>
 </html>
