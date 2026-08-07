@@ -25,6 +25,25 @@
     'bristir-rate-ep1','bristir-rate-ep2','bristir-rate-ep3'
   ];
 
+  // Helper dynamic function to check and resolve image path or external URL
+  function resolveImage(story) {
+    if (!story) return '';
+    let imgPath = story.cover || (story.images && story.images.length > 0 ? story.images[0] : '');
+    
+    if (!imgPath) return '';
+
+    // If it's already an external absolute url, return it directly
+    if (imgPath.startsWith('http://') || imgPath.startsWith('https://') || imgPath.startsWith('data:image')) {
+      return imgPath;
+    }
+    
+    // Fallback normalization logic if hosted relative inside project structures
+    if (imgPath.startsWith('/')) {
+      return imgPath.substring(1);
+    }
+    return imgPath;
+  }
+
   async function loadStories() {
     try {
       const res = await fetch('stories/index.json', { cache: 'no-store' });
@@ -52,8 +71,8 @@
         episode: s.episode != null ? Number(s.episode) : null,
         audio: s.audio || null,
         video: s.video || null,
-        images: [],
-        cover: null
+        images: s.images || [],
+        cover: s.cover || null
       }, s);
     });
 
@@ -63,10 +82,10 @@
     });
 
     renderFeed();
-    renderSeries();
-    renderFooterCats();
-    bindCategoryCards();
-    openDeepLink();
+    if (typeof renderSeries === 'function') renderSeries();
+    if (typeof renderFooterCats === 'function') renderFooterCats();
+    if (typeof bindCategoryCards === 'function') bindCategoryCards();
+    if (typeof openDeepLink === 'function') openDeepLink();
   }
 
   async function loadByIds(ids) {
@@ -111,6 +130,16 @@
     return 'Text';
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function renderFeed() {
     if (!feedEl) return;
     var list = getFiltered();
@@ -120,7 +149,7 @@
       return;
     }
 
-    // 1. Separate First Post (Hero) and Rest of the Posts
+    // Separate First Post (Hero) and Rest of the Posts
     var heroStory = list[0];
     var otherStories = list.slice(1);
 
@@ -134,9 +163,9 @@
       ? '<span class="feed-type-badge">' + escapeHtml(heroStory.series) + ' · Ep ' + (heroStory.episode || '?') + '</span>'
       : '<span class="feed-type-badge">' + typeLabel(heroType) + '</span>';
 
-    var heroCover = heroStory.cover || (heroStory.images && heroStory.images[0]);
+    var heroCover = resolveImage(heroStory);
     var heroCoverHtml = heroCover 
-      ? '<div style="width: 100%; height: 350px; overflow: hidden; border-radius: 12px; margin-bottom: 20px;"><img src="' + escapeHtml(heroCover) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Hero Cover"></div>' 
+      ? '<div style="width: 100%; height: 350px; overflow: hidden; border-radius: 12px; margin-bottom: 20px;"><img src="' + escapeHtml(heroCover) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Hero Cover" onerror="this.style.display=\'none\'"></div>' 
       : '';
 
     html += '<div class="hero-section" style="margin-bottom: 50px; border-bottom: 2px solid var(--border-color, #e0e0e0); padding-bottom: 30px;">';
@@ -179,32 +208,59 @@
           ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
           : '<span class="feed-type-badge">' + typeLabel(t) + '</span>';
         
-        var coverImg = story.cover || (story.images && story.images[0]);
+        var coverImg = resolveImage(story);
         var coverHtml = (coverImg && !isExpanded) 
-          ? '<div style="height: 160px; overflow: hidden; border-radius: 8px 8px 0 0; margin: -15px -15px 15px -15px;"><img src="' + escapeHtml(coverImg) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover"></div>' 
+          ? '<div style="height: 160px; overflow: hidden; border-radius: 8px 8px 0 0; margin: -15px -15px 15px -15px;"><img src="' + escapeHtml(coverImg) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover" onerror="this.style.display=\'none\'"></div>' 
           : '';
 
         var bodyPlaceholder = isExpanded ? '<div class="feed-full-content" id="content-' + story.id + '" style="margin-top:15px;"><p style="color: #888;">লোড হচ্ছে...</p></div>' : '';
         var nextBtn = (isExpanded && story.nextEpisodeId) ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>' : '';
 
-        // If expanded, it takes full width of the grid row
         var gridStyle = isExpanded ? 'grid-column: 1 / -1; transform: scale(1);' : 'display: flex; flex-direction: column;';
 
         return (
-          '<article class="feed-card ' + (isExpanded ? 'expanded' : '') + '" style="border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 15px; ' + gridStyle + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '">' +
+          '<article class="feed-card ' + (isExpanded ? 'expanded' : '') + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '" style="' + gridStyle + '">' +
             coverHtml +
             '<div class="feed-card-header">' +
-              '<div class="feed-avatar" style="width:30px;height:30px;">N</div>' +
+              '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author" style="font-size:0.9em;">Nights</div>' +
-                '<div class="feed-time" style="font-size:0.8em;">' + escapeHtml(story.date || '') + '</div>' +
+                '<div class="feed-author">Nights</div>' +
+                '<div class="feed-time">' + escapeHtml(story.date || '') + '</div>' +
               '</div>' + badge +
             '</div>' +
-            '<h3 class="feed-title" style="margin: 10px 0; font-size: 1.2em;">' + escapeHtml(story.title) + '</h3>' +
-            (!isExpanded ? '<p class="feed-excerpt" style="flex-grow: 1; font-size:0.9em; color: var(--text-muted, #666);">' + escapeHtml(story.excerpt || '') + '</p>' : '') +
+            '<h2 class="feed-title">' + escapeHtml(story.title) + '</h2>' +
+            (isExpanded ? '' : '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>') +
             bodyPlaceholder +
-            '<div class="feed-actions" style="margin-top: auto; padding-top:15px;">' +
-              '<button class="read-more-btn" style="width: 100%; text-align: center;">' + (isExpanded ? 'বন্ধ করুন' : 'আরও পড়ুন') + '</button>' +
+            '<div class="feed-actions">' +
+              '<button class="read-more-btn">' + (isExpanded ? 'ছোট করে দেখুন ↑' : 'সবটুকু পড়ুন →') + '</button>' +
+              nextBtn +          ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
+          : '<span class="feed-type-badge">' + typeLabel(t) + '</span>';
+        
+        var coverImg = resolveImage(story);
+        var coverHtml = (coverImg && !isExpanded) 
+          ? '<div style="height: 160px; overflow: hidden; border-radius: 8px 8px 0 0; margin: -15px -15px 15px -15px;"><img src="' + escapeHtml(coverImg) + '" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover" onerror="this.style.display=\'none\'"></div>' 
+          : '';
+
+        var bodyPlaceholder = isExpanded ? '<div class="feed-full-content" id="content-' + story.id + '" style="margin-top:15px;"><p style="color: #888;">লোড হচ্ছে...</p></div>' : '';
+        var nextBtn = (isExpanded && story.nextEpisodeId) ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>' : '';
+
+        var gridStyle = isExpanded ? 'grid-column: 1 / -1; transform: scale(1);' : 'display: flex; flex-direction: column;';
+
+        return (
+          '<article class="feed-card ' + (isExpanded ? 'expanded' : '') + '" data-id="' + escapeHtml(story.id) + '" id="story-' + escapeHtml(story.id) + '" style="' + gridStyle + '">' +
+            coverHtml +
+            '<div class="feed-card-header">' +
+              '<div class="feed-avatar">N</div>' +
+              '<div class="feed-meta">' +
+                '<div class="feed-author">Nights</div>' +
+                '<div class="feed-time">' + escapeHtml(story.date || '') + '</div>' +
+              '</div>' + badge +
+            '</div>' +
+            '<h2 class="feed-title">' + escapeHtml(story.title) + '</h2>' +
+            (isExpanded ? '' : '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>') +
+            bodyPlaceholder +
+            '<div class="feed-actions">' +
+              '<button class="read-more-btn">' + (isExpanded ? 'ছোট করে দেখুন ↑' : 'সবটুকু পড়ুন →') + '</button>' +
               nextBtn +
             '</div>' +
           '</article>'
@@ -215,212 +271,47 @@
     }
 
     feedEl.innerHTML = html;
-
-    // Attach Listeners
-    feedEl.querySelectorAll('.read-more-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var card = btn.closest('.feed-card');
-        if (!card) return;
-        toggleExpand(card.getAttribute('data-id'));
-      });
-    });
-
-    feedEl.querySelectorAll('.inline-next').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var nid = btn.getAttribute('data-next');
-        if (nid) {
-            expandedId = nid;
-            renderFeed();
-            var el = document.getElementById('story-' + nid);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-
-    // Load FULL HTML content asynchronously for Hero Post
-    ensureContent(heroStory.id).then(function(html) {
-      var el = document.getElementById('content-' + heroStory.id);
-      if (el) el.innerHTML = html || '<p>কনটেন্ট পাওয়া যায়নি।</p>';
-    });
-
-    // Load FULL HTML content asynchronously for Expanded Grid Posts
-    if (expandedId && expandedId !== heroStory.id) {
-      ensureContent(expandedId).then(function (html) {
-        var el = document.getElementById('content-' + expandedId);
-        if (el) el.innerHTML = html || '<p>কনটেন্ট পাওয়া যায়নি।</p>';
-      });
-    }
-
     if (feedEnd) feedEnd.hidden = false;
-    if (window.NightsAds) window.NightsAds.onFeedRendered(feedEl);
-  }
 
-  function toggleExpand(id) {
-    if (expandedId === id) {
-      expandedId = null; // Close if already open
-    } else {
-      expandedId = id; // Open the clicked one
-    }
-    renderFeed();
+    // Immediately trigger content load for the Featured Hero Post
+    ensureContent(heroStory.id).then(content => {
+      const targetEl = document.getElementById('content-' + heroStory.id);
+      if (targetEl) targetEl.innerHTML = '<p>' + escapeHtml(content).replace(/\n/g, '<br>') + '</p>';
+    });
+
+    // Re-trigger content load if any other card was already expanded
     if (expandedId) {
-      var el = document.getElementById('story-' + expandedId);
-      // Wait slightly for DOM to render, then scroll to the expanded story
-      setTimeout(function() {
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 50);
+      ensureContent(expandedId).then(content => {
+        const targetEl = document.getElementById('content-' + expandedId);
+        if (targetEl) targetEl.innerHTML = '<p>' + escapeHtml(content).replace(/\n/g, '<br>') + '</p>';
+      });
     }
   }
 
-  function renderSeries() {
-    if (!seriesGrid) return;
-    var bySeries = {};
-    allStories.forEach(function (s) {
-      if (!s.series) return;
-      if (!bySeries[s.series]) bySeries[s.series] = [];
-      bySeries[s.series].push(s);
-    });
-    var keys = Object.keys(bySeries);
-    if (!keys.length) {
-      seriesGrid.innerHTML = '<p style="color:var(--text-muted)">কোনো সিরিজ নেই।</p>';
-      return;
-    }
-    seriesGrid.innerHTML = keys.map(function (name) {
-      var eps = bySeries[name].sort(function (a, b) { return (a.episode || 0) - (b.episode || 0); });
-      var first = eps[0];
-      return (
-        '<a class="series-card" href="?story=' + encodeURIComponent(first.id) + '">' +
-          '<div class="series-card-title">' + escapeHtml(name) + '</div>' +
-          '<div class="series-card-meta">' + eps.length + ' episodes</div>' +
-        '</a>'
-      );
-    }).join('');
-  }
-
-  function renderFooterCats() {
-    var listEl = document.getElementById('footerCatsList');
-    if (!listEl || !allStories.length) return;
-    var catMap = {}, tagMap = {};
-    allStories.forEach(function (s) {
-      var c = (s.category || 'Story').trim();
-      if (c) { if (!catMap[c]) catMap[c] = { count: 0, desc: categoryDesc(c) }; catMap[c].count++; }
-      (s.tags || []).forEach(function (t) {
-        t = String(t).trim();
-        if (t) { if (!tagMap[t]) tagMap[t] = 0; tagMap[t]++; }
-      });
-    });
-    var html = '';
-    Object.keys(catMap).sort().forEach(function (c) {
-      html += '<a class="footer-cat-link" href="#feed" data-filter-cat="' + escapeHtml(c.toLowerCase()) + '" title="' + escapeHtml(catMap[c].desc) + '">' +
-        escapeHtml(c) + ' <span class="footer-cat-count">' + catMap[c].count + '</span></a>';
-    });
-    Object.keys(tagMap).sort().forEach(function (t) {
-      html += '<a class="footer-cat-link footer-tag-link" href="#feed" data-filter-tag="' + escapeHtml(t.toLowerCase()) + '">#' + escapeHtml(t) + '</a>';
-    });
-    listEl.innerHTML = html;
-    listEl.querySelectorAll('[data-filter-cat]').forEach(function (a) {
-      a.addEventListener('click', function (e) { e.preventDefault(); applyCategoryFilter(a.getAttribute('data-filter-cat')); });
-    });
-    listEl.querySelectorAll('[data-filter-tag]').forEach(function (a) {
-      a.addEventListener('click', function (e) { e.preventDefault(); applyTagFilter(a.getAttribute('data-filter-tag')); });
-    });
-  }
-
-  function categoryDesc(c) {
-    var map = {
-      'Forbidden': 'Taboo chemistry, senior-junior, madam-student, secret nights',
-      'Romance': 'Slow burn, emotional tension, intimate connection',
-      'Fantasy': 'Impossible desires and pure fantasy scenes',
-      'Intimate': 'Close, sensual, body-focused moments',
-      'Story': 'All stories'
-    };
-    return map[c] || (c + ' stories on Nights');
-  }
-
-  function applyCategoryFilter(cat) {
-    currentFilter = 'all';
-    var filtered = allStories.filter(function (s) { return String(s.category || '').toLowerCase() === cat; });
-    if (!filtered.length) filtered = allStories;
-    renderTemp(filtered);
-  }
-
-  function applyTagFilter(tag) {
-    currentFilter = 'all';
-    var filtered = allStories.filter(function (s) {
-      return (s.tags || []).some(function (t) { return String(t).toLowerCase() === tag; });
-    });
-    if (!filtered.length) filtered = allStories;
-    renderTemp(filtered);
-  }
-
-  function renderTemp(list) {
-    if (!feedEl) return;
-    var backup = allStories;
-    allStories = list;
-    renderFeed();
-    allStories = backup;
-    var feedSec = document.getElementById('feed');
-    if (feedSec) window.scrollTo({ top: feedSec.offsetTop - 80, behavior: 'smooth' });
-  }
-
-  function bindCategoryCards() {
-    document.querySelectorAll('.category-card[data-cat]').forEach(function (card) {
-      card.addEventListener('click', function (e) {
-        e.preventDefault();
-        var cat = card.getAttribute('data-cat');
-        if (cat === 'series' || cat === 'audio' || cat === 'video') {
-          currentFilter = cat;
-          if (feedFilters) {
-            feedFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
-            var btn = feedFilters.querySelector('[data-filter="' + cat + '"]');
-            if (btn) btn.classList.add('active');
-          }
-          renderFeed();
-        } else {
-          applyCategoryFilter(cat);
-        }
-      });
-    });
-  }
-
-  function openDeepLink() {
-    var params = new URLSearchParams(window.location.search);
-    var id = params.get('story');
-    if (id) {
-      currentFilter = 'all';
-      if (feedFilters) {
-        feedFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
-        var allBtn = feedFilters.querySelector('[data-filter="all"]');
-        if (allBtn) allBtn.classList.add('active');
-      }
-      toggleExpand(id);
-    }
-  }
-
-  if (feedFilters) {
-    feedFilters.querySelectorAll('.filter-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        feedFilters.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
-        expandedId = null;
-        renderFeed();
-      });
-    });
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    var d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
-  window.NightsBlog = {
-    loadStories: loadStories,
-    openReader: function (id) { toggleExpand(id); },
-    closeReader: function () { expandedId = null; renderFeed(); },
-    getStories: function () { return allStories; }
-  };
-
+  // Initialize
   document.addEventListener('DOMContentLoaded', loadStories);
+
+  // Global handler setup for clicks inside feed
+  if (feedEl) {
+    feedEl.addEventListener('click', function (e) {
+      const card = e.target.closest('.feed-card');
+      if (!card) return;
+      const id = card.getAttribute('data-id');
+
+      if (e.target.classList.contains('read-more-btn')) {
+        if (expandedId === id) {
+          expandedId = null;
+        } else {
+          expandedId = id;
+        }
+        renderFeed();
+        if (expandedId) {
+          const element = document.getElementById('story-' + expandedId);
+          if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+  }
+
 })();
+
