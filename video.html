@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#0a0a0c" />
   <link rel="canonical" href="https://mahmuda.fun/video.html" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/navigation.css" />
   <link rel="stylesheet" href="assets/css/ads.css" />
   <link rel="stylesheet" href="assets/css/pages.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -50,29 +51,27 @@
         <p class="section-desc">Teasers & story clips · linked to full stories</p>
       </div>
 
-      <div class="video-grid" id="videoGrid">
-        <article class="video-card" data-story="university-madam-eyes">
+      <div class="video-grid">
+        <article class="video-card">
           <div class="video-thumb">
-            <video controls preload="metadata" playsinline>
+            <video controls playsinline preload="metadata" poster="">
               <source src="assets/video/university-madam-teaser.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
             </video>
           </div>
           <div class="video-info">
-            <h2>চোখের দেখা · ম্যাম ও স্টুডেন্ট</h2>
-            <p>Classroom eye contact → locked cabin → secret game. 19s teaser.</p>
+            <h2>University Madam · Teaser</h2>
+            <p>Classroom tension · cabin door · eye contact that does not look away.</p>
             <div class="video-meta">
-              <span class="feed-type-badge">VIDEO</span>
-              <span>@Mahmudajenny69</span>
-              <span>19 sec</span>
+              <a href="index.html?story=university-madam-eyes" class="btn btn-ghost">Read full story →</a>
+              <a href="gallery.html" class="btn btn-ghost">Gallery →</a>
             </div>
-            <a href="index.html?story=university-madam-eyes" class="btn btn-primary" style="margin-top:12px;display:inline-flex;">Read full story →</a>
-            <a href="gallery.html#madam" class="btn btn-ghost" style="margin-top:8px;display:inline-flex;">View Gallery →</a>
           </div>
         </article>
       </div>
 
-      <p style="text-align:center;margin-top:40px;color:var(--text-muted);font-size:0.9rem;">
-        More video stories appear here when published. · <a href="index.html" style="color:var(--accent);">Back to Feed</a>
+      <p style="text-align:center;margin-top:48px;color:var(--text-muted);font-size:0.9rem;">
+        More clips appear as series grow. · <a href="index.html" style="color:var(--accent);">Back to Feed</a>
       </p>
     </div>
   </main>
@@ -91,6 +90,7 @@
     </div>
   </footer>
 
+  <script src="assets/js/navigation.js"></script>
   <script src="assets/js/apps.js"></script>
   <script src="assets/js/ads.js"></script>
 </body>
