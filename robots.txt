@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /assets/
+Disallow: /scripts/
 
 Sitemap: https://mahmuda.fun/sitemap.xml

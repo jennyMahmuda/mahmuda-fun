@@ -12,8 +12,8 @@ language: bn
 readTime: 12 min
 author: Mahmudajenny69
 excerpt: পর্ব 11 শীঘ্রই আসছে। প্রতিদিন একটি করে নতুন পর্ব যোগ হচ্ছে।
+cover: story-post/image/senior-apu-cover.jpg
 ---
-
 পর্ব 11 শীঘ্রই প্রকাশিত হবে।
 
 প্রতিদিন একটি করে সম্পূর্ণ পর্ব যোগ করা হচ্ছে। আগামীকাল ফিরে আসুন।

@@ -27,26 +27,14 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # Markdown files convert korar environment setup
-      - name: Convert Markdown to HTML
-        run: |
-          npm install -g marked
-          # Automatic find all .md files and generate html format 
-          for file in stories/*.md; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file" .md)
-              marked -i "$file" -o "stories/${filename}.html"
-              echo "Converted $file to stories/${filename}.html"
-            fi
-          done
-          
+
       - name: Create .nojekyll bypass
         run: touch .nojekyll
         
       - name: Install NPM Dependencies
         run: npm ci
         
-      - name: Build story HTML & JSON
+      - name: Build story JSON + sitemap + robots
         run: npm run build
         
       - name: Setup GitHub Pages

@@ -1,37 +1,49 @@
-# Nights – Premium Adult Story Platform
+# mahmuda.fun – Premium Adult Story Platform
 
-Dark glossy night-mood website with Day/Night mode, clean UX, and a simple story publishing system.
-live Website [Night](https://jennymahmuda.github.io/mahmuda-fun/)
+Reader-first premium adult story website with Day/Night mode, immersive Read Mode, full image & video support, SEO metadata, and automatic ad injection in every new post.
+
+Live: [mahmuda.fun](https://mahmuda.fun)
 
 ## Architecture
 
 ```
 /
-├── index.html                 ← Main entry (live website)
+├── index.html                 ← Home / Feed + Read Mode
+├── categories.html            ← Browse by category (?cat=Romance)
+├── series.html                ← All series with episode lists
+├── video.html / gallery.html  ← Media pages
 ├── assets/
-│   ├── css/style.css          ← Dark glossy + Day mode styles
+│   ├── logo.svg               ← Playful SVG logo (moon + wink)
+│   ├── css/
+│   │   ├── style.css          ← Design tokens & base
+│   │   ├── navigation.css     ← Premium glass navbar + SVG logo
+│   │   ├── blog.css           ← Feed, cards, Read Mode typography
+│   │   ├── ads.css            ← Ad slots & mobile reading fix
+│   │   └── pages.css          ← Video / gallery pages
 │   ├── js/
-│   │   ├── apps.js            ← Theme toggle, nav, UX logic
-│   │   └── blog.js            ← Story loading & reader modal
-│   └── images/                ← Optimized covers (from enhance.py)
-├── script/
-│   ├── blog-builder.js        ← Markdown → JSON/HTML converter
-│   └── enhance.py             ← Image crop, resize, SEO, WebP
+│   │   ├── navigation.js      ← Theme · menu · active nav (single source)
+│   │   ├── blog.js            ← Feed, media rendering, Read Mode, SEO
+│   │   └── ads.js             ← Ad manager + auto in-post injection
+│   ├── images/gallery/        ← Story scene SVG art
+│   └── video/                 ← Local story videos (optional)
 ├── story-post/                ← Drop raw .md stories here
+│   ├── image/                 ← Local story images (optional)
+│   └── video/                 ← Local story videos (optional)
+├── script/blog-builder.js     ← Markdown → JSON + sitemap + SEO + ad markers
 └── stories/                   ← Generated JSON (live data)
-    ├── index.json
-    └── *.json
 ```
 
 ## Features
 
-- **Dark Glossy Premium UI** (default Night mode)
-- **Day / Night toggle** (persists in localStorage)
-- Clean navigation + mobile menu
-- Story cards grid + full reader modal
-- Markdown → JSON pipeline
-- SEO-friendly image processing (crop, WebP, smart filenames)
-- Fully static – works on any host (GitHub Pages, Netlify, Vercel, etc.)
+- **Reader-first design** — large comfortable type, wide column, Read Mode panel with progress bar
+- **Dark / Light theme** (Day–Night toggle, persists, respects system preference)
+- **Premium navigation** — playful SVG logo, Home · Video · Category · Gallery · Series
+- **Full media support** — local & external images, videos, audio in every post
+- **All link types** — story deep links (?story=id), categories, safe external links
+- **SEO** — per-story title/description/keywords, sitemap.xml, robots.txt, JSON-LD, canonical URLs
+- **Automatic ad injection** — every new post gets inline-native, mid-content & end-of-post ad slots at build time, zero manual work
+- **Series navigation** — automatic next/previous episode links
+- Fully static — works on any host (GitHub Pages, Netlify, Vercel)
 
 ## How to publish a new story
 
@@ -40,38 +52,50 @@ live Website [Night](https://jennymahmuda.github.io/mahmuda-fun/)
 ```markdown
 ---
 title: Your Story Title
-category: Romance
-tags: [Intimate, Fantasy]
+category: Forbidden
+tags: [Intimate, Fantasy, University]
+series: Senior Apu
+episode: 5
 excerpt: Short teaser text…
-date: 2026-08-02
+date: 2026-08-07
 language: bn
-cover: /assets/images/your-cover-card-800x500.webp
+author: You
+cover: https://i.ibb.co/xxx/cover.jpg     # external cover
+# OR cover: image/cover.jpg               # local file in story-post/image/
+video: video/teaser.mp4                    # local or absolute URL
+audio: https://example.com/audio.mp3
+images: [image/scene1.jpg, image/scene2.jpg]
 ---
 
 Your full story content in **markdown** here…
 
-Paragraphs, *emphasis*, etc.
+Use images anywhere: ![Scene](image/scene1.jpg)
+Use videos: ![Teaser](video/teaser.mp4)
+Link episodes: [Next episode](?story=senior-apu-ep06)
+External links get target=_blank + nofollow automatically.
 ```
+
+Supported media fields in front matter: `cover` (or legacy `image`), `images[]`, `video`, `audio`.
 
 2. Run the builder:
 
 ```bash
-node script/blog-builder.js
-```
-
-   Or watch mode:
-
-```bash
+node script/blog-builder.js        # or: npm run build
 node script/blog-builder.js --watch
 ```
 
-3. (Optional) Process cover image:
+3. Refresh the website – the new story appears automatically **with ads already injected**.
 
-```bash
-python script/enhance.py your-photo.jpg --all-sizes --out assets/images/
-```
+## Navigation & Pages
 
-4. Refresh the website – the new story appears automatically.
+| Page | Purpose |
+|------|---------|
+| `index.html` | Feed (hero + grid) + Read Mode |
+| `categories.html` | Category grid, `?cat=` deep links |
+| `series.html` | All series, episode cards |
+| `video.html` | Video teasers |
+| `gallery.html` | Story scene gallery |
+| `privacy-policy.html` | Privacy policy |
 
 ## Theme Logic
 
@@ -84,9 +108,10 @@ python script/enhance.py your-photo.jpg --all-sizes --out assets/images/
 
 - No framework – pure HTML/CSS/JS
 - CSS variables for instant theme switching
-- Glassmorphism navbar + soft glow accents
-- Accessible reader modal (Esc to close)
-- Bangla + English friendly
+- Glassmorphism navbar, playful SVG logo, soft gold glow accents
+- Accessible Read Mode (Esc to close, stop media on close)
+- Bangla + English friendly typography (Playfair Display + Inter)
+- `blog-builder.js` converts markdown → JSON, updates sitemap.xml / robots.txt, computes per-story SEO keywords, and injects ad markers into every new post
 
 ---
 

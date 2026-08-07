@@ -1,8 +1,10 @@
 /**
- * Nights – Shared Navigation
- * navigation.js
+ * Nights – Shared Navigation v3 (single source of truth)
+ * navigation.js (mahmuda.fun)
  * Theme toggle · Mobile menu · Active page highlight · Scroll state
  * Safe to load on every page. Does not overwrite existing markup.
+ * NOTE: apps.js must NOT be loaded together with this file —
+ * this module owns theme + menu + scroll behaviour.
  */
 (function () {
   'use strict';
@@ -21,10 +23,24 @@
     return 'dark';
   }
 
+  function updateMetaThemeColor(theme) {
+    var metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (!metaTheme) {
+      metaTheme = document.createElement('meta');
+      metaTheme.name = 'theme-color';
+      document.head.appendChild(metaTheme);
+    }
+    metaTheme.content = theme === 'light' ? '#fcfbf9' : '#050505';
+  }
+
   function setTheme(theme) {
     html.setAttribute('data-theme', theme);
     try {
       localStorage.setItem(THEME_KEY, theme);
+    } catch (e) {}
+    updateMetaThemeColor(theme);
+    try {
+      window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: theme } }));
     } catch (e) {}
   }
 
@@ -39,34 +55,39 @@
     var path = (window.location.pathname || '').toLowerCase();
     var file = path.split('/').pop() || 'index.html';
     if (file === '' || file === '/') file = 'index.html';
+    var query = (window.location.search || '').toLowerCase();
 
-    var items = document.querySelectorAll('.nav-item');
-    items.forEach(function (item) {
+    document.querySelectorAll('.nav-item').forEach(function (item) {
       item.classList.remove('active');
       var href = (item.getAttribute('href') || '').toLowerCase();
-      var hrefFile = href.split('/').pop().split('#')[0] || '';
+      var hrefFile = href.split('/').pop().split('#')[0].split('?')[0] || '';
 
-      if (
-        (file === 'index.html' || file === '') &&
-        (hrefFile === 'index.html' || href === '/' || href === 'index.html' || href.indexOf('?view=feed') !== -1)
-      ) {
-        if (href.indexOf('#') === -1 || href === 'index.html' || href === '/') {
-          item.classList.add('active');
-        }
-      } else if (file === 'video.html' && hrefFile === 'video.html') {
+      var isStoryPage = query.indexOf('story=') !== -1;
+
+      if (hrefFile === 'index.html' || hrefFile === '' || href === '/') {
+        if ((file === 'index.html' || file === '') && !isStoryPage) item.classList.add('active');
+      } else if (hrefFile === 'video.html' && file === 'video.html') {
         item.classList.add('active');
-      } else if (file === 'gallery.html' && hrefFile === 'gallery.html') {
+      } else if (hrefFile === 'gallery.html' && file === 'gallery.html') {
         item.classList.add('active');
-      } else if (file === 'privacy-policy.html' && hrefFile === 'privacy-policy.html') {
+      } else if (hrefFile === 'categories.html' && file === 'categories.html') {
+        item.classList.add('active');
+      } else if (hrefFile === 'series.html' && file === 'series.html') {
+        item.classList.add('active');
+      } else if (hrefFile === 'privacy-policy.html' && file === 'privacy-policy.html') {
+        item.classList.add('active');
+      } else if (href.indexOf('#') === 0 && (file === 'index.html' || file === '')) {
+        // Same-page anchors (feed/category/series sections on home)
         item.classList.add('active');
       }
     });
 
-    if ((file === 'index.html' || file === '') && window.location.search.indexOf('story=') !== -1) {
-      items.forEach(function (item) {
-        var href = (item.getAttribute('href') || '').toLowerCase();
-        if (href === 'index.html' || href === '/' || href.indexOf('?view=feed') !== -1) {
-          if (href.indexOf('#') === -1) item.classList.add('active');
+    // Story page → highlight Feed
+    if ((file === 'index.html' || file === '') && isStoryPage) {
+      document.querySelectorAll('.nav-item').forEach(function (item) {
+        var hrefFile = (item.getAttribute('href') || '').toLowerCase().split('/').pop().split('?')[0];
+        if (hrefFile === 'index.html' || hrefFile === '' || hrefFile === '/') {
+          item.classList.add('active');
         }
       });
     }
@@ -77,16 +98,20 @@
     var navLinks = document.getElementById('navLinks');
     if (!menuToggle || !navLinks) return;
 
-    menuToggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      navLinks.classList.toggle('open');
-      menuToggle.classList.toggle('active');
-    });
+    var toggle = function (e) {
+      if (e) e.preventDefault();
+      var isOpen = navLinks.classList.toggle('open');
+      menuToggle.classList.toggle('active', isOpen);
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+    };
+
+    menuToggle.addEventListener('click', toggle);
 
     navLinks.querySelectorAll('.nav-item').forEach(function (link) {
       link.addEventListener('click', function () {
         navLinks.classList.remove('open');
         menuToggle.classList.remove('active');
+        menuToggle.setAttribute('aria-expanded', 'false');
       });
     });
 
@@ -95,6 +120,7 @@
       if (navLinks.contains(e.target) || menuToggle.contains(e.target)) return;
       navLinks.classList.remove('open');
       menuToggle.classList.remove('active');
+      menuToggle.setAttribute('aria-expanded', 'false');
     });
   }
 
@@ -139,8 +165,4 @@
     },
     markActiveNav: markActiveNav
   };
-
-  if (!window.NightsApp) {
-    window.NightsApp = window.NightsNav;
-  }
 })();
