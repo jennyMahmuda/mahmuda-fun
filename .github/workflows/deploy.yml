@@ -25,14 +25,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm' # Caching image and build assets
           
       - name: Create .nojekyll bypass
         run: touch .nojekyll
         
       - name: Install NPM Dependencies
-        run: npm install
+        run: npm ci # Faster and clean install for production
         
-      - name: Build story HTML & JSON
+      - name: Build story HTML, JSON & Images
         run: npm run build
         
       - name: Setup GitHub Pages
@@ -41,7 +42,9 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          # Jodi build er por 'dist' ba 'build' folder-e code jay, seta select korben
+          # default code root directories direct copy korbe images shohor
+          path: '.' 
 
   deploy:
     environment:
