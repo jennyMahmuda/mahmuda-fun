@@ -45,6 +45,9 @@ jobs:
           cp sitemap.xml robots.txt llms.txt _site/ 2>/dev/null || true
           cp CNAME _site/ 2>/dev/null || echo "mahmuda.fun" > _site/CNAME
           cp -r assets stories _site/
+          # Story covers and inline media live in story-post/image/ and story-post/video/ —
+          # they must be served too (blog.js resolves `story-post/image/...` URLs)
+          cp -r story-post _site/ 2>/dev/null || true
           echo "--- _site ---" && find _site -type f | sort
 
       - name: Upload artifact
