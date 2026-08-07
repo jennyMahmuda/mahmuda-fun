@@ -2,6 +2,14 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) Measurement ID: G-1Z0TLKJZ9R -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1Z0TLKJZ9R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1Z0TLKJZ9R');
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Categories | mahmuda.fun – Browse Adult Stories by Desire</title>
   <meta name="description" content="Browse premium adult stories by category on mahmuda.fun: Romance, Fantasy, Intimate, Teacher, Forbidden & Series. 18+ only." />
@@ -17,12 +25,13 @@
   <link rel="stylesheet" href="assets/css/blog.css" />
   <link rel="stylesheet" href="assets/css/ads.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>html{scroll-behavior:smooth}</style>
 </head>
 <body>
   <header class="navbar">
     <div class="nav-container">
       <a href="index.html" class="logo" aria-label="mahmuda.fun home">
-        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" />
+        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" />
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
@@ -52,10 +61,7 @@
         <h1 class="section-title">Categories</h1>
         <p class="section-desc" id="catSub">Browse stories by desire</p>
       </div>
-
-      <!-- Category pills (built dynamically from real story data) -->
       <div class="feed-filters" id="catPills" style="margin-bottom: 32px;"></div>
-
       <div class="regular-stories-grid" id="catGrid">
         <div class="loading-state"><div class="spinner"></div><p>Loading stories…</p></div>
       </div>
@@ -68,7 +74,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" style="height: 30px; width: auto;" />
+          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" loading="lazy" decoding="async" style="height: 30px; width: auto;" />
         </div>
         <p class="footer-note">Premium Adult Fiction • Audio • Video • Series • 18+ Only • mahmuda.fun</p>
         <p class="footer-copy">
@@ -85,29 +91,18 @@
   </footer>
 
   <script>
-  /**
-   * categories.html – dynamic category grid (v2)
-   * - Pills are generated from the REAL tags in stories/index.json,
-   *   so no dead categories ever appear.
-   * - Filters: 'type' field (audio/video/series) + 'tags' array + 'category' + 'series'.
-   * - Deep link: ?cat=romance  (case-insensitive, matches tags too).
-   */
   (function () {
     'use strict';
     var grid = document.getElementById('catGrid');
     var sub = document.getElementById('catSub');
     var pills = document.getElementById('catPills');
     var currentCat = 'all';
-
     var m = (window.location.search || '').match(/[?&]cat=([^&]+)/);
     if (m) currentCat = decodeURIComponent(m[1]);
-
     function esc(s) {
-      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+      return String(s || '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#039;');
     }
     function norm(s) { return String(s || '').toLowerCase().trim(); }
-
-    /** A story matches a category if: tags/category/series/type contains it. */
     function storyMatches(s, cat) {
       if (cat === 'all') return true;
       var c = norm(cat);
@@ -117,7 +112,6 @@
         .map(norm);
       return haystack.indexOf(c) !== -1 || haystack.join(' ').indexOf(c) !== -1;
     }
-
     function coverUrl(s) {
       var p = s.cover || (s.images && s.images.length ? s.images[0] : '');
       if (!p) return '';
@@ -125,8 +119,6 @@
       if (p.charAt(0) === '/') return p.substring(1);
       return p;
     }
-
-    /** Build real pill list from story data. */
     function buildPills(stories) {
       var counts = {};
       stories.forEach(function (s) {
@@ -138,9 +130,7 @@
           }
         });
       });
-      var order = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
-      // cap at 12 pills
-      order = order.slice(0, 12);
+      var order = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 12);
       var html = '<button class="filter-btn' + (currentCat === 'all' ? ' active' : '') + '" data-cat="all">All (' + stories.length + ')</button>';
       order.forEach(function (c) {
         var label = c.charAt(0).toUpperCase() + c.slice(1);
@@ -149,12 +139,9 @@
       });
       pills.innerHTML = html;
     }
-
     function render(stories, cat) {
       var list = stories.filter(function (s) { return storyMatches(s, cat); });
-      var label = cat === 'all' ? 'All stories by category' : cat + ' stories';
-      if (sub) sub.textContent = label;
-
+      if (sub) sub.textContent = cat === 'all' ? 'All stories by category' : cat + ' stories';
       if (!list.length) {
         grid.innerHTML = '<div class="loading-state"><p>এই ক্যাটাগরিতে এখনো স্টোরি নেই।</p></div>';
         return;
@@ -163,7 +150,7 @@
         var img = coverUrl(s);
         var badge = s.series ? esc(s.series) : esc(s.category || s.type || 'Story');
         return '<a class="feed-card" href="index.html?story=' + encodeURIComponent(s.id) + '" style="text-decoration:none">' +
-          (img ? '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" onerror="this.style.display=\'none\'"></div>' : '') +
+          (img ? '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>' : '') +
           '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">Nights</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
           '<span class="feed-type-badge">' + badge + '</span></div>' +
           '<h2 class="feed-title">' + esc(s.title) + '</h2>' +
@@ -174,7 +161,6 @@
         b.classList.toggle('active', norm(b.getAttribute('data-cat')) === norm(cat));
       });
     }
-
     var cachedStories = [];
     function init() {
       fetch('stories/index.json', { cache: 'no-store' })
@@ -186,10 +172,9 @@
           render(cachedStories, currentCat);
         })
         .catch(function () {
-          grid.innerHTML = '<div class="loading-state"><p>লোড হচ্ছে না। <a href="index.html" style="color:var(--accent)">Home</a> থেকে চেষ্টা করুন।</p></div>';
+          grid.innerHTML = '<div class="loading-state"><p>লোড হচ্ছে না। <a href="index.html" style="color:var(--accent)">Home</a></p></div>';
         });
     }
-
     pills.addEventListener('click', function (e) {
       var btn = e.target.closest('.filter-btn');
       if (!btn) return;
@@ -197,11 +182,10 @@
       buildPills(cachedStories);
       render(cachedStories, currentCat);
     });
-
     document.addEventListener('DOMContentLoaded', init);
   })();
   </script>
-  <script src="assets/js/navigation.js"></script>
-  <script src="assets/js/ads.js"></script>
+  <script src="assets/js/navigation.js" defer></script>
+  <script src="assets/js/ads.js" defer></script>
 </body>
 </html>
