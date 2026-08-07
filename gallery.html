@@ -21,6 +21,9 @@
   <meta name="theme-color" content="#050505" />
   <link rel="canonical" href="https://mahmuda.fun/gallery.html" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <!-- LCP discovery: preload critical above-the-fold images -->
+  <link rel="preload" as="image" href="assets/logo.svg" type="image/svg+xml" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/images/gallery/madam-01-classroom.jpg" fetchpriority="high">
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/navigation.css" />
   <link rel="stylesheet" href="assets/css/ads.css" />
@@ -31,7 +34,7 @@
   <header class="navbar">
     <div class="nav-container">
       <a href="index.html" class="logo" aria-label="mahmuda.fun home">
-        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" />
+        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" />
       </a>
       <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
@@ -74,15 +77,15 @@
         </div>
         <div class="gallery-grid" id="galleryMadam">
           <figure class="gallery-item">
-            <img src="assets/images/gallery/madam-01-classroom.jpg" alt="University Madam Rumaisa in purple saree at classroom blackboard – intense eye contact, mahmuda.fun story gallery" loading="lazy" onerror="this.parentElement.classList.add('placeholder')" />
+            <img src="assets/images/gallery/madam-01-classroom.jpg" alt="University Madam Rumaisa in purple saree at classroom blackboard – intense eye contact, mahmuda.fun story gallery" width="800" height="1000" fetchpriority="high" loading="eager" decoding="async" onerror="this.parentElement.classList.add('placeholder')" />
             <figcaption>Classroom · চোখের দেখা</figcaption>
           </figure>
           <figure class="gallery-item">
-            <img src="assets/images/gallery/madam-02-cabin.jpg" alt="University Madam Rumaisa in cabin doorway, purple saree, playful smile, locked office mood" loading="lazy" onerror="this.parentElement.classList.add('placeholder')" />
+            <img src="assets/images/gallery/madam-02-cabin.jpg" alt="University Madam Rumaisa in cabin doorway, purple saree, playful smile, locked office mood" width="800" height="1000" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('placeholder')" />
             <figcaption>Cabin door · কেবিন</figcaption>
           </figure>
           <figure class="gallery-item">
-            <img src="assets/images/gallery/madam-03-intimate.svg" alt="University Madam and student close eye contact, purple saree, intimate cabin light" loading="lazy" onerror="this.parentElement.classList.add('placeholder')" />
+            <img src="assets/images/gallery/madam-03-intimate.svg" alt="University Madam and student close eye contact, purple saree, intimate cabin light" width="800" height="1000" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('placeholder')" />
             <figcaption>Intimate · গোপন স্পর্শ</figcaption>
           </figure>
         </div>
@@ -98,7 +101,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" style="height: 30px; width: auto;" />
+          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" width="120" height="30" loading="lazy" decoding="async" style="height: 30px; width: auto;" />
         </div>
         <p class="footer-note">Premium Adult Fiction • Video • Gallery • 18+ Only · mahmuda.fun</p>
         <p class="footer-copy">
