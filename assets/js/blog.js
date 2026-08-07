@@ -1,13 +1,7 @@
 /**
  * Nights – Blog Feed v3 (mahmuda.fun)
- * ====================================
- * - First story renders as a full HERO POST (cover image, media, content).
- * - Remaining stories render as a clean card GRID (image, title, excerpt).
- * - "Read More" expands a card inline OR opens the immersive READ MODE panel.
- * - Images, videos, audio and all link types render correctly.
- * - SEO title/description/meta updates whenever a story is opened.
- * - Auto ad injection: inline-native / mid-content / end-of-post markers
- *   inside every NEW post content are wired up by ads.js automatically.
+ * - First story = HERO POST (cover with fetchpriority=high)
+ * - Other stories = card grid (lazy images)
  */
 (function () {
   'use strict';
@@ -20,7 +14,7 @@
   let allStories = [];
   let currentFilter = 'all';
   let expandedId = null;
-  let currentStoryId = null;          // id of story open in read mode
+  let currentStoryId = null;
   const contentCache = {};
 
   const KNOWN_IDS = [
@@ -31,9 +25,6 @@
     'bristir-rate-ep1','bristir-rate-ep2','bristir-rate-ep3'
   ];
 
-  // ---------- Media URL resolver (fixed & tested) ----------
-  // Handles: absolute URL, project-relative path, leading slash,
-  // story-post/image/ and story-post/video/ directory conventions.
   function resolveMediaUrl(ref) {
     if (!ref) return '';
     ref = String(ref).trim();
@@ -49,7 +40,6 @@
     return imgPath ? resolveMediaUrl(imgPath) : '';
   }
 
-  // ---------- Story loading ----------
   async function loadStories() {
     try {
       const res = await fetch('stories/index.json', { cache: 'no-store' });
@@ -70,25 +60,13 @@
       });
     }
 
-    // Normalize every story with safe defaults (covers missing keys)
     allStories = allStories.map(function (s) {
       return Object.assign({
-        type: 'text',
-        series: null,
-        episode: null,
-        audio: null,
-        video: null,
-        images: [],
-        cover: null,
-        tags: [],
-        category: 'Story',
-        language: 'en',
-        seo: null,
-        ads: null
+        type: 'text', series: null, episode: null, audio: null, video: null,
+        images: [], cover: null, tags: [], category: 'Story', language: 'en', seo: null, ads: null
       }, s);
     });
 
-    // Sort by latest date
     allStories.sort(function (a, b) {
       return String(b.date || '').localeCompare(String(a.date || ''));
     });
@@ -149,14 +127,13 @@
   function escapeHtml(str) {
     if (!str) return '';
     return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
+      .replace(/&/g, '&')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"')
       .replace(/'/g, '&#039;');
   }
 
-  // ---------- Media blocks (video / audio rendered from story JSON) ----------
   function renderMediaBlocks(story) {
     var html = '';
     var videoSrc = story.video ? resolveMediaUrl(story.video) : '';
@@ -180,18 +157,16 @@
         '<span class="media-label">♫ Audio</span>' +
         '</div>';
     }
-    // Extra gallery images beyond the cover
     if (Array.isArray(story.images) && story.images.length > 1) {
       story.images.slice(1).forEach(function (img) {
         html += '<div class="feed-media-block feed-img-block">' +
-          '<img src="' + escapeHtml(resolveMediaUrl(img)) + '" alt="" loading="lazy" onerror="this.parentElement.style.display=\'none\'" />' +
+          '<img src="' + escapeHtml(resolveMediaUrl(img)) + '" alt="" loading="lazy" decoding="async" onerror="this.parentElement.style.display=\'none\'" />' +
           '</div>';
       });
     }
     return html;
   }
 
-  // ---------- SEO update when a story opens ----------
   function updateSeoForStory(story) {
     if (!story) return;
     var seo = story.seo || {};
@@ -212,7 +187,6 @@
         if (cl) cl.setAttribute('href', seo.canonical);
         history.replaceState && history.replaceState(null, '', seo.canonical);
       }
-      // Open Graph image
       if (seo.ogImage) {
         var ogImg = document.querySelector('meta[property="og:image"]');
         if (!ogImg) {
@@ -225,7 +199,6 @@
     } catch (e) {}
   }
 
-  // ---------- Feed render ----------
   function renderFeed() {
     if (!feedEl) return;
     var list = getFiltered();
@@ -237,20 +210,17 @@
 
     var heroStory = list[0];
     var otherStories = list.slice(1);
-
     var html = '';
 
-    // ==========================================
-    // HERO POST (fully expanded, rich media)
-    // ==========================================
     var heroType = heroStory.type || 'text';
     var heroBadge = heroStory.series
       ? '<span class="feed-type-badge">' + escapeHtml(heroStory.series) + ' · Ep ' + (heroStory.episode || '?') + '</span>'
       : '<span class="feed-type-badge">' + typeLabel(heroType) + '</span>';
 
     var heroCover = resolveImage(heroStory);
+    // LCP: discoverable in HTML, fetchpriority=high, NO lazy-load
     var heroCoverHtml = heroCover
-      ? '<figure class="feed-hero-cover"><img src="' + escapeHtml(heroCover) + '" alt="' + escapeHtml(heroStory.title) + '" loading="eager" decoding="async" onerror="this.closest(\'figure\').style.display=\'none\'"></figure>'
+      ? '<figure class="feed-hero-cover"><img src="' + escapeHtml(heroCover) + '" alt="' + escapeHtml(heroStory.title) + '" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" onerror="this.closest(\'figure\').style.display=\'none\'"></figure>'
       : '';
 
     html += '<div class="hero-section">';
@@ -273,9 +243,6 @@
             '</div>';
     html += '</article></div>';
 
-    // ==========================================
-    // OTHER POSTS (clean card grid)
-    // ==========================================
     if (otherStories.length > 0) {
       html += '<div class="regular-stories-grid">';
       html += otherStories.map(function (story) {
@@ -288,7 +255,7 @@
 
         var coverImg = resolveImage(story);
         var coverHtml = (coverImg && !isExpanded)
-          ? '<div class="feed-card-media"><img src="' + escapeHtml(coverImg) + '" alt="' + escapeHtml(story.title) + ' কভার" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>'
+          ? '<div class="feed-card-media"><img src="' + escapeHtml(coverImg) + '" alt="' + escapeHtml(story.title) + ' কভার" width="600" height="338" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>'
           : '';
 
         var mediaIcons = [];
@@ -334,7 +301,6 @@
     feedEl.innerHTML = html;
     if (feedEnd) feedEnd.hidden = false;
 
-    // Load full content (with media + inline ad markers) for the hero post
     ensureContent(heroStory.id).then(function (content) {
       var targetEl = document.getElementById('content-' + heroStory.id);
       if (targetEl) {
@@ -357,7 +323,6 @@
     }
   }
 
-  // Deep-link: ?story=xxxx opens that story directly in read mode
   function openDeepLink() {
     var m = (window.location.search || '').match(/[?&]story=([^&]+)/);
     if (m) {
@@ -371,13 +336,11 @@
     }
   }
 
-  // ---------- Read Mode (immersive reader panel) ----------
   async function openReader(id) {
     var story = allStories.find(function (s) { return s.id === id; });
     if (!story) return;
     currentStoryId = id;
     var content = await ensureContent(id);
-
     updateSeoForStory(story);
 
     var readerContent = document.getElementById('readerContent');
@@ -390,7 +353,7 @@
             '<span class="reader-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</span>' +
           '</div>' +
           '<h2 class="reader-title">' + escapeHtml(story.title) + '</h2>' +
-          (resolveImage(story) ? '<img class="reader-cover" src="' + escapeHtml(resolveImage(story)) + '" alt="' + escapeHtml(story.title) + '" loading="lazy">' : '') +
+          (resolveImage(story) ? '<img class="reader-cover" src="' + escapeHtml(resolveImage(story)) + '" alt="' + escapeHtml(story.title) + '" loading="lazy" decoding="async">' : '') +
           (story.video ? '<div class="feed-media-block"><video controls playsinline preload="metadata" style="width:100%">' +
               '<source src="' + escapeHtml(resolveMediaUrl(story.video)) + '">Your browser does not support the video tag.</video></div>' : '') +
           (story.audio ? '<div class="feed-media-block"><audio controls preload="metadata" style="width:100%">' +
@@ -412,7 +375,6 @@
       document.body.style.overflow = 'hidden';
       readerModal.scrollTop = 0;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function closeReader() {
@@ -423,13 +385,11 @@
       document.body.style.overflow = '';
     }
     currentStoryId = null;
-    // Stop any playing media inside the reader
     document.querySelectorAll('#readerContent video, #readerContent audio').forEach(function (m) {
       try { m.pause(); } catch (e) {}
     });
   }
 
-  // Wire next/prev episode buttons anywhere in the content
   function wireMediaButtons(container) {
     if (!container) return;
     container.querySelectorAll('[data-next]').forEach(function (btn) {
@@ -439,7 +399,6 @@
         e.preventDefault();
         var nextId = btn.getAttribute('data-next');
         if (btn.hasAttribute('data-prev')) {
-          // Find previous episode by series ordering
           var cur = allStories.find(function (s) { return s.id === nextId; });
           if (cur && cur.series) {
             var eps = allStories.filter(function (s) { return s.series === cur.series; })
@@ -454,7 +413,6 @@
         openReader(nextId);
       });
     });
-    // Content links: ?story=id deep links open in read mode
     container.querySelectorAll('a[href*="story="]').forEach(function (a) {
       if (a.dataset.bound) return;
       a.dataset.bound = '1';
@@ -470,14 +428,12 @@
     });
   }
 
-  // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', loadStories);
 
   if (feedEl) {
     feedEl.addEventListener('click', function (e) {
-      // Next-episode buttons
       var nextBtn = e.target.closest('[data-next]');
-      if (nextBtn) return; // handled by wireMediaButtons
+      if (nextBtn) return;
 
       var card = e.target.closest('.feed-card');
       if (!card) return;
@@ -496,7 +452,6 @@
         return;
       }
 
-      // Clicking the card header/title opens immersive read mode
       var isTitleArea = e.target.closest('.feed-card-header, .feed-title, .feed-excerpt, .feed-card-media');
       if (isTitleArea && id !== expandedId) {
         openReader(id);
@@ -504,7 +459,6 @@
     });
   }
 
-  // Esc closes read mode; apps.js can also call NightsBlog.closeReader()
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeReader();
   });
