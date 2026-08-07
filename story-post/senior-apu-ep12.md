@@ -12,13 +12,13 @@ language: bn
 readTime: 70 min
 author: Mahmudajenny69
 cover: image/University teacher.JPG
-images: ["image/University teacher.JPG", "image/seniorapu.JPG"]
+images: "https://mahmuda.fun/assets/images/gallery/University.JPG"
 excerpt: বিশ্ববিদ্যালয়ের শিক্ষিকা আর সিনিয়র আপু—দুজনেই রাফির শরীর নিয়ে লড়াই। হেভি ডার্টি টক, বারবার চোষা, ডাবল ডগি, রাতভর থামা নেই। সিরিজের শেষ ধামাকা।
 ---
 
-![University Madam](image/University teacher.JPG)
+![University Madam](https://mahmuda.fun/assets/images/gallery/University.JPG)
 
-![Senior Apu](image/seniorapu.JPG)
+![Senior Apu](https://mahmuda.fun/assets/images/gallery/seniorapu.JPG)
 
 রুম ৫১৮-এর চাদর এখনও ভেজা।
 
