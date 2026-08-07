@@ -74,4 +74,4 @@ cover: story-post/image/senior-apu-cover.jpg
 
 পরের পর্বে: সন্ধ্যা সাতটা। একই কর্নার। এবং সানজিদা আপু যেভাবে খেলা শুরু করেন…
 
-**[পরবর্তী পর্ব পড়ুন →](/?story=senior-apu-ep02)**
+**[পরবর্তী পর্ব পড়ুন →](https://mahmuda.fun/?story=senior-apu-ep02)**
