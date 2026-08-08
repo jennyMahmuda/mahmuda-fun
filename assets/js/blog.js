@@ -16,6 +16,45 @@
   let expandedId = null;
   let currentStoryId = null;
   const contentCache = {};
+  let openedFromHistory = false;
+
+  function storyUrl(id) {
+    return 'index.html?story=' + encodeURIComponent(id);
+  }
+
+  function normalizeCategory(value) {
+    return String(value || '').trim().toLowerCase();
+  }
+
+  function getRelatedStories(story) {
+    if (!story) return [];
+    var category = normalizeCategory(story.category);
+    var related = allStories.filter(function (candidate) {
+      if (!candidate || candidate.id === story.id) return false;
+      var sameCategory = category && normalizeCategory(candidate.category) === category;
+      var sameSeries = story.series && candidate.series && candidate.series === story.series;
+      return sameCategory || sameSeries;
+    });
+    return related.sort(function (a, b) {
+      var aSame = normalizeCategory(a.category) === category ? 1 : 0;
+      var bSame = normalizeCategory(b.category) === category ? 1 : 0;
+      return bSame - aSame || String(b.date || '').localeCompare(String(a.date || ''));
+    }).slice(0, 4);
+  }
+
+  function renderRelatedStories(story) {
+    var related = getRelatedStories(story);
+    if (!related.length) return '';
+    return '<section class="related-section" aria-label="Related stories">' +
+      '<div class="related-heading"><span>Related in ' + escapeHtml(story.category || 'this category') + '</span></div>' +
+      '<div class="related-grid">' + related.map(function (item) {
+        var image = resolveImage(item);
+        return '<a class="related-card" href="' + storyUrl(item.id) + '" data-story-link="' + escapeHtml(item.id) + '">' +
+          (image ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(item.title) + '" loading="lazy">' : '<div class="related-placeholder">N</div>') +
+          '<span class="related-card-body"><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.category || 'Story') + '</small></span>' +
+        '</a>';
+      }).join('') + '</div></section>';
+  }
 
   const KNOWN_IDS = [
     'senior-apu-ep01','senior-apu-ep02','senior-apu-ep03','senior-apu-ep04',
@@ -329,14 +368,18 @@
       var id = decodeURIComponent(m[1]);
       var story = allStories.find(function (s) { return s.id === id; });
       if (story) {
-        expandedId = id;
+        expandedId = null;
         renderFeed();
-        openReader(id);
+        openReader(id, { silent: true });
       }
     }
   }
 
-  async function openReader(id) {
+  async function openReader(id, options) {
+    options = options || {};
+    if (!options.silent) {
+      history.pushState({ story: id }, '', storyUrl(id));
+    }
     var story = allStories.find(function (s) { return s.id === id; });
     if (!story) return;
     currentStoryId = id;
@@ -347,6 +390,7 @@
     var readerModal = document.getElementById('readerModal');
     if (readerContent) {
       readerContent.innerHTML =
+        '<button class="reader-back" type="button" data-reader-back aria-label="Back to stories">← Back to stories</button>' +
         '<div class="reader-head">' +
           '<div class="reader-meta">' +
             (story.series ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>' : '<span class="feed-type-badge">' + typeLabel(story.type || 'text') + '</span>') +
@@ -360,6 +404,7 @@
               '<source src="' + escapeHtml(resolveMediaUrl(story.audio)) + '">Your browser does not support the audio tag.</audio></div>' : '') +
         '</div>' +
         '<div class="reader-body">' + content + '</div>' +
+        renderRelatedStories(story) +
         '<div class="reader-nav">' +
           '<button class="inline-next" data-next="' + escapeHtml(id) + '" data-prev="1">← আগের পর্ব</button>' +
           (story.nextEpisodeId ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>' : '') +
@@ -392,7 +437,19 @@
 
   function wireMediaButtons(container) {
     if (!container) return;
-    container.querySelectorAll('[data-next]').forEach(function (btn) {
+      container.querySelectorAll('[data-reader-back]').forEach(function (btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', function () {
+          if (window.history.length > 1 && window.history.state && window.history.state.story) {
+            history.back();
+          } else {
+            history.replaceState({}, '', 'index.html');
+            closeReader();
+          }
+        });
+      });
+      container.querySelectorAll('[data-next]').forEach(function (btn) {
       if (btn.dataset.bound) return;
       btn.dataset.bound = '1';
       btn.addEventListener('click', function (e) {
@@ -413,14 +470,13 @@
         openReader(nextId);
       });
     });
-    container.querySelectorAll('a[href*="story="]').forEach(function (a) {
+      container.querySelectorAll('a[data-story-link], a[href*="story="]').forEach(function (a) {
       if (a.dataset.bound) return;
       a.dataset.bound = '1';
       a.addEventListener('click', function (e) {
         var m = (a.getAttribute('href') || '').match(/[?&]story=([^&]+)/);
         if (m) {
           e.preventDefault();
-          closeReader();
           expandedId = null;
           openReader(decodeURIComponent(m[1]));
         }
@@ -440,15 +496,7 @@
       var id = card.getAttribute('data-id');
 
       if (e.target.classList.contains('read-more-btn')) {
-        if (expandedId === id) {
-          expandedId = null;
-          renderFeed();
-        } else {
-          expandedId = id;
-          renderFeed();
-          var element = document.getElementById('story-' + id);
-          if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        openReader(id);
         return;
       }
 
@@ -461,6 +509,12 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeReader();
+  });
+
+  window.addEventListener('popstate', function () {
+    var match = (window.location.search || '').match(/[?&]story=([^&]+)/);
+    if (match) openReader(decodeURIComponent(match[1]), { silent: true });
+    else closeReader();
   });
 
   window.NightsBlog = {

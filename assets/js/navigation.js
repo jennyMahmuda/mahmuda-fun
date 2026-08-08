@@ -66,13 +66,13 @@
 
       if (hrefFile === 'index.html' || hrefFile === '' || href === '/') {
         if ((file === 'index.html' || file === '') && !isStoryPage) item.classList.add('active');
-      } else if (hrefFile === 'video.html' && file === 'video.html') {
+      } else if ((href.indexOf('video/') !== -1 && path.indexOf('/video/') !== -1) || (hrefFile === 'video.html' && file === 'video.html')) {
         item.classList.add('active');
-      } else if (hrefFile === 'gallery.html' && file === 'gallery.html') {
+      } else if ((href.indexOf('gellery/') !== -1 && path.indexOf('/gellery/') !== -1) || (hrefFile === 'gallery.html' && file === 'gallery.html')) {
         item.classList.add('active');
-      } else if (hrefFile === 'categories.html' && file === 'categories.html') {
+      } else if ((href.indexOf('category/') !== -1 && path.indexOf('/category/') !== -1) || (hrefFile === 'categories.html' && file === 'categories.html')) {
         item.classList.add('active');
-      } else if (hrefFile === 'series.html' && file === 'series.html') {
+      } else if ((href.indexOf('series/') !== -1 && path.indexOf('/series/') !== -1) || (hrefFile === 'series.html' && file === 'series.html')) {
         item.classList.add('active');
       } else if (hrefFile === 'privacy-policy.html' && file === 'privacy-policy.html') {
         item.classList.add('active');
