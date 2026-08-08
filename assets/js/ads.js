@@ -79,7 +79,8 @@
    * Loads an AT-options ad (iframe) into a container, idempotent.
    */
   function injectAtOptions(container, cfg) {
-    if (!container || container.dataset.adLoaded === '1') return;
+    if (!container || container.closest('.navbar, nav')) return;
+    if (container.dataset.adLoaded === '1') return;
     container.dataset.adLoaded = '1';
     container.classList.add('ad-slot', 'ad-loaded');
     container.style.minHeight = cfg.height + 'px';
@@ -128,6 +129,7 @@
     let slot = document.querySelector('[data-ad="native"]');
     if (!slot) {
       const anchor = document.querySelector('.section-header, .feed-header, main .container');
+      if (anchor && anchor.closest('.navbar, nav')) return;
       if (!anchor) return;
       slot = document.createElement('aside');
       slot.className = 'ad-slot ad-native-slot';
@@ -163,6 +165,7 @@
    */
   function fillStaticSlots() {
     document.querySelectorAll('[data-ad]').forEach(function (el) {
+      if (el.closest('.navbar, nav')) { el.removeAttribute('data-ad'); el.style.display = 'none'; return; }
       const type = el.getAttribute('data-ad');
       if (type === 'leaderboard') {
         if (!isMobile()) injectAtOptions(el, ADS.leaderboard);

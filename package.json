@@ -7,7 +7,8 @@
     "build": "node script/build.js",
     "watch": "node script/builder.js --watch",
     "images:report": "python3 script/imageoptimization.py",
-    "images:optimize": "python3 script/imageoptimization.py --write"
+    "images:optimize": "python3 script/imageoptimization.py --write",
+    "validate": "node script/validate-site.js"
   },
   "engines": {
     "node": ">=18.0.0"

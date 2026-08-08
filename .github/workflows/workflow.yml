@@ -1,0 +1,87 @@
+name: Build and Deploy Nights
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.x'
+
+jobs:
+  build:
+    name: Build and validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install image-report dependency
+        run: python -m pip install --disable-pip-version-check --no-input pillow
+
+      - name: Build stories, metadata and sitemap
+        run: npm run build
+
+      - name: Run image report
+        run: npm run images:report
+
+      - name: Syntax checks
+        run: |
+          node --check assets/js/blog.js
+          node --check assets/js/ads.js
+          node --check assets/js/navigation.js
+          node --check assets/js/site-components.js
+          node --check assets/js/rating-review.js
+
+      - name: Validate all pages and required assets
+        run: node script/validate-site.js
+
+      - name: Assemble complete Pages artifact
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -R . _site
+          rm -rf _site/.git _site/.github _site/node_modules _site/_site
+          find _site -name '__pycache__' -type d -prune -exec rm -rf {} +
+          find _site -name '*.pyc' -delete
+          test -f _site/index.html
+          test -f _site/sitemap.xml
+          test -f _site/robots.txt
+          echo "Published files: $(find _site -type f | wc -l)"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

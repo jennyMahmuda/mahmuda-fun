@@ -411,3 +411,8 @@ body.reader-open .reader-progress { display: block; }
 @media (min-width: 900px) {
   .reader-modal { padding: 40px 24px; }
 }
+
+.rating-review-shell { margin-top: 24px; padding: 16px; border: 1px solid var(--border, #2f2f35); border-radius: 12px; background: rgba(255,255,255,.025); }
+.rating-review-shell h3 { margin: 0 0 6px; }
+.rating-review-shell p { margin: 0 0 8px; color: var(--text-muted, #999); font-size: .9rem; }
+.rating-placeholder { letter-spacing: .25em; color: var(--accent, #c9a87c); font-size: 1.3rem; }

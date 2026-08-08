@@ -437,8 +437,12 @@
         '<div class="reader-nav">' +
           '<button class="inline-next" data-next="' + escapeHtml(id) + '" data-prev="1">← আগের পর্ব</button>' +
           (story.nextEpisodeId ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>' : '') +
-        '</div>';
+        '</div>' +
+        '<div class="rating-review-mount" data-rating-review-mount></div>';
       wireMediaButtons(readerContent);
+      if (window.NightsRatingReview && typeof window.NightsRatingReview.mount === 'function') {
+        window.NightsRatingReview.mount(id, readerContent.querySelector('[data-rating-review-mount]'));
+      }
       if (window.NightsAds && typeof window.NightsAds.onReaderOpen === 'function') {
         window.NightsAds.onReaderOpen(readerContent);
       }
