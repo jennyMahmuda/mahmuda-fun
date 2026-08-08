@@ -232,6 +232,20 @@ function writeSitemap(stories) {
   fs.writeFileSync(SITEMAP_FILE, xml, 'utf8');
   console.log('✓ sitemap.xml (' + urls.length + ' canonical URLs)');
 
+  // Only /script/ (build tooling source) and /_site/ (local build output,
+  // never actually published) are kept out of the crawl — everything else
+  // is intentionally open. No search engine or AI crawler is singled out
+  // for blocking; the entries below exist to make that explicit for the
+  // crawlers site owners ask about most, not to restrict anyone not listed
+  // (the wildcard rule at the top already allows every other bot by default).
+  const openCrawlers = [
+    'Googlebot', 'Googlebot-Image', 'Googlebot-Video', 'Googlebot-News',
+    'Google-Extended', 'Bingbot', 'DuckDuckBot', 'Applebot', 'Applebot-Extended',
+    'Amazonbot', 'YandexBot',
+    'GPTBot', 'ChatGPT-User', 'OAI-SearchBot',
+    'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'anthropic-ai',
+    'PerplexityBot', 'Perplexity-User', 'CCBot', 'meta-externalagent'
+  ];
   const robots = [
     'User-agent: *',
     'Allow: /',
@@ -243,9 +257,20 @@ function writeSitemap(stories) {
     'Allow: /stories/',
     'Allow: /assets/',
     '',
-    'Sitemap: ' + SITE_URL + '/sitemap.xml',
-    ''
-  ].join('\n');
+    '# Explicitly open to major search and AI crawlers — this is a content',
+    '# site and wants to be found. Only build tooling stays disallowed, same',
+    '# as for everyone else above; nothing here is more restrictive than the',
+    "# wildcard rule. If a crawler you use isn't listed by name, it's still",
+    '# allowed by the wildcard rule at the top of this file.'
+  ]
+    .concat(openCrawlers.reduce(function (lines, ua) {
+      return lines.concat(['User-agent: ' + ua, 'Allow: /', 'Disallow: /script/', 'Disallow: /_site/', '']);
+    }, []))
+    .concat([
+      'Sitemap: ' + SITE_URL + '/sitemap.xml',
+      ''
+    ])
+    .join('\n');
   fs.writeFileSync(ROBOTS_FILE, robots, 'utf8');
   console.log('✓ robots.txt');
 }
