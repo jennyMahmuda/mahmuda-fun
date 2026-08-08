@@ -7,7 +7,7 @@ tags: [Madam, University, Teacher, Student, AgeGap, Offer, Tension]
 type: text
 date: 2026-08-08
 language: bn
-readTime: 35 min
+readTime: 10 min
 author: Mahmudajenny69
 cover: https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg
 images: ["https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg"]
@@ -113,4 +113,4 @@ excerpt: ডিভোর্সড ম্যাডাম। হলুদ ব্�
 **গল্প শেষ (পর্ব ১)**
 
 নম্বর উঠবে। রাত এখনও বাকি।
-**পর্ব ২ চাইলে বলো।**
+**[পর্ব ২](/story-post/university-madam-home-offer-2.md)
