@@ -53,6 +53,11 @@
         <h1 class="section-title">Categories</h1>
         <p class="section-desc" id="catSub">Browse stories by desire</p>
       </div>
+      <section class="top-rated-section" id="topRatedSection" hidden>
+        <h2 class="top-rated-title">★ Top Rated Stories</h2>
+        <div class="top-rated-grid" id="topRatedGrid"></div>
+      </section>
+
       <div class="feed-filters" id="catPills" style="margin-bottom: 32px;"></div>
       <div class="regular-stories-grid" id="catGrid">
         <div class="loading-state"><div class="spinner"></div><p>Loading stories…</p></div>
@@ -144,13 +149,55 @@
         return '<a class="feed-card" href="../index.html?story=' + encodeURIComponent(s.id) + '" style="text-decoration:none">' +
           (img ? '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>' : '') +
           '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">Nights</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
-          '<span class="feed-type-badge">' + badge + '</span></div>' +
+          '<span class="feed-type-badge">' + badge + '</span>' +
+          '<span data-rating-slot="' + esc(s.id) + '"></span>' +
+          '</div>' +
           '<h2 class="feed-title">' + esc(s.title) + '</h2>' +
           '<p class="feed-excerpt">' + esc(s.excerpt || '') + '</p>' +
           '</a>';
       }).join('');
       document.querySelectorAll('#catPills .filter-btn').forEach(function (b) {
         b.classList.toggle('active', norm(b.getAttribute('data-cat')) === norm(cat));
+      });
+      applyRatingBadges(grid);
+    }
+
+    // Progressive-enhancement: fills [data-rating-slot] placeholders with
+    // "★ 4.5 (12)" badges once the bulk ratings summary loads.
+    function applyRatingBadges(container) {
+      if (!container || !window.NightsRatingReview) return;
+      window.NightsRatingReview.getSummaryMap().then(function (map) {
+        container.querySelectorAll('[data-rating-slot]').forEach(function (slot) {
+          var summary = map[slot.getAttribute('data-rating-slot')];
+          if (summary && summary.count) slot.outerHTML = window.NightsRatingReview.badgeHtml(summary);
+        });
+      });
+    }
+
+    // Shows the best-rated stories (at least one rating) above the grid.
+    function renderTopRated(stories) {
+      if (!window.NightsRatingReview) return;
+      var section = document.getElementById('topRatedSection');
+      var topGrid = document.getElementById('topRatedGrid');
+      window.NightsRatingReview.getSummaryMap().then(function (map) {
+        var byId = {};
+        stories.forEach(function (s) { byId[s.id] = s; });
+        var ranked = Object.keys(map)
+          .filter(function (id) { return byId[id] && map[id].count > 0; })
+          .sort(function (a, b) {
+            return map[b].average - map[a].average || map[b].count - map[a].count;
+          })
+          .slice(0, 6);
+        if (!ranked.length) { section.hidden = true; return; }
+        topGrid.innerHTML = ranked.map(function (id) {
+          var s = byId[id];
+          var img = coverUrl(s);
+          return '<a class="top-rated-card" href="../index.html?story=' + encodeURIComponent(id) + '">' +
+            window.NightsRatingReview.badgeHtml(map[id]) +
+            '<div class="top-rated-name">' + esc(s.title) + '</div>' +
+            '</a>';
+        }).join('');
+        section.hidden = false;
       });
     }
     var cachedStories = [];
@@ -162,6 +209,7 @@
           cachedStories.sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
           buildPills(cachedStories);
           render(cachedStories, currentCat);
+          renderTopRated(cachedStories);
         })
         .catch(function () {
           grid.innerHTML = '<div class="loading-state"><p>লোড হচ্ছে না। <a href="../index.html" style="color:var(--accent)">Home</a></p></div>';
@@ -179,6 +227,7 @@
   </script>
   <script src="../assets/js/navigation.js" defer></script>
   <script src="../assets/js/site-components.js" defer></script>
+  <script src="../assets/js/rating-review.js" defer></script>
   <script src="../assets/js/ads.js" defer></script>
 </body>
 </html>

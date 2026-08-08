@@ -266,6 +266,22 @@
     });
   }
 
+  // Fills in the [data-rating-slot] placeholders left in each feed card
+  // with a "★ 4.5 (12)" badge, once ratings are available. Non-blocking —
+  // cards render immediately and badges pop in when the API responds.
+  function applyRatingBadges(container) {
+    if (!container || !window.NightsRatingReview || typeof window.NightsRatingReview.getSummaryMap !== 'function') return;
+    window.NightsRatingReview.getSummaryMap().then(function (map) {
+      container.querySelectorAll('[data-rating-slot]').forEach(function (slot) {
+        var id = slot.getAttribute('data-rating-slot');
+        var summary = map[id];
+        if (summary && summary.count) {
+          slot.outerHTML = window.NightsRatingReview.badgeHtml(summary);
+        }
+      });
+    });
+  }
+
   function renderFeed() {
     if (!feedEl) return;
     var list = getFiltered();
@@ -299,6 +315,7 @@
                 '<div class="feed-author">Nights (Featured)</div>' +
                 '<div class="feed-time">' + escapeHtml(heroStory.date || '') + ' · ' + escapeHtml(heroStory.readTime || '') + '</div>' +
               '</div>' + heroBadge +
+              '<span data-rating-slot="' + escapeHtml(heroStory.id) + '"></span>' +
             '</div>';
     html += '<h1 class="feed-title hero-title">' + escapeHtml(heroStory.title) + '</h1>';
     html += '<div class="feed-full-content" id="content-' + heroStory.id + '"><p class="loading-text">ফুল স্টোরি লোড হচ্ছে...</p></div>';
@@ -351,6 +368,7 @@
                 '<div class="feed-author">Nights</div>' +
                 '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
               '</div>' + badge +
+              '<span data-rating-slot="' + escapeHtml(story.id) + '"></span>' +
             '</div>' +
             '<h2 class="feed-title">' + escapeHtml(story.title) + '</h2>' +
             (isExpanded ? '' : '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>') +
@@ -367,6 +385,7 @@
 
     feedEl.innerHTML = html;
     if (feedEnd) feedEnd.hidden = false;
+    applyRatingBadges(feedEl);
 
     ensureContent(heroStory.id).then(function (content) {
       var targetEl = document.getElementById('content-' + heroStory.id);

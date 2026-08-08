@@ -67,6 +67,19 @@ export default {
       return json({ ok: true, service: 'mahmuda-fun-api', database: 'configured' }, 200, corsHeaders(origin));
     }
 
+    if (pathname === '/api/ratings/summary' && request.method === 'GET') {
+      if (!origin && request.headers.get('Origin')) {
+        return json({ error: 'Origin not allowed' }, 403);
+      }
+      if (!env.REVIEWS_DB) {
+        return json({ error: 'Database binding is not configured' }, 503, corsHeaders(origin));
+      }
+      const result = await env.REVIEWS_DB.prepare(
+        'SELECT story_id AS storyId, COUNT(*) AS count, ROUND(AVG(rating), 2) AS average FROM story_ratings GROUP BY story_id ORDER BY average DESC, count DESC LIMIT 200'
+      ).all();
+      return json({ ratings: result.results || [] }, 200, corsHeaders(origin));
+    }
+
     const route = routeStoryId(pathname);
     if (!route || !validStoryId(route.storyId)) {
       return json({ error: 'Not found' }, 404, corsHeaders(origin));
