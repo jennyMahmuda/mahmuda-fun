@@ -199,7 +199,7 @@
     if (Array.isArray(story.images) && story.images.length > 1) {
       story.images.slice(1).forEach(function (img) {
         html += '<div class="feed-media-block feed-img-block">' +
-          '<img src="' + escapeHtml(resolveMediaUrl(img)) + '" alt="" loading="lazy" decoding="async" onerror="this.parentElement.style.display=\'none\'" />' +
+          '<img src="' + escapeHtml(resolveMediaUrl(img)) + '" alt="' + escapeHtml(story.title + ' story image') + '" loading="lazy" decoding="async" onerror="this.parentElement.style.display=\'none\'" />' +
           '</div>';
       });
     }
@@ -226,6 +226,8 @@
         if (cl) cl.setAttribute('href', seo.canonical);
         history.replaceState && history.replaceState(null, '', seo.canonical);
       }
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle && seo.title) ogTitle.setAttribute('content', seo.title);
       if (seo.ogImage) {
         var ogImg = document.querySelector('meta[property="og:image"]');
         if (!ogImg) {
@@ -236,6 +238,32 @@
         ogImg.setAttribute('content', seo.ogImage);
       }
     } catch (e) {}
+  }
+
+  function updateStoryStructuredData(story) {
+    if (!story) return;
+    var seo = story.seo || {};
+    var script = document.getElementById('storyStructuredData');
+    if (!script) {
+      script = document.createElement('script');
+      script.id = 'storyStructuredData';
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+    var image = seo.ogImage || resolveImage(story);
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      'headline': story.title,
+      'description': seo.description || story.excerpt || story.title,
+      'url': seo.canonical || (location.origin + '/?story=' + encodeURIComponent(story.id)),
+      'datePublished': story.date || undefined,
+      'image': image ? [image] : undefined,
+      'articleSection': story.category || 'Story',
+      'keywords': Array.isArray(story.tags) ? story.tags : [],
+      'isFamilyFriendly': false,
+      'inLanguage': story.language || 'en'
+    });
   }
 
   function renderFeed() {
@@ -385,6 +413,7 @@
     currentStoryId = id;
     var content = await ensureContent(id);
     updateSeoForStory(story);
+    updateStoryStructuredData(story);
 
     var readerContent = document.getElementById('readerContent');
     var readerModal = document.getElementById('readerModal');

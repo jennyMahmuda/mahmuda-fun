@@ -5,7 +5,9 @@
   "private": true,
   "scripts": {
     "build": "node script/build.js",
-    "watch": "node script/builder.js --watch"
+    "watch": "node script/builder.js --watch",
+    "images:report": "python3 script/imageoptimization.py",
+    "images:optimize": "python3 script/imageoptimization.py --write"
   },
   "engines": {
     "node": ">=18.0.0"

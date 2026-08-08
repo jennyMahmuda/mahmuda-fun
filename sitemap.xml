@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mahmuda.fun/</loc>
     <lastmod>2026-08-08</lastmod>
@@ -7,22 +7,28 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://mahmuda.fun/index.html</loc>
-    <lastmod>2026-08-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://mahmuda.fun/video.html</loc>
+    <loc>https://mahmuda.fun/category/</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://mahmuda.fun/gallery.html</loc>
+    <loc>https://mahmuda.fun/gellery/</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/video/</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/series/</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/privacy-policy.html</loc>
@@ -41,24 +47,28 @@
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg</image:loc><image:title>গরম ভাবি · পর্ব ২ · রাত লম্বা</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=gorom-bhabi-orange-3</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg</image:loc><image:title>গরম ভাবি · পর্ব ৩ · শেষ রাত</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=gorom-bhabi-orange-4</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg</image:loc><image:title>গরম ভাবি · পর্ব ৪ · হার্ড অ্যানাল</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=gorom-bhabi-orange</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg</image:loc><image:title>গরম ভাবি · কমলা শাড়ি · জামাই ঢাকার বাইরে</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=university-madam-home-offer-2</loc>
@@ -71,12 +81,15 @@
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg</image:loc><image:title>ইউনিভার্সিটি ম্যাডাম · বাসায় এসো · নম্বর বাড়বে</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=senior-apu-ending</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/University.JPG</image:loc><image:title>সিনিয়র আপু · শেষ শট — মেগা এন্ডিং</image:title></image:image>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/seniorapu.JPG</image:loc><image:title>সিনিয়র আপু · শেষ শট — মেগা এন্ডিং</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=senior-apu-ep04</loc>
@@ -173,6 +186,7 @@
     <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://i.ibb.co/Lh0gpvvw/IMG-7853.jpg</image:loc><image:title>বৃষ্টির রাতে – পর্ব ৩ · নিষিদ্ধ দুপুর</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=bristir-rate-ep3</loc>

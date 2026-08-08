@@ -186,45 +186,59 @@ function injectAdMarkers(htmlContent) {
 
 function writeSitemap(stories) {
   const today = new Date().toISOString().slice(0, 10);
+  const staticPages = [
+    { path: '/', changefreq: 'daily', priority: '1.0' },
+    { path: '/category/', changefreq: 'weekly', priority: '0.8' },
+    { path: '/gellery/', changefreq: 'weekly', priority: '0.7' },
+    { path: '/video/', changefreq: 'weekly', priority: '0.8' },
+    { path: '/series/', changefreq: 'weekly', priority: '0.8' },
+    { path: '/privacy-policy.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/llms.txt', changefreq: 'monthly', priority: '0.2' }
+  ];
+  const seen = new Set();
   const urls = [];
-  urls.push({ loc: SITE_URL + '/', lastmod: today, changefreq: 'daily', priority: '1.0' });
-  urls.push({ loc: SITE_URL + '/index.html', lastmod: today, changefreq: 'daily', priority: '1.0' });
-  urls.push({ loc: SITE_URL + '/video.html', lastmod: today, changefreq: 'weekly', priority: '0.8' });
-  urls.push({ loc: SITE_URL + '/gallery.html', lastmod: today, changefreq: 'weekly', priority: '0.7' });
-  urls.push({ loc: SITE_URL + '/privacy-policy.html', lastmod: today, changefreq: 'monthly', priority: '0.3' });
-  urls.push({ loc: SITE_URL + '/llms.txt', lastmod: today, changefreq: 'monthly', priority: '0.2' });
+  const addUrl = function (loc, lastmod, changefreq, priority) {
+    if (!loc || seen.has(loc)) return;
+    seen.add(loc); urls.push({ loc: loc, lastmod: lastmod || today, changefreq: changefreq, priority: priority });
+  };
+  staticPages.forEach(function (p) { addUrl(SITE_URL + p.path, today, p.changefreq, p.priority); });
 
   (stories || []).forEach(function (s) {
     const slug = s.id || s.slug;
-    urls.push({
-      loc: SITE_URL + '/?story=' + encodeURIComponent(slug),
-      lastmod: (s.date || today).slice(0, 10),
-      changefreq: 'weekly',
-      priority: '0.8'
-    });
+    if (!slug) return;
+    addUrl(SITE_URL + '/?story=' + encodeURIComponent(slug), (s.date || today).slice(0, 10), 'weekly', '0.8');
   });
 
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n';
   urls.forEach(function (u) {
     xml += '  <url>\n';
     xml += '    <loc>' + escapeXml(u.loc) + '</loc>\n';
-    xml += '    <lastmod>' + u.lastmod + '</lastmod>\n';
+    xml += '    <lastmod>' + escapeXml(u.lastmod) + '</lastmod>\n';
     xml += '    <changefreq>' + u.changefreq + '</changefreq>\n';
     xml += '    <priority>' + u.priority + '</priority>\n';
+    const story = (stories || []).find(function (s) { return SITE_URL + '/?story=' + encodeURIComponent(s.id || s.slug) === u.loc; });
+    if (story) {
+      const media = [story.cover].concat(story.images || []).filter(Boolean);
+      Array.from(new Set(media)).slice(0, 10).forEach(function (img) {
+        if (/^https?:\/\//i.test(img) || /^\//.test(img)) {
+          xml += '    <image:image><image:loc>' + escapeXml(img) + '</image:loc><image:title>' + escapeXml(story.title) + '</image:title></image:image>\n';
+        }
+      });
+    }
     xml += '  </url>\n';
   });
   xml += '</urlset>\n';
-
   fs.writeFileSync(SITEMAP_FILE, xml, 'utf8');
-  console.log('✓ sitemap.xml (' + urls.length + ' URLs)');
+  console.log('✓ sitemap.xml (' + urls.length + ' canonical URLs)');
 
-  // Correct robots: allow assets (CSS/JS/images), point AI crawlers to llms.txt
   const robots = [
     'User-agent: *',
     'Allow: /',
+    'Disallow: /script/',
+    'Disallow: /_site/',
     '',
-    '# AI / LLM crawlers – see /llms.txt for site purpose and preferred usage',
+    '# Public text, image, video and story paths remain crawlable.',
     'Allow: /llms.txt',
     'Allow: /stories/',
     'Allow: /assets/',

@@ -1,7 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /script/
+Disallow: /_site/
 
-# AI / LLM crawlers – see /llms.txt for site purpose and preferred usage
+# Public text, image, video and story paths remain crawlable.
 Allow: /llms.txt
 Allow: /stories/
 Allow: /assets/

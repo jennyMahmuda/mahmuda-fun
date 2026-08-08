@@ -32,6 +32,8 @@ jobs:
           node script/blog-builder.js || true
           ls -la stories/ sitemap.xml robots.txt || true
 
+      - name: Image optimization report
+        run: python3 script/imageoptimization.py
       - name: Performance audit (Lighthouse guardian)
         run: |
           python3 script/Lighthouse.py --fix || true

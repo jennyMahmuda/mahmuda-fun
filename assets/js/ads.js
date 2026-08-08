@@ -44,6 +44,23 @@
       height: 300,
       script: 'https://www.highperformanceformat.com/273da8332344d6fc1a2bf05ed7bb975f/invoke.js'
     },
+    rectangle: {
+      key: '69d8bf2cd9393fcc93c970b18794623a',
+      width: 300,
+      height: 250,
+      script: 'https://www.highperformanceformat.com/69d8bf2cd9393fcc93c970b18794623a/invoke.js'
+    },
+    compact: {
+      key: '044c64ab2a94fddc6c1342270517ad48',
+      width: 468,
+      height: 60,
+      script: 'https://www.highperformanceformat.com/044c64ab2a94fddc6c1342270517ad48/invoke.js'
+    },
+    native: {
+      src: 'https://pl30754545.effectivecpmnetwork.com/338427ef031554fb69be13a7ebed5b7b/invoke.js',
+      containerId: 'container-338427ef031554fb69be13a7ebed5b7b'
+    },
+    smartLink: 'https://www.effectivecpmnetwork.com/kg1dg8q0c2?key=43cfb175f776514c54c4c87294d1718d',
     socialBar: 'https://pl30691116.effectivecpmnetwork.com/2d/ce/92/2dce92dedc17227889cf9319e3234751.js'
   };
 
@@ -103,7 +120,42 @@
     const s = document.createElement('script');
     s.src = ADS.socialBar;
     s.async = true;
+    s.setAttribute('data-ad-network', 'socialbar');
     document.body.appendChild(s);
+  }
+
+  function loadNativeBanner() {
+    let slot = document.querySelector('[data-ad="native"]');
+    if (!slot) {
+      const anchor = document.querySelector('.section-header, .feed-header, main .container');
+      if (!anchor) return;
+      slot = document.createElement('aside');
+      slot.className = 'ad-slot ad-native-slot';
+      slot.setAttribute('data-ad', 'native');
+      slot.setAttribute('aria-label', 'Advertisement');
+      slot.innerHTML = '<div class="ad-label">Advertisement</div><div id="' + ADS.native.containerId + '"></div>';
+      anchor.parentNode.insertBefore(slot, anchor.nextSibling);
+    }
+    if (slot.dataset.adLoaded === '1') return;
+    slot.dataset.adLoaded = '1';
+    const container = slot.querySelector('#' + ADS.native.containerId);
+    if (!container) return;
+    const script = document.createElement('script');
+    script.async = true;
+    script.setAttribute('data-cfasync', 'false');
+    script.src = ADS.native.src;
+    container.appendChild(script);
+  }
+
+  function addSmartLinkNotice(root) {
+    root = root || document;
+    if (root.querySelector('.ad-smartlink')) return;
+    const target = root.querySelector('.feed-actions, .reader-nav, footer');
+    if (!target) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'ad-smartlink';
+    wrap.innerHTML = '<span>Sponsored</span> <a href="' + ADS.smartLink + '" target="_blank" rel="sponsored nofollow noopener noreferrer">Continue with partner</a>';
+    target.appendChild(wrap);
   }
 
   /**
@@ -123,6 +175,12 @@
         else el.style.display = 'none';
       } else if (type === 'mid') {
         injectAtOptions(el, ADS.mid);
+      } else if (type === 'rectangle') {
+        injectAtOptions(el, ADS.rectangle);
+      } else if (type === 'compact') {
+        injectAtOptions(el, ADS.compact);
+      } else if (type === 'native') {
+        loadNativeBanner();
       }
     });
   }
@@ -203,6 +261,7 @@
     if (!readerContent) return;
 
     fillInlineAdContainers(readerContent);
+    addSmartLinkNotice(readerContent);
 
     let slot = readerContent.querySelector('.reader-ad-slot');
     if (!slot) {
@@ -220,13 +279,15 @@
     if (inner && inner.dataset.adLoaded !== '1') {
       inner.dataset.adLoaded = '';
       inner.innerHTML = '';
-      injectAtOptions(inner, ADS.mid);
+      injectAtOptions(inner, ADS.rectangle);
     }
   }
 
   function init() {
     fillStaticSlots();
+    loadNativeBanner();
     loadSocialBar();
+    addSmartLinkNotice(document);
 
     window.addEventListener('resize', function () {
       document.querySelectorAll('[data-ad="leaderboard"]').forEach(function (el) {
