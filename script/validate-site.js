@@ -14,7 +14,7 @@ for (const file of pages) {
   if (header && /data-ad=|<iframe|<script[^>]+src=.*ad/i.test(header[0])) errors.push(`${file}: ad marker appears inside header`);
   if (!html.includes('privacy-policy.html') && !html.includes('site-components.js')) errors.push(`${file}: missing privacy/shared legal link`);
 }
-const workflow = path.join(root, '.github/workflows/workflow.yml');
-if (!fs.existsSync(workflow)) errors.push('Missing canonical workflow.yml');
+const workflows = ['.github/workflows/Deploy.yml', '.github/workflows/cloudflare-worker.yml'];
+for (const workflow of workflows) if (!fs.existsSync(path.join(root, workflow))) errors.push(`Missing ${workflow}`);
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 console.log(`Validated ${pages.length} pages and ${required.length} required assets.`);

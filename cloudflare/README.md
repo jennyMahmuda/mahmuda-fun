@@ -1,8 +1,24 @@
 # Cloudflare setup guide
 
+## Exact repository paths
+
+এই files-গুলো repository root থেকে ঠিক এই path-এ থাকবে:
+
+| File | Repository path |
+|---|---|
+| Wrangler config | `/wrangler.toml` |
+| D1 migration SQL | `/cloudflare/migrations/0001_rating_review.sql` |
+| Worker source | `/cloudflare/worker/src/index.js` |
+| Pages workflow | `/.github/workflows/Deploy.yml` |
+| Cloudflare Worker workflow | `/.github/workflows/cloudflare-worker.yml` |
+
+GitHub-এর **Add file → Upload files** ব্যবহার করলে প্রথমে `.github/workflows/` folder তৈরি করে workflow files upload করবেন। SQL file `cloudflare/migrations/` folder-এ এবং Worker JavaScript `cloudflare/worker/src/` folder-এ রাখবেন। Root-level `wrangler.toml` অবশ্যই repository root-এ থাকবে।
+
 এই repository-তে Wrangler configuration, Cloudflare Worker API এবং D1 migration আগে থেকেই প্রস্তুত করা আছে। Worker-এর নাম `mahmuda-fun-api`; D1 database-এর নাম `mahmuda_fun_reviews`; database ID repository-এর `wrangler.toml`-এ আছে। Existing `zamil_shop` database স্পর্শ করা হয়নি।
 
 ## GitHub repository secrets
+
+`Deploy.yml` GitHub Pages deploy করে। `cloudflare-worker.yml` Cloudflare D1 migration ও Worker deploy করে। এই দুই workflow আলাদা রাখা হয়েছে, যাতে একই commit থেকে Pages এবং Worker প্রত্যেকে একবার করে deploy হয়।
 
 GitHub repository-এর **Settings → Secrets and variables → Actions → New repository secret** থেকে নিচের দুটি secret যোগ করুন। Secret value এখানে বা repository file-এ লিখবেন না।
 

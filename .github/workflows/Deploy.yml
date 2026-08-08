@@ -1,4 +1,4 @@
-name: Build and Deploy Nights
+name: Build and Deploy Pages
 
 on:
   push:
@@ -20,7 +20,7 @@ env:
 
 jobs:
   build:
-    name: Build and validate
+    name: Build and validate site
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,6 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -58,7 +59,7 @@ jobs:
           node --check cloudflare/worker/src/index.js
 
       - name: Validate all pages and required assets
-        run: node script/validate-site.js
+        run: npm run validate
 
       - name: Assemble complete Pages artifact
         run: |
@@ -89,32 +90,3 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
-  deploy-worker:
-    name: Deploy Cloudflare Worker and D1 migrations
-    needs: build
-    if: ${{ vars.ENABLE_CLOUDFLARE_DEPLOY == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Apply D1 migrations
-        run: npm run cf:migrate:remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Deploy Worker
-        run: npm run cf:deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
