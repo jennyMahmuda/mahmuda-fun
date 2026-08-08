@@ -73,11 +73,16 @@ jobs:
           test -f _site/sitemap.xml
           test -f _site/robots.txt
           echo "Published files: $(find _site -type f | wc -l)"
+          # Package the site into a tarball exactly as GitHub Pages expects
+          tar --dereference --hard-dereference --directory _site -cvf ${{ runner.temp }}/artifact.tar .
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        # Replaced composite action with direct, securely pinned upload-artifact (v4.3.6)
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
         with:
-          path: _site
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
 
   deploy:
     name: Deploy to GitHub Pages
