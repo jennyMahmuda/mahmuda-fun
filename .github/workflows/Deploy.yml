@@ -63,18 +63,23 @@ jobs:
 
       - name: Assemble complete Pages artifact
         run: |
-          rm -rf _site
-          mkdir -p _site
-          cp -R . _site
-          rm -rf _site/.git _site/.github _site/node_modules _site/_site
-          find _site -name '__pycache__' -type d -prune -exec rm -rf {} +
-          find _site -name '*.pyc' -delete
-          test -f _site/index.html
-          test -f _site/sitemap.xml
-          test -f _site/robots.txt
-          echo "Published files: $(find _site -type f | wc -l)"
+          # Stage into a directory OUTSIDE the repo checkout so the staging
+          # dir never ends up nested inside the thing being copied
+          # (that self-nesting is what caused "cp: cannot copy a directory,
+          # '.', into itself, '_site/.'" in earlier runs).
+          SITE_DIR="${{ runner.temp }}/_site"
+          rm -rf "$SITE_DIR"
+          mkdir -p "$SITE_DIR"
+          cp -R . "$SITE_DIR"
+          rm -rf "$SITE_DIR/.git" "$SITE_DIR/.github" "$SITE_DIR/node_modules"
+          find "$SITE_DIR" -name '__pycache__' -type d -prune -exec rm -rf {} +
+          find "$SITE_DIR" -name '*.pyc' -delete
+          test -f "$SITE_DIR/index.html"
+          test -f "$SITE_DIR/sitemap.xml"
+          test -f "$SITE_DIR/robots.txt"
+          echo "Published files: $(find "$SITE_DIR" -type f | wc -l)"
           # Package the site into a tarball exactly as GitHub Pages expects
-          tar --dereference --hard-dereference --directory _site -cvf ${{ runner.temp }}/artifact.tar .
+          tar --dereference --hard-dereference --directory "$SITE_DIR" -cvf ${{ runner.temp }}/artifact.tar .
 
       - name: Upload Pages artifact
         # Replaced composite action with direct, securely pinned upload-artifact (v4.3.6)

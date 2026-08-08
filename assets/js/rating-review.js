@@ -1,14 +1,252 @@
-/* Future rating/review UI shell. Deliberately no network or data collection until Cloudflare API is enabled. */
+/* Ratings & reviews widget — talks to the Cloudflare Worker + D1 API.
+   Mounted by blog.js into [data-rating-review-mount] each time a story reader opens. */
 (function () {
   'use strict';
+
+  var API_BASE = 'https://mahmuda-fun-api.mahmudajenny6.workers.dev';
+  var ANON_KEY_STORAGE = 'nights_anonymous_key';
+
+  function getAnonymousKey() {
+    try {
+      var existing = window.localStorage.getItem(ANON_KEY_STORAGE);
+      if (existing && /^[a-zA-Z0-9._:-]{16,160}$/.test(existing)) return existing;
+      var fresh = 'anon-' + (window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : Date.now().toString(36) + Math.random().toString(36).slice(2));
+      window.localStorage.setItem(ANON_KEY_STORAGE, fresh);
+      return fresh;
+    } catch (e) {
+      // localStorage unavailable (private mode / blocked) — use a per-session key
+      return 'anon-session-' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    try {
+      var d = new Date(iso.replace(' ', 'T') + 'Z');
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function apiFetch(path, options) {
+    return fetch(API_BASE + path, options).then(function (res) {
+      return res.json().catch(function () { return null; }).then(function (data) {
+        if (!res.ok) {
+          var message = (data && data.error) || ('Request failed (' + res.status + ')');
+          throw new Error(message);
+        }
+        return data;
+      });
+    });
+  }
+
+  function starsMarkup(average, interactive) {
+    var rounded = Math.round(Number(average) || 0);
+    var out = '';
+    for (var i = 1; i <= 5; i++) {
+      if (interactive) {
+        out += '<button type="button" class="rr-star" data-star="' + i + '" aria-label="Rate ' + i + ' out of 5">' +
+          '<span aria-hidden="true">' + (i <= rounded ? '★' : '☆') + '</span></button>';
+      } else {
+        out += '<span class="rr-star-static" aria-hidden="true">' + (i <= rounded ? '★' : '☆') + '</span>';
+      }
+    }
+    return out;
+  }
+
+  function render(shell, state) {
+    var avg = state.ratingSummary ? state.ratingSummary.average : 0;
+    var count = state.ratingSummary ? state.ratingSummary.count : 0;
+    var myRating = state.myRating || 0;
+
+    var reviewsMarkup = '';
+    if (state.reviewsLoading) {
+      reviewsMarkup = '<p class="rr-hint">Loading reviews…</p>';
+    } else if (state.reviewsError) {
+      reviewsMarkup = '<p class="rr-hint rr-error">Could not load reviews right now.</p>';
+    } else if (!state.reviews || state.reviews.length === 0) {
+      reviewsMarkup = '<p class="rr-hint">No reviews yet. Be the first to share your thoughts.</p>';
+    } else {
+      reviewsMarkup = '<ul class="rr-list">' + state.reviews.map(function (r) {
+        return '<li class="rr-item">' +
+          '<div class="rr-item-head">' +
+            '<span class="rr-item-name">' + escapeHtml(r.displayName || 'Anonymous') + '</span>' +
+            '<span class="rr-item-date">' + escapeHtml(formatDate(r.createdAt)) + '</span>' +
+          '</div>' +
+          '<p class="rr-item-text">' + escapeHtml(r.reviewText) + '</p>' +
+        '</li>';
+      }).join('') + '</ul>';
+    }
+
+    shell.innerHTML =
+      '<h3>Ratings &amp; reviews</h3>' +
+      '<div class="rr-summary">' +
+        '<div class="rr-stars" data-role="static-stars">' + starsMarkup(avg, false) + '</div>' +
+        '<span class="rr-average">' + (count ? Number(avg).toFixed(1) : '—') + '</span>' +
+        '<span class="rr-count">' + (count ? count + (count === 1 ? ' rating' : ' ratings') : 'No ratings yet') + '</span>' +
+      '</div>' +
+
+      '<div class="rr-rate-block">' +
+        '<p class="rr-label">' + (myRating ? 'Your rating' : 'Tap to rate') + '</p>' +
+        '<div class="rr-stars rr-stars-interactive" data-role="my-stars">' + starsMarkup(myRating, true) + '</div>' +
+        (state.rateStatus ? '<p class="rr-hint' + (state.rateStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.rateStatus.message) + '</p>' : '') +
+      '</div>' +
+
+      '<form class="rr-form" data-role="review-form">' +
+        '<label class="rr-field">' +
+          '<span>Name (optional)</span>' +
+          '<input type="text" name="displayName" maxlength="80" placeholder="Anonymous" autocomplete="off">' +
+        '</label>' +
+        '<label class="rr-field">' +
+          '<span>Your review</span>' +
+          '<textarea name="reviewText" rows="3" maxlength="2000" minlength="2" placeholder="Share what you thought of this story…" required></textarea>' +
+        '</label>' +
+        '<button type="submit" class="rr-submit"' + (state.submitting ? ' disabled' : '') + '>' +
+          (state.submitting ? 'Submitting…' : 'Submit review') +
+        '</button>' +
+        (state.reviewStatus ? '<p class="rr-hint' + (state.reviewStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.reviewStatus.message) + '</p>' : '') +
+      '</form>' +
+
+      '<div class="rr-reviews">' + reviewsMarkup + '</div>';
+
+    // Wire star buttons
+    var starsWrap = shell.querySelector('[data-role="my-stars"]');
+    if (starsWrap) {
+      starsWrap.querySelectorAll('.rr-star').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var value = Number(btn.getAttribute('data-star'));
+          submitRating(shell, state, value);
+        });
+      });
+    }
+
+    // Wire review form
+    var form = shell.querySelector('[data-role="review-form"]');
+    if (form) {
+      form.addEventListener('submit', function (evt) {
+        evt.preventDefault();
+        if (state.submitting) return;
+        var formData = new FormData(form);
+        submitReview(shell, state, {
+          displayName: (formData.get('displayName') || '').toString().trim(),
+          reviewText: (formData.get('reviewText') || '').toString().trim(),
+        });
+      });
+    }
+  }
+
+  function loadSummary(shell, state) {
+    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/ratings')
+      .then(function (data) {
+        state.ratingSummary = data;
+        render(shell, state);
+      })
+      .catch(function () {
+        state.ratingSummary = { count: 0, average: 0 };
+        render(shell, state);
+      });
+  }
+
+  function loadReviews(shell, state) {
+    state.reviewsLoading = true;
+    render(shell, state);
+    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/reviews')
+      .then(function (data) {
+        state.reviewsLoading = false;
+        state.reviews = (data && data.reviews) || [];
+        render(shell, state);
+      })
+      .catch(function () {
+        state.reviewsLoading = false;
+        state.reviewsError = true;
+        render(shell, state);
+      });
+  }
+
+  function submitRating(shell, state, value) {
+    state.myRating = value;
+    state.rateStatus = null;
+    render(shell, state);
+    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/ratings', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-anonymous-key': state.anonymousKey },
+      body: JSON.stringify({ rating: value, anonymousKey: state.anonymousKey }),
+    })
+      .then(function () {
+        state.rateStatus = { message: 'Thanks for rating!', error: false };
+        loadSummary(shell, state);
+      })
+      .catch(function (err) {
+        state.rateStatus = { message: err.message || 'Could not save your rating. Try again.', error: true };
+        render(shell, state);
+      });
+  }
+
+  function submitReview(shell, state, payload) {
+    if (payload.reviewText.length < 2) {
+      state.reviewStatus = { message: 'Please write a little more before submitting.', error: true };
+      render(shell, state);
+      return;
+    }
+    state.submitting = true;
+    state.reviewStatus = null;
+    render(shell, state);
+    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/reviews', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-anonymous-key': state.anonymousKey },
+      body: JSON.stringify({
+        displayName: payload.displayName || undefined,
+        reviewText: payload.reviewText,
+        anonymousKey: state.anonymousKey,
+      }),
+    })
+      .then(function () {
+        state.submitting = false;
+        state.reviewStatus = { message: 'Thanks! Your review was submitted and will appear after a quick moderation check.', error: false };
+        render(shell, state);
+      })
+      .catch(function (err) {
+        state.submitting = false;
+        state.reviewStatus = { message: err.message || 'Could not submit your review. Try again.', error: true };
+        render(shell, state);
+      });
+  }
+
   function mount(storyId, target) {
     if (!target || !storyId || target.querySelector('[data-rating-review-shell]')) return;
     var shell = document.createElement('section');
     shell.className = 'rating-review-shell';
     shell.setAttribute('data-rating-review-shell', '1');
     shell.setAttribute('aria-label', 'Ratings and reviews');
-    shell.innerHTML = '<h3>Ratings & reviews</h3><p>Coming soon. Ratings and reviews are not collected in this release.</p><div class="rating-placeholder" aria-hidden="true">☆ ☆ ☆ ☆ ☆</div>';
     target.appendChild(shell);
+
+    var state = {
+      storyId: storyId,
+      anonymousKey: getAnonymousKey(),
+      ratingSummary: null,
+      myRating: 0,
+      rateStatus: null,
+      reviews: [],
+      reviewsLoading: true,
+      reviewsError: false,
+      reviewStatus: null,
+      submitting: false,
+    };
+
+    render(shell, state);
+    loadSummary(shell, state);
+    loadReviews(shell, state);
   }
+
   window.NightsRatingReview = { mount: mount };
 })();
