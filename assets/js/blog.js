@@ -114,7 +114,37 @@
     if (typeof renderSeries === 'function') renderSeries();
     if (typeof renderFooterCats === 'function') renderFooterCats();
     if (typeof bindCategoryCards === 'function') bindCategoryCards();
+    renderTopStories();
     openDeepLink();
+  }
+
+  // Home-page "★ Top Stories" — same ranking approach as the category page:
+  // stories with at least one rating, sorted by average (ties by count).
+  function renderTopStories() {
+    if (!window.NightsRatingReview || typeof window.NightsRatingReview.getSummaryMap !== 'function') return;
+    var section = document.getElementById('topStoriesSection');
+    var grid = document.getElementById('topStoriesGrid');
+    if (!section || !grid) return;
+    window.NightsRatingReview.getSummaryMap().then(function (map) {
+      var byId = {};
+      allStories.forEach(function (s) { byId[s.id] = s; });
+      var ranked = Object.keys(map)
+        .filter(function (id) { return byId[id] && map[id].count > 0; })
+        .sort(function (a, b) { return map[b].average - map[a].average || map[b].count - map[a].count; })
+        .slice(0, 6);
+      if (!ranked.length) { section.hidden = true; return; }
+      grid.innerHTML = ranked.map(function (id) {
+        var s = byId[id];
+        var img = resolveImage(s);
+        return '<a class="top-rated-card" href="' + storyUrl(id) + '" data-story-link="' + escapeHtml(id) + '">' +
+          (img ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:8px;" onerror="this.remove()">' : '') +
+          window.NightsRatingReview.badgeHtml(map[id]) +
+          '<div class="top-rated-name">' + escapeHtml(s.title) + '</div>' +
+          '</a>';
+      }).join('');
+      section.hidden = false;
+      wireMediaButtons(grid); // intercepts the ?story= links for in-page SPA navigation
+    });
   }
 
   async function loadByIds(ids) {
@@ -266,6 +296,20 @@
     });
   }
 
+  // Mounts the ratings/reviews widget into every [data-rating-review-mount]
+  // placeholder currently in the feed — the hero card (always expanded) and
+  // any grid card the reader has expanded inline via "সবটুকু পড়ুন". The
+  // modal reader (openReader()) mounts its own copy separately. mount() is
+  // idempotent, so calling this on every render is safe.
+  function mountRatingReviews(container) {
+    if (!container || !window.NightsRatingReview || typeof window.NightsRatingReview.mount !== 'function') return;
+    container.querySelectorAll('[data-rating-review-mount]').forEach(function (mountEl) {
+      var card = mountEl.closest('[data-id]');
+      var id = card && card.getAttribute('data-id');
+      if (id) window.NightsRatingReview.mount(id, mountEl);
+    });
+  }
+
   // Fills in the [data-rating-slot] placeholders left in each feed card
   // with a "★ 4.5 (12)" badge, once ratings are available. Non-blocking —
   // cards render immediately and badges pop in when the API responds.
@@ -325,6 +369,7 @@
     html += '<div class="feed-tags">' +
               (heroStory.tags || []).map(function (tg) { return '<span class="feed-tag">#' + escapeHtml(tg) + '</span>'; }).join('') +
             '</div>';
+    html += '<div class="rating-review-mount" data-rating-review-mount></div>';
     html += '</article></div>';
 
     if (otherStories.length > 0) {
@@ -377,6 +422,7 @@
               '<button class="read-more-btn">' + (isExpanded ? 'ছোট করে দেখুন ↑' : 'সবটুকু পড়ুন →') + '</button>' +
               nextBtn +
             '</div>' +
+            (isExpanded ? '<div class="rating-review-mount" data-rating-review-mount></div>' : '') +
           '</article>'
         );
       }).join('');
@@ -386,6 +432,7 @@
     feedEl.innerHTML = html;
     if (feedEnd) feedEnd.hidden = false;
     applyRatingBadges(feedEl);
+    mountRatingReviews(feedEl);
 
     ensureContent(heroStory.id).then(function (content) {
       var targetEl = document.getElementById('content-' + heroStory.id);
