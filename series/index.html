@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) Measurement ID: G-1Z0TLKJZ9R -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1Z0TLKJZ9R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1Z0TLKJZ9R');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Series | mahmuda.fun – Episode-by-Episode Adult Stories</title>
+  <meta name="description" content="Browse story series on mahmuda.fun: Senior Apu, Bhabhi Devar Rain, University Madam and more. Read every episode in order. 18+ only." />
+  <meta name="keywords" content="adult story series, bangla golpo series, senior apu series, bhabhi devar rain series, university madam series, episodic stories, mahmuda.fun" />
+  <meta name="author" content="mahmuda.fun" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="rating" content="adult" />
+  <meta name="theme-color" content="#050505" />
+  <link rel="canonical" href="https://mahmuda.fun/series.html" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/navigation.css" />
+  <link rel="stylesheet" href="assets/css/blog.css" />
+  <link rel="stylesheet" href="assets/css/ads.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>html{scroll-behavior:smooth}</style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo" aria-label="mahmuda.fun home">
+        <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" />
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+        <a href="video.html" class="nav-item"><span class="nav-icon">▶</span>Video</a>
+        <a href="categories.html" class="nav-item"><span class="nav-icon">◈</span>Category</a>
+        <a href="gallery.html" class="nav-item"><span class="nav-icon">🖼</span>Gallery</a>
+        <a href="series.html" class="nav-item active"><span class="nav-icon">▣</span>Series</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="icon-moon">☾</span>
+          <span class="icon-sun">☀</span>
+        </button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="ad-leaderboard-wrap"><div data-ad="leaderboard" class="ad-slot"></div></div>
+  <div class="ad-mobile-wrap"><div data-ad="mobile-banner" class="ad-slot"></div></div>
+
+  <main class="section" style="padding-top: 80px;">
+    <div class="container">
+      <div class="section-header">
+        <h1 class="section-title">Series</h1>
+        <p class="section-desc">Continue the story — every episode in order</p>
+      </div>
+      <div class="series-list" id="seriesList">
+        <div class="loading-state"><div class="spinner"></div><p>Loading series…</p></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="ad-between-sections"><div data-ad="mid" class="ad-slot"></div></div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" loading="lazy" decoding="async" style="height: 30px; width: auto;" />
+        </div>
+        <p class="footer-note">Premium Adult Fiction • Audio • Video • Series • 18+ Only • mahmuda.fun</p>
+        <p class="footer-copy">
+          <a href="index.html" style="color:var(--text-muted)">Home</a> ·
+          <a href="video.html" style="color:var(--text-muted)">Video</a> ·
+          <a href="categories.html" style="color:var(--text-muted)">Category</a> ·
+          <a href="gallery.html" style="color:var(--text-muted)">Gallery</a> ·
+          <a href="series.html" style="color:var(--text-muted)">Series</a> ·
+          <a href="privacy-policy.html" style="color:var(--text-muted)">Privacy</a> ·
+          © 2026 mahmuda.fun
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+    var listEl = document.getElementById('seriesList');
+    function esc(s) {
+      return String(s || '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#039;');
+    }
+    function render(stories) {
+      var bySeries = {};
+      stories.forEach(function (s) {
+        if (!s.series) return;
+        if (!bySeries[s.series]) bySeries[s.series] = [];
+        bySeries[s.series].push(s);
+      });
+      var names = Object.keys(bySeries);
+      if (!names.length) {
+        listEl.innerHTML = '<div class="loading-state"><p>এখনো কোনো সিরিজ নেই।</p></div>';
+        return;
+      }
+      listEl.innerHTML = names.map(function (name) {
+        var eps = bySeries[name].sort(function (a, b) { return (a.episode || 0) - (b.episode || 0); });
+        var first = eps[0];
+        return '<section class="series-block" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:28px;">' +
+          '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;">' +
+            '<div class="feed-avatar" style="width:44px;height:44px;font-size:1.1rem;">▣</div>' +
+            '<div><h2 style="font-family:var(--font-display);font-size:1.5rem;color:var(--text-primary);margin:0;">' + esc(name) + '</h2>' +
+            '<p style="color:var(--text-muted);font-size:0.85rem;margin:4px 0 0;">' + eps.length + ' episode' + (eps.length > 1 ? 's' : '') + ' · ' + esc(first.category || '') + '</p></div>' +
+          '</div>' +
+          '<div class="episode-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">' +
+          eps.map(function (ep) {
+            return '<a href="index.html?story=' + encodeURIComponent(ep.id) + '" style="display:block;padding:14px 16px;border-radius:10px;background:var(--bg-secondary);border:1px solid var(--border);text-decoration:none;">' +
+              '<div style="font-size:0.75rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;">Episode ' + (ep.episode != null ? ep.episode : '—') + '</div>' +
+              '<div style="font-family:var(--font-display);font-weight:600;color:var(--text-primary);margin-top:4px;line-height:1.35;">' + esc(ep.title) + '</div>' +
+              '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">' + esc(ep.date || '') + ' · ' + esc(ep.readTime || '') + '</div>' +
+            '</a>';
+          }).join('') +
+          '</div></section>';
+      }).join('');
+    }
+    fetch('stories/index.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var stories = Array.isArray(data) ? data : [];
+        stories.sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
+        render(stories);
+      })
+      .catch(function () {
+        listEl.innerHTML = '<div class="loading-state"><p>লোড হচ্ছে না। <a href="index.html" style="color:var(--accent)">Home</a></p></div>';
+      });
+  })();
+  </script>
+  <script src="assets/js/navigation.js" defer></script>
+  <script src="assets/js/ads.js" defer></script>
+</body>
+</html>
