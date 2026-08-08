@@ -51,6 +51,31 @@ Worker-এর public URL হলো `https://mahmuda-fun-api.mahmudajenny6.worker
 
 Cloudflare account read-only audit করে দেখা হয়েছে। Existing D1 `zamil_shop` এবং existing Worker/Page project অন্য application-এর, তাই সেগুলো পরিবর্তন করা হয়নি। আলাদা `mahmuda_fun_reviews` D1 database APAC primary location-এ তৈরি করা হয়েছে এবং rating/review schema apply করা হয়েছে। Wrangler configuration সেই database-এর সঙ্গে bound।
 
+## Accounts + member-only stories (email/password, no third-party login)
+
+`0002_accounts.sql` migration আসার পর Worker-এ প্রথম-পক্ষ (first-party) account system যোগ হয়েছে — কোনো Google/Facebook login নেই, শুধু email + password। Endpoints: `POST /api/auth/signup`, `POST /api/auth/verify`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`, `POST /api/auth/request-password-reset`, `POST /api/auth/reset-password`। Session token একটি Bearer token (localStorage-এ রাখা হয়, cookie নয় — কারণ API আলাদা domain-এ থাকায় cross-site cookie বহু browser-এ silently block হয়ে যায়)।
+
+Frontend pages: `/account/` (login + signup), `/account/verify.html`, `/account/forgot.html`, `/account/reset.html`।
+
+### Member-only ("exclusive") stories
+
+কোনো story-কে member-only করতে তার markdown frontmatter-এ `exclusive: true` যোগ করুন (দেখুন `story-post/*.md`)। Build script (`script/blog-builder.js`) তখন:
+- Public `stories/<id>.json` এবং `stories/index.json`-এ সেই story-র `content` বাদ দিয়ে দেয় (title/excerpt/cover ইত্যাদি থেকে যায়, card-এ 🔒 badge দেখায়)।
+- পুরো body text `cloudflare/generated/exclusive-content.sql`-এ লেখে, যেটা প্রতি Worker deploy-এ D1-এর `exclusive_content` table-এ sync হয় (`cloudflare-worker.yml`-এর "Sync exclusive story content to D1" step)।
+- শুধু logged-in + email-verified session `GET /api/stories/{id}/content`-এর মাধ্যমে সেই content পড়তে পারে।
+
+### নতুন GitHub repository secrets (এই feature কাজ করার জন্য প্রয়োজন)
+
+| Name | Value | কী হবে যদি না দেন |
+|---|---|---|
+| `AUTH_SECRET` | একটি random hex string (নিচে একটি generate করা আছে, চাইলে নিজেও `openssl rand -hex 32` দিয়ে বানাতে পারেন) | Login rate-limiting-এর IP hash pepper ছাড়া চলবে — কাজ করবে, কিন্তু কম private। Signup/login তবুও ঠিকমতো কাজ করবে। |
+| `RESEND_API_KEY` | [resend.com](https://resend.com)-এ account খুলে API key নিন | **Signup verification email এবং password-reset email পাঠানো যাবে না** — account তৈরি হবে কিন্তু কেউ verify করতে পারবে না, তাই কেউ login করতে পারবে না। এই একটা secret ছাড়া পুরো accounts feature কার্যত অচল থাকবে। |
+| `RESEND_FROM_EMAIL` | Resend-এ verify করা sending address, যেমন `noreply@mahmuda.fun` | উপরের মতোই — email পাঠানো বন্ধ থাকবে। |
+
+**Session-এ একটি `AUTH_SECRET` generate করা হয়েছিল, সেটা chat-এ দেওয়া আছে — সরাসরি GitHub secret হিসেবে paste করে দিতে পারেন, নতুন করে বানানোর দরকার নেই।**
+
+`RESEND_API_KEY` এবং `RESEND_FROM_EMAIL` ছাড়া deploy fail হবে না (`cloudflare-worker.yml`-এর secret-configuration step সেগুলো না থাকলে শুধু skip করে) — কিন্তু ততক্ষণ পর্যন্ত signup করা account-গুলো কখনো verify হবে না। Resend account বানানো এবং domain verify করা এই session থেকে সম্ভব না — এটা manual step, নিজে করতে হবে।
+
 ## Security rules
 
 API token কখনো `wrangler.toml`, `.env`, Markdown, commit message বা frontend JavaScript-এ রাখবেন না। GitHub Actions secret-এই token রাখবেন। Token-এর permission প্রয়োজনের চেয়ে বেশি দেবেন না এবং সন্দেহ হলে Cloudflare Dashboard থেকে token rotate করবেন।

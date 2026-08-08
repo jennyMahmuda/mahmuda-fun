@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account | mahmuda.fun</title>
+  <meta name="description" content="Log in or create a free mahmuda.fun account to read member-only stories." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="rating" content="adult" />
+  <link rel="canonical" href="https://mahmuda.fun/account/" />
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/navigation.css" />
+  <link rel="stylesheet" href="../assets/css/blog.css" />
+  <link rel="stylesheet" href="../assets/css/ads.css" />
+  <style>
+    .account-wrap { max-width: 420px; margin: 0 auto; padding: 100px 16px 60px; }
+    .account-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; }
+    .account-card h1 { font-family: var(--font-display); font-size: 1.4rem; margin: 0 0 6px; color: var(--text-primary); }
+    .account-card p.sub { color: var(--text-muted); font-size: .88rem; margin: 0 0 22px; }
+    .account-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--bg-elevated); border-radius: 999px; padding: 4px; }
+    .account-tab { flex: 1; text-align: center; padding: 8px 10px; border-radius: 999px; font-size: .85rem; font-weight: 600; cursor: pointer; color: var(--text-secondary); background: none; border: none; }
+    .account-tab.active { background: linear-gradient(135deg, var(--accent), #96791b); color: #14110a; }
+    .account-panel { display: none; }
+    .account-panel.active { display: block; }
+    .account-status { text-align: center; }
+    .account-status .rr-submit { width: 100%; margin-top: 14px; }
+    .account-links { display: flex; justify-content: space-between; margin-top: 10px; font-size: .82rem; }
+    .account-links a { color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="mahmuda.fun home">
+        <img class="logo-svg" src="../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" decoding="async" />
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="../index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+        <a href="../video/" class="nav-item"><span class="nav-icon">▶</span>Video</a>
+        <a href="../category/" class="nav-item"><span class="nav-icon">◈</span>Category</a>
+        <a href="../gellery/" class="nav-item"><span class="nav-icon">🖼</span>Gallery</a>
+        <a href="../series/" class="nav-item"><span class="nav-icon">▣</span>Series</a>
+        <a href="../account/" class="nav-item active" id="navAccountLink"><span class="nav-icon">👤</span><span id="navAccountLabel">Account</span></a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="account-wrap">
+    <div class="account-card" id="accountCard">
+      <p>Loading…</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-note">Premium Adult Fiction • 18+ Only • mahmuda.fun</p>
+        <p class="footer-copy"><a href="../index.html" style="color:var(--text-muted)">Home</a> · <a href="../privacy-policy.html" style="color:var(--text-muted)">Privacy</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/auth.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/site-components.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderLoggedOut() {
+      var card = document.getElementById('accountCard');
+      card.innerHTML =
+        '<div class="account-tabs">' +
+          '<button type="button" class="account-tab active" data-tab="login">Log in</button>' +
+          '<button type="button" class="account-tab" data-tab="signup">Create account</button>' +
+        '</div>' +
+
+        '<div class="account-panel active" data-panel="login">' +
+          '<h1>Welcome back</h1>' +
+          '<p class="sub">Log in to read member-only stories.</p>' +
+          '<form class="rr-form" data-role="login-form">' +
+            '<label class="rr-field"><span>Email</span><input type="email" name="email" required autocomplete="email"></label>' +
+            '<label class="rr-field"><span>Password</span><input type="password" name="password" required autocomplete="current-password"></label>' +
+            '<button type="submit" class="rr-submit">Log in</button>' +
+            '<div id="loginStatus"></div>' +
+          '</form>' +
+          '<div class="account-links"><a href="forgot.html">Forgot password?</a></div>' +
+        '</div>' +
+
+        '<div class="account-panel" data-panel="signup">' +
+          '<h1>Create a free account</h1>' +
+          '<p class="sub">No third-party login — just an email and password. We’ll send a confirmation link before your account is active.</p>' +
+          '<form class="rr-form" data-role="signup-form">' +
+            '<label class="rr-field"><span>Email</span><input type="email" name="email" required autocomplete="email"></label>' +
+            '<label class="rr-field"><span>Password</span><input type="password" name="password" minlength="8" required autocomplete="new-password"></label>' +
+            '<p class="rr-hint">At least 8 characters.</p>' +
+            '<button type="submit" class="rr-submit">Create account</button>' +
+            '<div id="signupStatus"></div>' +
+          '</form>' +
+        '</div>';
+
+      card.querySelectorAll('.account-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          card.querySelectorAll('.account-tab').forEach(function (t) { t.classList.toggle('active', t === tab); });
+          card.querySelectorAll('.account-panel').forEach(function (p) {
+            p.classList.toggle('active', p.getAttribute('data-panel') === tab.getAttribute('data-tab'));
+          });
+        });
+      });
+
+      var loginForm = card.querySelector('[data-role="login-form"]');
+      loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var fd = new FormData(loginForm);
+        var status = document.getElementById('loginStatus');
+        status.innerHTML = '<p class="rr-hint">Logging in…</p>';
+        window.NightsAuth.login(fd.get('email'), fd.get('password')).then(function () {
+          window.location.reload();
+        }).catch(function (err) {
+          status.innerHTML = '<p class="rr-hint rr-error">' + escapeHtml(err.message) + '</p>';
+        });
+      });
+
+      var signupForm = card.querySelector('[data-role="signup-form"]');
+      signupForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var fd = new FormData(signupForm);
+        var status = document.getElementById('signupStatus');
+        status.innerHTML = '<p class="rr-hint">Creating account…</p>';
+        window.NightsAuth.signup(fd.get('email'), fd.get('password')).then(function () {
+          status.innerHTML = '<p class="rr-hint rr-success">Check your email for a confirmation link to finish creating your account.</p>';
+          signupForm.reset();
+        }).catch(function (err) {
+          status.innerHTML = '<p class="rr-hint rr-error">' + escapeHtml(err.message) + '</p>';
+        });
+      });
+    }
+
+    function renderLoggedIn(data) {
+      var card = document.getElementById('accountCard');
+      card.innerHTML =
+        '<div class="account-status">' +
+          '<h1>Signed in</h1>' +
+          '<p class="sub">' + escapeHtml(data.email) + (data.emailVerified ? '' : ' — <span class="rr-error">email not verified</span>') + '</p>' +
+          '<p class="rr-hint">You can now read member-only stories marked 🔒 across the site.</p>' +
+          '<button type="button" class="rr-submit" id="logoutBtn">Log out</button>' +
+        '</div>';
+      document.getElementById('logoutBtn').addEventListener('click', function () {
+        window.NightsAuth.logout().then(function () { window.location.reload(); });
+      });
+    }
+
+    function init() {
+      if (!window.NightsAuth) { renderLoggedOut(); return; }
+      window.NightsAuth.me().then(function (data) {
+        if (data.authenticated) renderLoggedIn(data);
+        else renderLoggedOut();
+      });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>
