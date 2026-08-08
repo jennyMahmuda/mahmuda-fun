@@ -18,11 +18,45 @@ FORMATS = {".jpg", ".jpeg", ".png", ".webp", ".avif"}
 WIDTHS = (480, 800, 1200)
 
 
+def write_webp_siblings(quality: int) -> int:
+    """Writes a same-directory, same-basename .webp next to every jpg/png
+    source (no resizing — same dimensions, just format conversion). Run
+    BEFORE `node script/build.js` so blog-builder.js can pick up the .webp
+    sibling and reference it instead of the original in generated story
+    JSON — smaller files, no client-side format negotiation needed.
+    Skips a source if its .webp sibling is already newer (idempotent on
+    repeat CI runs, only converts what actually changed).
+    """
+    convertible = {".jpg", ".jpeg", ".png"}
+    files = sorted({p for source in SOURCES if source.exists() for p in source.rglob("*") if p.suffix.lower() in convertible})
+    written = 0
+    for source in files:
+        target = source.with_suffix(".webp")
+        if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
+            continue
+        try:
+            with Image.open(source) as image:
+                converted = ImageOps.exif_transpose(image).convert("RGB")
+                converted.save(target, "WEBP", quality=max(60, min(quality, 95)), method=6)
+                written += 1
+                print(f"webp: {source.relative_to(ROOT)} -> {target.relative_to(ROOT)}")
+        except Exception as exc:
+            print(f"skip {source}: {exc}")
+    print(f"imageoptimization(siblings): scanned={len(files)} written={written}")
+    return written
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--write", action="store_true", help="write WebP derivatives")
+    parser.add_argument("--write", action="store_true", help="write responsive WebP derivatives into assets/images/optimized/")
+    parser.add_argument("--write-webp-siblings", action="store_true", help="write a same-name .webp next to every jpg/png source")
     parser.add_argument("--quality", type=int, default=82)
     args = parser.parse_args()
+
+    if args.write_webp_siblings:
+        write_webp_siblings(args.quality)
+        return
+
     files = sorted({p for source in SOURCES if source.exists() for p in source.rglob("*") if p.suffix.lower() in FORMATS})
     written = 0
     for source in files:

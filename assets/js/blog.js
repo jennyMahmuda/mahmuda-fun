@@ -73,10 +73,14 @@
     return ref;
   }
 
+  var DEFAULT_COVER = 'assets/images/default-cover.svg';
+
+  // Falls back to a branded placeholder ONLY when a story genuinely has no
+  // cover/images set — never overrides a manually-provided image.
   function resolveImage(story) {
-    if (!story) return '';
+    if (!story) return DEFAULT_COVER;
     let imgPath = story.cover || (story.images && story.images.length > 0 ? story.images[0] : '');
-    return imgPath ? resolveMediaUrl(imgPath) : '';
+    return imgPath ? resolveMediaUrl(imgPath) : DEFAULT_COVER;
   }
 
   async function loadStories() {
@@ -111,9 +115,9 @@
     });
 
     renderFeed();
-    if (typeof renderSeries === 'function') renderSeries();
-    if (typeof renderFooterCats === 'function') renderFooterCats();
-    if (typeof bindCategoryCards === 'function') bindCategoryCards();
+    renderSeries();
+    renderFooterCats();
+    bindCategoryCards();
     renderTopStories();
     openDeepLink();
   }
@@ -145,6 +149,59 @@
       section.hidden = false;
       wireMediaButtons(grid); // intercepts the ?story= links for in-page SPA navigation
     });
+  }
+
+  // Home page "Categories" section ships as static cards with data-cat
+  // attributes and href="#" placeholders — wires each to the real category
+  // page filter (or straight to /series/ for the "Series" card).
+  function bindCategoryCards() {
+    document.querySelectorAll('.category-card[data-cat]').forEach(function (card) {
+      var cat = card.getAttribute('data-cat');
+      if (!cat) return;
+      card.href = cat === 'series' ? 'series/' : 'category/?cat=' + encodeURIComponent(cat);
+    });
+  }
+
+  // Home page "Series" preview — lightweight version of series/index.html's
+  // grouping (name + episode count), linking through to the full page.
+  function renderSeries() {
+    var grid = document.getElementById('seriesGrid');
+    if (!grid) return;
+    var bySeries = {};
+    allStories.forEach(function (s) {
+      if (!s.series) return;
+      (bySeries[s.series] = bySeries[s.series] || []).push(s);
+    });
+    var names = Object.keys(bySeries).slice(0, 6);
+    if (!names.length) { grid.innerHTML = ''; return; }
+    grid.innerHTML = names.map(function (name) {
+      var eps = bySeries[name];
+      return '<a class="feed-card" href="series/" style="text-decoration:none;">' +
+        '<h3 class="feed-title">' + escapeHtml(name) + '</h3>' +
+        '<p class="feed-excerpt">' + eps.length + ' episode' + (eps.length > 1 ? 's' : '') + '</p>' +
+        '</a>';
+    }).join('');
+  }
+
+  // Footer "Popular tags" — same aggregation the category page's filter
+  // pills already use, so the footer only ever links to tags/categories
+  // that genuinely exist in current content.
+  function renderFooterCats() {
+    var list = document.getElementById('footerCatsList');
+    if (!list) return;
+    var counts = {};
+    allStories.forEach(function (s) {
+      [s.type || 'text', s.category || ''].concat(s.tags || []).forEach(function (raw) {
+        var key = String(raw || '').toLowerCase().trim();
+        if (!key || key === 'text' || key === 'story') return;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+    });
+    var top = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 14);
+    list.innerHTML = top.map(function (key) {
+      var label = key.charAt(0).toUpperCase() + key.slice(1);
+      return '<a href="category/?cat=' + encodeURIComponent(key) + '">' + escapeHtml(label) + '</a>';
+    }).join('');
   }
 
   async function loadByIds(ids) {

@@ -43,6 +43,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Convert new/changed jpg,png images to WebP
+        run: npm run images:webp
+
       - name: Build stories, metadata and sitemap
         run: npm run build
 

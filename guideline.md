@@ -40,7 +40,18 @@ audio: ""
 date: 2026-08-08
 language: bn
 author: Nights
+exclusive: false
 ---
+
+### Recommended tags
+
+Category/story pages auto-derive their filter pills from whatever `tags`/`category` values actually appear across published stories — there's no separate tag database to edit. Use tags from this list where they fit, so the category filters and footer "Popular tags" stay meaningful instead of fragmenting into one-off tags:
+
+`Bhabi`, `House wife`, `Wife`, `Cheating`, `Husband`, `Bangladeshi`, `Desi`, `Romantic`, `MILF`, `Couple`, `Girlfriend`, `First Time`, `Forbidden`, `Chemistry`, `Tension`, `Teasing`, `College`, `University`, `Senior`, `Junior`, `Beauty`, `Cute`
+
+**Deliberately not on this list, and please don't add them:** nationality/ethnicity-as-browsable-category tags (e.g. tagging stories "Indian"/"Pakistani"/"Russian" etc. as a way to browse by ethnicity — a pattern from tube-video sites, not appropriate for fiction here), and any age-callout tag (`Teen`, `18 Year Old`, or similar). Age-callout tags are one of the most common patterns associated with actual exploitation content and are avoided industry-wide for that reason, regardless of the performers'/characters' actual ages.
+
+`exclusive: true` marks a story as member-only — the build strips its full text from the public story JSON entirely (see `script/blog-builder.js`) and only serves it via the Worker to logged-in, email-verified accounts. Leave it `false` (or omit it) for regular public stories.
 
 ## Story heading
 

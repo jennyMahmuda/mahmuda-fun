@@ -13,13 +13,29 @@ const SITEMAP_FILE = path.join(ROOT, 'sitemap.xml');
 const ROBOTS_FILE = path.join(ROOT, 'robots.txt');
 const SITE_URL = 'https://mahmuda.fun';
 
+// If script/imageoptimization.py --write-webp-siblings has already run
+// (see Deploy.yml — it runs before this build script), a same-name .webp
+// file sits next to the jpg/png source. Prefer it: smaller file, same
+// content, no client-side format negotiation needed. Never touches a
+// reference that isn't a local jpg/png (http(s) URLs, video, audio, and
+// already-webp/svg/gif images pass through unchanged).
+function preferWebpSibling(localRef) {
+  if (!/\.(jpe?g|png)$/i.test(localRef)) return localRef;
+  const onDisk = path.join(ROOT, localRef.replace(/^\/+/, ''));
+  const webpOnDisk = onDisk.replace(/\.(jpe?g|png)$/i, '.webp');
+  if (fs.existsSync(webpOnDisk)) {
+    return localRef.replace(/\.(jpe?g|png)$/i, '.webp');
+  }
+  return localRef;
+}
+
 function resolveMediaUrl(ref) {
   if (!ref) return '';
   ref = ref.trim();
   if (!ref) return '';
   if (/^https?:\/\//i.test(ref) || ref.startsWith('data:')) return ref;
-  if (ref.startsWith('/')) return ref.substring(1);
-  return ref;
+  const local = ref.startsWith('/') ? ref.substring(1) : ref;
+  return preferWebpSibling(local);
 }
 
 function mdToHtml(md) {
