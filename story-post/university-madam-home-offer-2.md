@@ -1,18 +1,17 @@
 ---
 title: ইউনিভার্সিটি ম্যাডাম · পর্ব ২ · খেলা শুরু
-id: university-madam-home-offer-2
-slug: university-madam-home-offer-2
-category: Forbidden
+description: দরজা লক। ফারিহা শাড়ি খুললেন। ফিট কোমর, টানটান পেট, ভারী স্তন—ডিভোর্সড ম্যাডামের বাসনা এখন আর লুকানো নেই। রাফি শুধু নম্বর নয়, পুরো রাত নিল।
+images: "/assets/images/gallery/university-teacher-home.jpg"
+category: 
+- Forbidder
+- romantic 
 tags: [Madam, University, Teacher, Student, Fitness, Body, Climax, DirtyTalk]
-type: text
 date: 2026-08-08
 language: bn
-readTime: 45 min
+readTime: 10
 author: Mahmudajenny69
-cover: https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg
-images: ["https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg"]
-excerpt: দরজা লক। ফারিহা শাড়ি খুললেন। ফিট কোমর, টানটান পেট, ভারী স্তন—ডিভোর্সড ম্যাডামের বাসনা এখন আর লুকানো নেই। রাফি শুধু নম্বর নয়, পুরো রাত নিল।
 ---
+
 
 ![University Madam](https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg)
 
@@ -105,4 +104,4 @@ excerpt: দরজা লক। ফারিহা শাড়ি খুললে�
 
 **পর্ব ২ শেষ**
 
-**[পর্ব ১](?story=university-madam-home-offer)** · ফাইনালের আগে আবার ডাক আসবে।
+**[পর্ব ১](/?story=university-madam-home-offer.md)** · ফাইনালের আগে আবার ডাক আসবে।
