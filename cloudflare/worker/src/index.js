@@ -151,6 +151,29 @@ async function sendEmail(env, to, subject, html) {
   }
 }
 
+// ---------- server-side GA4 events (Measurement Protocol) ----------
+
+// Only fires when the visitor already accepted analytics client-side (the
+// frontend passes gaClientId from gtag's own client_id, and only does so
+// when GA already loaded under consent — see assets/js/auth.js). No
+// consent, no gaClientId, no event: this must stay opt-in, same as the
+// existing client-side analytics.
+async function sendGaEvent(env, gaClientId, name, params) {
+  if (!env.GA_API_SECRET || !env.GA_MEASUREMENT_ID || !gaClientId) return;
+  if (typeof gaClientId !== 'string' || gaClientId.length > 200) return;
+  try {
+    await fetch(
+      'https://www.google-analytics.com/mp/collect?measurement_id=' + encodeURIComponent(env.GA_MEASUREMENT_ID) + '&api_secret=' + encodeURIComponent(env.GA_API_SECRET),
+      {
+        method: 'POST',
+        body: JSON.stringify({ client_id: gaClientId, events: [{ name, params: params || {} }] }),
+      }
+    );
+  } catch {
+    // Analytics is best-effort — never let a GA outage affect signup/login.
+  }
+}
+
 function verifyEmailHtml(link) {
   return '<p>Confirm your mahmuda.fun account:</p><p><a href="' + link + '">' + link + '</a></p><p>This link expires in 24 hours. If you did not create this account, ignore this email.</p>';
 }
@@ -185,6 +208,7 @@ async function handleSignup(request, env, origin) {
   const body = await readJson(request);
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
   const password = body?.password;
+  const gaClientId = typeof body?.gaClientId === 'string' ? body.gaClientId : null;
   if (!validEmail(email) || !validPassword(password)) {
     return json({ error: 'A valid email and a password of at least 8 characters are required' }, 400, corsHeaders(origin));
   }
@@ -224,6 +248,7 @@ async function handleSignup(request, env, origin) {
     "INSERT INTO email_tokens (token, user_id, purpose, expires_at) VALUES (?, ?, 'verify', datetime('now', '+24 hours'))"
   ).bind(token, inserted.id).run();
   await sendEmail(env, email, 'Confirm your mahmuda.fun account', verifyEmailHtml(verifyLink(env, token)));
+  await sendGaEvent(env, gaClientId, 'sign_up', { method: 'email' });
   return genericResponse;
 }
 
@@ -265,6 +290,7 @@ async function handleLogin(request, env, origin) {
   const body = await readJson(request);
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
   const password = body?.password;
+  const gaClientId = typeof body?.gaClientId === 'string' ? body.gaClientId : null;
   const ipHash = await hashIp(request, env);
 
   if (!validEmail(email) || typeof password !== 'string' || !password) {
@@ -293,6 +319,7 @@ async function handleLogin(request, env, origin) {
   await env.REVIEWS_DB.prepare(
     "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
   ).bind(sessionToken, user.id).run();
+  await sendGaEvent(env, gaClientId, 'login', { method: 'email' });
   return json({ ok: true, sessionToken }, 200, corsHeaders(origin));
 }
 

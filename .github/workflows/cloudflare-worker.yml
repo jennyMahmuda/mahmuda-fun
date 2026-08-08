@@ -63,17 +63,19 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Configure auth/email secrets (skips any that aren't set yet)
+      - name: Configure optional secrets (skips any that aren't set yet)
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          GA_API_SECRET: ${{ secrets.GA_API_SECRET }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           # Account signup/login works without any of these being set, but
-          # verification/reset emails silently won't send, and IP-hash rate
-          # limiting falls back to an unpepper-ed hash, until they're added
+          # verification/reset emails silently won't send, IP-hash rate
+          # limiting falls back to an unpepper-ed hash, and server-side
+          # sign_up/login analytics events won't send, until they're added
           # as repo secrets. See cloudflare/README.md. Each block below
           # fails the job (not just logs a warning) if the value WAS
           # provided but `wrangler secret put` itself failed.
@@ -92,4 +94,9 @@ jobs:
             printf '%s' "$AUTH_SECRET" | npx wrangler secret put AUTH_SECRET
           else
             echo "AUTH_SECRET not set — skipping (login rate-limit IP hashing runs unpeppered until it is)"
+          fi
+          if [ -n "$GA_API_SECRET" ]; then
+            printf '%s' "$GA_API_SECRET" | npx wrangler secret put GA_API_SECRET
+          else
+            echo "GA_API_SECRET not set — skipping (server-side sign_up/login GA4 events won't send until it is)"
           fi

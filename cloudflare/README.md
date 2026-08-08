@@ -71,8 +71,13 @@ Frontend pages: `/account/` (login + signup), `/account/verify.html`, `/account/
 | `AUTH_SECRET` | একটি random hex string (নিচে একটি generate করা আছে, চাইলে নিজেও `openssl rand -hex 32` দিয়ে বানাতে পারেন) | Login rate-limiting-এর IP hash pepper ছাড়া চলবে — কাজ করবে, কিন্তু কম private। Signup/login তবুও ঠিকমতো কাজ করবে। |
 | `RESEND_API_KEY` | [resend.com](https://resend.com)-এ account খুলে API key নিন | **Signup verification email এবং password-reset email পাঠানো যাবে না** — account তৈরি হবে কিন্তু কেউ verify করতে পারবে না, তাই কেউ login করতে পারবে না। এই একটা secret ছাড়া পুরো accounts feature কার্যত অচল থাকবে। |
 | `RESEND_FROM_EMAIL` | Resend-এ verify করা sending address, যেমন `noreply@mahmuda.fun` | উপরের মতোই — email পাঠানো বন্ধ থাকবে। |
+| `GA_API_SECRET` | GA4 property → Admin → Data Streams → আপনার stream → Measurement Protocol API secrets | Server-side `sign_up`/`login` event GA4-তে পাঠানো যাবে না — সাইট বাকি সবকিছু normal-ই চলবে, শুধু এই দুটো event GA4-তে দেখা যাবে না। |
 
 **Session-এ একটি `AUTH_SECRET` generate করা হয়েছিল, সেটা chat-এ দেওয়া আছে — সরাসরি GitHub secret হিসেবে paste করে দিতে পারেন, নতুন করে বানানোর দরকার নেই।**
+
+### Server-side analytics (sign_up / login events)
+
+`GA_API_SECRET` secret যোগ করলে Worker সরাসরি Google Analytics 4-এ (Measurement Protocol দিয়ে, `GA_MEASUREMENT_ID` — `wrangler.toml`-এ আগে থেকেই আছে, `assets/js/site-components.js`-এর client-side ID-র সাথে মিলিয়ে) `sign_up` এবং `login` event পাঠায়, একজন visitor সত্যিই account তৈরি বা login করলে। এটা client-side gtag-এর চেয়ে বেশি নির্ভরযোগ্য (ad-blocker-এ block হয় না), কিন্তু consent respect করেই কাজ করে — visitor cookie banner-এ "Reject analytics" চাপলে `window.gtag` load-ই হয় না, তাই `auth.js` কোনো client ID পাঠাতে পারে না, আর Worker সেক্ষেত্রে event পাঠায়ই না। **এই secret কখনো `wrangler.toml`, কোনো `.js` file বা commit-এ লিখবেন না** — শুধু GitHub repository secret হিসেবে রাখুন, উপরের অন্য secret-গুলোর মতোই।
 
 `RESEND_API_KEY` এবং `RESEND_FROM_EMAIL` ছাড়া deploy fail হবে না (`cloudflare-worker.yml`-এর secret-configuration step সেগুলো না থাকলে শুধু skip করে) — কিন্তু ততক্ষণ পর্যন্ত signup করা account-গুলো কখনো verify হবে না। Resend account বানানো এবং domain verify করা এই session থেকে সম্ভব না — এটা manual step, নিজে করতে হবে।
 

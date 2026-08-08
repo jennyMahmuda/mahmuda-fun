@@ -9,6 +9,32 @@
   var API_BASE = 'https://mahmuda-fun-api.mahmudajenny6.workers.dev';
   var TOKEN_KEY = 'nights_session_token';
   var meCache = null; // { authenticated, email, emailVerified } | null, cached per page load
+  // Must match the ID in assets/js/site-components.js — used only to read
+  // gtag's own client_id, never to load/re-init analytics from here.
+  var GA_ID = 'G-1Z0TLKJZ9R';
+
+  // Resolves to gtag's client_id, or null. Deliberately returns null (not
+  // a fallback generated ID) when analytics wasn't consented to — window.
+  // gtag only exists after the visitor accepted the cookie banner (see
+  // site-components.js), so this naturally respects that choice without
+  // auth.js needing to know about consent state itself.
+  function getGaClientId() {
+    return new Promise(function (resolve) {
+      if (typeof window.gtag !== 'function') { resolve(null); return; }
+      var settled = false;
+      var timer = setTimeout(function () { if (!settled) { settled = true; resolve(null); } }, 300);
+      try {
+        window.gtag('get', GA_ID, 'client_id', function (clientId) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(typeof clientId === 'string' ? clientId : null);
+        });
+      } catch (e) {
+        if (!settled) { settled = true; clearTimeout(timer); resolve(null); }
+      }
+    });
+  }
 
   function getToken() {
     try { return window.localStorage.getItem(TOKEN_KEY); } catch (e) { return null; }
@@ -40,18 +66,22 @@
   }
 
   function signup(email, password) {
-    return apiFetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password }),
+    return getGaClientId().then(function (gaClientId) {
+      return apiFetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password, gaClientId: gaClientId }),
+      });
     });
   }
 
   function login(email, password) {
-    return apiFetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password }),
+    return getGaClientId().then(function (gaClientId) {
+      return apiFetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password, gaClientId: gaClientId }),
+      });
     }).then(function (data) {
       if (data && data.sessionToken) setToken(data.sessionToken);
       return data;
