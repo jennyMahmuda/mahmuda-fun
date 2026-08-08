@@ -1,0 +1,13 @@
+name = "mahmuda-fun-api"
+main = "cloudflare/worker/src/index.js"
+compatibility_date = "2026-08-08"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://mahmuda.fun,https://www.mahmuda.fun"
+
+[[d1_databases]]
+binding = "REVIEWS_DB"
+database_name = "mahmuda_fun_reviews"
+database_id = "e636af61-8016-4590-98ea-350ddd5cc808"
+migrations_dir = "cloudflare/migrations"

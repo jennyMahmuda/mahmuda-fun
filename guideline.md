@@ -1,5 +1,7 @@
 # mahmuda.fun Content & Deployment Guideline
 
+Wrangler, Cloudflare Worker, D1 migration এবং GitHub Secrets setup-এর জন্য [`cloudflare/README.md`](cloudflare/README.md) পড়ুন।
+
 এই ফাইলটি repository-তে content যোগ করার প্রধান নির্দেশিকা। সব content অবশ্যই 18+ audience-এর জন্য আইনসম্মত, fictional এবং consent-respecting হতে হবে। ব্যক্তিগত তথ্য, বাস্তব ব্যক্তির পরিচয়, non-consensual sexual content বা minor-related content কখনো যোগ করবেন না।
 
 ## 1. কোন folder-এ কী রাখবেন

@@ -8,9 +8,17 @@
     "watch": "node script/builder.js --watch",
     "images:report": "python3 script/imageoptimization.py",
     "images:optimize": "python3 script/imageoptimization.py --write",
-    "validate": "node script/validate-site.js"
+    "validate": "node script/validate-site.js",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy",
+    "cf:migrate:local": "wrangler d1 migrations apply mahmuda_fun_reviews --local",
+    "cf:migrate:remote": "wrangler d1 migrations apply mahmuda_fun_reviews --remote",
+    "cf:secret": "wrangler secret put API_SECRET"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.120.0"
   }
 }
