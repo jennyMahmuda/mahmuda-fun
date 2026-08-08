@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Set a new password | mahmuda.fun</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="rating" content="adult" />
+  <link rel="canonical" href="https://mahmuda.fun/account/reset.html" />
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/navigation.css" />
+  <link rel="stylesheet" href="../assets/css/blog.css" />
+  <link rel="stylesheet" href="../assets/css/ads.css" />
+  <style>
+    .account-wrap { max-width: 420px; margin: 0 auto; padding: 100px 16px 60px; }
+    .account-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; }
+    .account-card h1 { font-family: var(--font-display); font-size: 1.4rem; margin: 0 0 6px; color: var(--text-primary); }
+    .account-card p.sub { color: var(--text-muted); font-size: .88rem; margin: 0 0 22px; }
+    .rr-submit { width: 100%; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="mahmuda.fun home">
+        <img class="logo-svg" src="../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" decoding="async" />
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="../index.html" class="nav-item">Home</a>
+        <a href="../account/" class="nav-item active" id="navAccountLink"><span id="navAccountLabel">Account</span></a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="account-wrap">
+    <div class="account-card" id="resetCard">
+      <h1>Set a new password</h1>
+      <p class="sub">At least 8 characters.</p>
+      <form class="rr-form" id="resetForm">
+        <label class="rr-field"><span>New password</span><input type="password" name="password" minlength="8" required autocomplete="new-password"></label>
+        <button type="submit" class="rr-submit">Update password</button>
+        <div id="resetStatus"></div>
+      </form>
+    </div>
+  </main>
+
+  <script src="../assets/js/auth.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/site-components.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+    function init() {
+      var m = (window.location.search || '').match(/[?&]token=([^&]+)/);
+      var token = m ? decodeURIComponent(m[1]) : null;
+      var card = document.getElementById('resetCard');
+      if (!token) {
+        card.innerHTML = '<h1>Invalid link</h1><p class="rr-hint">This reset link is missing its token. Copy the full link from your email, or <a href="forgot.html" style="color:var(--accent)">request a new one</a>.</p>';
+        return;
+      }
+      var form = document.getElementById('resetForm');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var status = document.getElementById('resetStatus');
+        status.innerHTML = '<p class="rr-hint">Updating…</p>';
+        window.NightsAuth.resetPassword(token, new FormData(form).get('password')).then(function () {
+          card.innerHTML = '<h1>Password updated</h1><p class="rr-hint rr-success">You’ve been logged out everywhere for security — log in again with your new password.</p><a href="../account/" style="color:var(--accent)">Log in</a>';
+        }).catch(function (err) {
+          status.innerHTML = '<p class="rr-hint rr-error">' + String(err.message || 'Could not update your password.').replace(/</g, '&lt;') + '</p>';
+        });
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>

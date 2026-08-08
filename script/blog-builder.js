@@ -232,6 +232,20 @@ function writeSitemap(stories) {
   fs.writeFileSync(SITEMAP_FILE, xml, 'utf8');
   console.log('✓ sitemap.xml (' + urls.length + ' canonical URLs)');
 
+  // Only /script/ (build tooling source) and /_site/ (local build output,
+  // never actually published) are kept out of the crawl — everything else
+  // is intentionally open. No search engine or AI crawler is singled out
+  // for blocking; the entries below exist to make that explicit for the
+  // crawlers site owners ask about most, not to restrict anyone not listed
+  // (the wildcard rule at the top already allows every other bot by default).
+  const openCrawlers = [
+    'Googlebot', 'Googlebot-Image', 'Googlebot-Video', 'Googlebot-News',
+    'Google-Extended', 'Bingbot', 'DuckDuckBot', 'Applebot', 'Applebot-Extended',
+    'Amazonbot', 'YandexBot',
+    'GPTBot', 'ChatGPT-User', 'OAI-SearchBot',
+    'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'anthropic-ai',
+    'PerplexityBot', 'Perplexity-User', 'CCBot', 'meta-externalagent'
+  ];
   const robots = [
     'User-agent: *',
     'Allow: /',
@@ -243,9 +257,20 @@ function writeSitemap(stories) {
     'Allow: /stories/',
     'Allow: /assets/',
     '',
-    'Sitemap: ' + SITE_URL + '/sitemap.xml',
-    ''
-  ].join('\n');
+    '# Explicitly open to major search and AI crawlers — this is a content',
+    '# site and wants to be found. Only build tooling stays disallowed, same',
+    '# as for everyone else above; nothing here is more restrictive than the',
+    "# wildcard rule. If a crawler you use isn't listed by name, it's still",
+    '# allowed by the wildcard rule at the top of this file.'
+  ]
+    .concat(openCrawlers.reduce(function (lines, ua) {
+      return lines.concat(['User-agent: ' + ua, 'Allow: /', 'Disallow: /script/', 'Disallow: /_site/', '']);
+    }, []))
+    .concat([
+      'Sitemap: ' + SITE_URL + '/sitemap.xml',
+      ''
+    ])
+    .join('\n');
   fs.writeFileSync(ROBOTS_FILE, robots, 'utf8');
   console.log('✓ robots.txt');
 }
@@ -286,6 +311,11 @@ function buildStory(filePath) {
     language: meta.language || 'en',
     author: meta.author || 'Nights',
     content: injectAdMarkers(htmlContent),
+    // Members-only story: full text is stripped from the public JSON (see
+    // writeStoryJson/publicStoryJson below) and instead synced into the D1
+    // exclusive_content table, served only to logged-in verified accounts
+    // via GET /api/stories/{id}/content.
+    exclusive: meta.exclusive === true || meta.exclusive === 'true',
     nextEpisodeId: null,
     seo: {
       title: (title + ' | mahmuda.fun – Premium Adult Stories').slice(0, 60),
@@ -300,9 +330,49 @@ function buildStory(filePath) {
     }
   };
 
-  fs.writeFileSync(path.join(OUTPUT_DIR, id + '.json'), JSON.stringify(story, null, 2), 'utf8');
+  writeStoryJson(story);
   console.log('  ✓ ' + id + '.json');
   return story;
+}
+
+// Public JSON must never carry the body text of an exclusive story — the
+// full text only ever lives in D1 (exclusive_content), gated behind login.
+// Everything else (title, excerpt, cover, tags…) stays public so the
+// story still shows up as a locked card in feeds/category/series.
+function publicStoryJson(story) {
+  if (!story.exclusive) return story;
+  return Object.assign({}, story, { content: null });
+}
+
+function writeStoryJson(story) {
+  fs.writeFileSync(path.join(OUTPUT_DIR, story.id + '.json'), JSON.stringify(publicStoryJson(story), null, 2), 'utf8');
+}
+
+function sqlString(value) {
+  return "'" + String(value == null ? '' : value).replace(/'/g, "''") + "'";
+}
+
+// Syncs full body text for every exclusive story into a SQL file applied
+// to D1 on each Worker deploy (see .github/workflows/cloudflare-worker.yml).
+// Markdown stays the single source of truth; D1 is just the runtime
+// serving layer for the gated content.
+function writeExclusiveContentSeed(stories) {
+  const genDir = path.join(ROOT, 'cloudflare', 'generated');
+  if (!fs.existsSync(genDir)) fs.mkdirSync(genDir, { recursive: true });
+  const sqlFile = path.join(genDir, 'exclusive-content.sql');
+  const exclusiveStories = stories.filter(function (s) { return s.exclusive; });
+  if (!exclusiveStories.length) {
+    fs.writeFileSync(sqlFile, '-- No exclusive stories in this build.\n', 'utf8');
+    console.log('✓ cloudflare/generated/exclusive-content.sql (0 exclusive stories)');
+    return;
+  }
+  const lines = exclusiveStories.map(function (s) {
+    return 'INSERT INTO exclusive_content (story_id, content, updated_at) VALUES (' +
+      sqlString(s.id) + ', ' + sqlString(s.content) + ", datetime('now'))" +
+      ' ON CONFLICT(story_id) DO UPDATE SET content = excluded.content, updated_at = excluded.updated_at;';
+  });
+  fs.writeFileSync(sqlFile, lines.join('\n') + '\n', 'utf8');
+  console.log('✓ cloudflare/generated/exclusive-content.sql (' + exclusiveStories.length + ' exclusive stories)');
 }
 
 function linkEpisodes(stories) {
@@ -317,7 +387,7 @@ function linkEpisodes(stories) {
     eps.sort(function (a, b) { return a.episode - b.episode; });
     for (let i = 0; i < eps.length - 1; i++) {
       eps[i].nextEpisodeId = eps[i + 1].id;
-      fs.writeFileSync(path.join(OUTPUT_DIR, eps[i].id + '.json'), JSON.stringify(eps[i], null, 2), 'utf8');
+      writeStoryJson(eps[i]);
     }
   });
 }
@@ -342,8 +412,9 @@ function build() {
   });
 
   linkEpisodes(stories);
+  writeExclusiveContentSeed(stories);
   stories.sort(function (a, b) { return (b.date || '').localeCompare(a.date || ''); });
-  fs.writeFileSync(INDEX_FILE, JSON.stringify(stories, null, 2), 'utf8');
+  fs.writeFileSync(INDEX_FILE, JSON.stringify(stories.map(publicStoryJson), null, 2), 'utf8');
 
   console.log('\n✓ stories/index.json (' + stories.length + ' stories)');
   writeSitemap(stories);

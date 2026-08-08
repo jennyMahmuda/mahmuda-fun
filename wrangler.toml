@@ -5,6 +5,10 @@ workers_dev = true
 
 [vars]
 ALLOWED_ORIGINS = "https://mahmuda.fun,https://www.mahmuda.fun"
+# Not secret — this is the same GA4 Measurement ID already public in
+# assets/js/site-components.js. Pairs with the GA_API_SECRET Worker
+# secret (see cloudflare/README.md) for server-side sign_up/login events.
+GA_MEASUREMENT_ID = "G-1Z0TLKJZ9R"
 
 [[d1_databases]]
 binding = "REVIEWS_DB"

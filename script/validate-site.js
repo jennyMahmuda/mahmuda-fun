@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const root = path.resolve(__dirname, '..');
-const pages = ['index.html', 'category/index.html', 'gellery/index.html', 'video/index.html', 'series/index.html', 'privacy-policy.html', 'terms.html', 'faq.html', 'cookies.html', 'premium.html'];
-const required = ['assets/js/navigation.js', 'assets/js/site-components.js', 'assets/js/ads.js', 'assets/css/ads.css', 'sitemap.xml', 'robots.txt', 'wrangler.toml', 'package-lock.json', 'cloudflare/migrations/0001_rating_review.sql', 'cloudflare/worker/src/index.js'];
+const pages = ['index.html', 'category/index.html', 'gellery/index.html', 'video/index.html', 'series/index.html', 'privacy-policy.html', 'terms.html', 'faq.html', 'cookies.html', 'premium.html', 'account/index.html', 'account/verify.html', 'account/forgot.html', 'account/reset.html'];
+const required = ['assets/js/navigation.js', 'assets/js/site-components.js', 'assets/js/ads.js', 'assets/js/auth.js', 'assets/css/ads.css', 'sitemap.xml', 'robots.txt', 'wrangler.toml', 'package-lock.json', 'cloudflare/migrations/0001_rating_review.sql', 'cloudflare/migrations/0002_accounts.sql', 'cloudflare/worker/src/index.js'];
 const errors = [];
 for (const file of pages.concat(required)) if (!fs.existsSync(path.join(root, file))) errors.push(`Missing: ${file}`);
 for (const file of pages) {

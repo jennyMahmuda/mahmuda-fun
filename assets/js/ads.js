@@ -10,7 +10,9 @@
  *            [data-ad-container="inline-native"]   after 1st paragraph
  *            [data-ad-container="mid-content"]     middle of long posts
  *            [data-ad-container="end-of-post"]     end of every post
- *  SocialBar → Sticky bottom (all pages)
+ *  SocialBar → DISABLED (see loadSocialBar() below) — this format renders
+ *              a fake "message notification" overlay that covered the
+ *              site navigation; it is not called from init() anymore.
  *
  * The blog builder (blog-builder.js) injects these marker containers
  * into EVERY new post at build time, so ads appear automatically in
@@ -115,6 +117,14 @@
     iframe.srcdoc = html;
   }
 
+  // Disabled: this ad format renders a fixed-position overlay that mimics an
+  // OS/app message notification (a fake "New message from Anna" popup) to
+  // bait clicks, and it positions itself using the ad network's own script
+  // rather than anything in our DOM/CSS — so it can render on top of the
+  // navbar regardless of where loadSocialBar() is called from. That's not a
+  // placement bug we can fix by moving code around; it's the ad format
+  // itself. Kept here (unused) in case a non-deceptive replacement is
+  // wanted later — do not re-enable this as-is.
   function loadSocialBar() {
     if (socialLoaded) return;
     socialLoaded = true;
@@ -289,7 +299,9 @@
   function init() {
     fillStaticSlots();
     loadNativeBanner();
-    loadSocialBar();
+    // loadSocialBar() intentionally not called — see comment above its
+    // definition. It rendered a fake "message notification" overlay that
+    // covered the navigation.
     addSmartLinkNotice(document);
 
     window.addEventListener('resize', function () {

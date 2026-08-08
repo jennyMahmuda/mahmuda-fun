@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset your password | mahmuda.fun</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="rating" content="adult" />
+  <link rel="canonical" href="https://mahmuda.fun/account/forgot.html" />
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/navigation.css" />
+  <link rel="stylesheet" href="../assets/css/blog.css" />
+  <link rel="stylesheet" href="../assets/css/ads.css" />
+  <style>
+    .account-wrap { max-width: 420px; margin: 0 auto; padding: 100px 16px 60px; }
+    .account-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; }
+    .account-card h1 { font-family: var(--font-display); font-size: 1.4rem; margin: 0 0 6px; color: var(--text-primary); }
+    .account-card p.sub { color: var(--text-muted); font-size: .88rem; margin: 0 0 22px; }
+    .rr-submit { width: 100%; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="mahmuda.fun home">
+        <img class="logo-svg" src="../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" decoding="async" />
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="../index.html" class="nav-item">Home</a>
+        <a href="../account/" class="nav-item active" id="navAccountLink"><span id="navAccountLabel">Account</span></a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="account-wrap">
+    <div class="account-card">
+      <h1>Forgot your password?</h1>
+      <p class="sub">Enter your email and we’ll send a reset link, if an account exists for it.</p>
+      <form class="rr-form" id="forgotForm">
+        <label class="rr-field"><span>Email</span><input type="email" name="email" required autocomplete="email"></label>
+        <button type="submit" class="rr-submit">Send reset link</button>
+        <div id="forgotStatus"></div>
+      </form>
+    </div>
+  </main>
+
+  <script src="../assets/js/auth.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/site-components.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+    function init() {
+      var form = document.getElementById('forgotForm');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var status = document.getElementById('forgotStatus');
+        status.innerHTML = '<p class="rr-hint">Sending…</p>';
+        window.NightsAuth.requestPasswordReset(new FormData(form).get('email')).then(function () {
+          status.innerHTML = '<p class="rr-hint rr-success">If that email has an account, a reset link is on its way.</p>';
+          form.reset();
+        }).catch(function () {
+          status.innerHTML = '<p class="rr-hint rr-success">If that email has an account, a reset link is on its way.</p>';
+        });
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>

@@ -114,7 +114,37 @@
     if (typeof renderSeries === 'function') renderSeries();
     if (typeof renderFooterCats === 'function') renderFooterCats();
     if (typeof bindCategoryCards === 'function') bindCategoryCards();
+    renderTopStories();
     openDeepLink();
+  }
+
+  // Home-page "★ Top Stories" — same ranking approach as the category page:
+  // stories with at least one rating, sorted by average (ties by count).
+  function renderTopStories() {
+    if (!window.NightsRatingReview || typeof window.NightsRatingReview.getSummaryMap !== 'function') return;
+    var section = document.getElementById('topStoriesSection');
+    var grid = document.getElementById('topStoriesGrid');
+    if (!section || !grid) return;
+    window.NightsRatingReview.getSummaryMap().then(function (map) {
+      var byId = {};
+      allStories.forEach(function (s) { byId[s.id] = s; });
+      var ranked = Object.keys(map)
+        .filter(function (id) { return byId[id] && map[id].count > 0; })
+        .sort(function (a, b) { return map[b].average - map[a].average || map[b].count - map[a].count; })
+        .slice(0, 6);
+      if (!ranked.length) { section.hidden = true; return; }
+      grid.innerHTML = ranked.map(function (id) {
+        var s = byId[id];
+        var img = resolveImage(s);
+        return '<a class="top-rated-card" href="' + storyUrl(id) + '" data-story-link="' + escapeHtml(id) + '">' +
+          (img ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:8px;" onerror="this.remove()">' : '') +
+          window.NightsRatingReview.badgeHtml(map[id]) +
+          '<div class="top-rated-name">' + escapeHtml(s.title) + '</div>' +
+          '</a>';
+      }).join('');
+      section.hidden = false;
+      wireMediaButtons(grid); // intercepts the ?story= links for in-page SPA navigation
+    });
   }
 
   async function loadByIds(ids) {
@@ -128,9 +158,41 @@
     return out;
   }
 
+  // Renders a locked-story message instead of body text. Never cached in
+  // contentCache — the auth check must be re-evaluated each time (e.g. the
+  // reader can be reopened right after the visitor logs in elsewhere).
+  function lockedTeaserHtml(story, isLoggedIn) {
+    var body = isLoggedIn
+      ? '<p class="rr-hint">Please verify your email to unlock this story.</p>'
+      : '<p class="rr-hint">This story is free for logged-in members — just create an account.</p>' +
+        '<a class="rr-submit" style="display:inline-block;text-decoration:none;margin-top:10px;" href="account/">Log in or create a free account</a>';
+    return '<div class="locked-story-teaser"><div class="locked-story-icon" aria-hidden="true">🔒</div>' +
+      '<p>' + escapeHtml(story.excerpt || '') + '</p>' + body + '</div>';
+  }
+
+  // Exclusive stories carry no `content` in the public JSON (see
+  // script/blog-builder.js) — full text only exists in D1, behind a
+  // logged-in + verified session, served by GET /api/stories/{id}/content.
+  async function ensureExclusiveContent(id, story) {
+    if (!window.NightsAuth) return lockedTeaserHtml(story, false);
+    var session = await window.NightsAuth.me();
+    if (!session.authenticated) return lockedTeaserHtml(story, false);
+    if (!session.emailVerified) return lockedTeaserHtml(story, true);
+    try {
+      var data = await window.NightsAuth.fetchExclusiveContent(id);
+      contentCache[id] = data.content || '';
+      return contentCache[id];
+    } catch (err) {
+      return lockedTeaserHtml(story, true);
+    }
+  }
+
   async function ensureContent(id) {
     if (contentCache[id]) return contentCache[id];
     var story = allStories.find(function (s) { return s.id === id; });
+    if (story && story.exclusive) {
+      return ensureExclusiveContent(id, story);
+    }
     if (story && story.content && String(story.content).length > 120) {
       contentCache[id] = story.content;
       return story.content;
@@ -266,6 +328,20 @@
     });
   }
 
+  // Mounts the ratings/reviews widget into every [data-rating-review-mount]
+  // placeholder currently in the feed — the hero card (always expanded) and
+  // any grid card the reader has expanded inline via "সবটুকু পড়ুন". The
+  // modal reader (openReader()) mounts its own copy separately. mount() is
+  // idempotent, so calling this on every render is safe.
+  function mountRatingReviews(container) {
+    if (!container || !window.NightsRatingReview || typeof window.NightsRatingReview.mount !== 'function') return;
+    container.querySelectorAll('[data-rating-review-mount]').forEach(function (mountEl) {
+      var card = mountEl.closest('[data-id]');
+      var id = card && card.getAttribute('data-id');
+      if (id) window.NightsRatingReview.mount(id, mountEl);
+    });
+  }
+
   // Fills in the [data-rating-slot] placeholders left in each feed card
   // with a "★ 4.5 (12)" badge, once ratings are available. Non-blocking —
   // cards render immediately and badges pop in when the API responds.
@@ -296,9 +372,10 @@
     var html = '';
 
     var heroType = heroStory.type || 'text';
-    var heroBadge = heroStory.series
+    var heroBadge = (heroStory.series
       ? '<span class="feed-type-badge">' + escapeHtml(heroStory.series) + ' · Ep ' + (heroStory.episode || '?') + '</span>'
-      : '<span class="feed-type-badge">' + typeLabel(heroType) + '</span>';
+      : '<span class="feed-type-badge">' + typeLabel(heroType) + '</span>') +
+      (heroStory.exclusive ? '<span class="feed-type-badge feed-exclusive-badge">🔒 Members</span>' : '');
 
     var heroCover = resolveImage(heroStory);
     // LCP: discoverable in HTML, fetchpriority=high, NO lazy-load
@@ -325,6 +402,7 @@
     html += '<div class="feed-tags">' +
               (heroStory.tags || []).map(function (tg) { return '<span class="feed-tag">#' + escapeHtml(tg) + '</span>'; }).join('') +
             '</div>';
+    html += '<div class="rating-review-mount" data-rating-review-mount></div>';
     html += '</article></div>';
 
     if (otherStories.length > 0) {
@@ -333,9 +411,10 @@
         var t = story.type || 'text';
         var isExpanded = expandedId === story.id;
 
-        var badge = story.series
+        var badge = (story.series
           ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>'
-          : '<span class="feed-type-badge">' + typeLabel(t) + '</span>';
+          : '<span class="feed-type-badge">' + typeLabel(t) + '</span>') +
+          (story.exclusive ? '<span class="feed-type-badge feed-exclusive-badge">🔒 Members</span>' : '');
 
         var coverImg = resolveImage(story);
         var coverHtml = (coverImg && !isExpanded)
@@ -377,6 +456,7 @@
               '<button class="read-more-btn">' + (isExpanded ? 'ছোট করে দেখুন ↑' : 'সবটুকু পড়ুন →') + '</button>' +
               nextBtn +
             '</div>' +
+            (isExpanded ? '<div class="rating-review-mount" data-rating-review-mount></div>' : '') +
           '</article>'
         );
       }).join('');
@@ -386,6 +466,7 @@
     feedEl.innerHTML = html;
     if (feedEnd) feedEnd.hidden = false;
     applyRatingBadges(feedEl);
+    mountRatingReviews(feedEl);
 
     ensureContent(heroStory.id).then(function (content) {
       var targetEl = document.getElementById('content-' + heroStory.id);
