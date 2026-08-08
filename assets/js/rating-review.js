@@ -222,6 +222,36 @@
       });
   }
 
+  var summaryMapPromise = null;
+
+  // Fetches every story's {count, average} in one request and caches the
+  // result for the lifetime of the page. Used by feed/category/series
+  // listings to show a rating badge on each card without one fetch per card.
+  function getSummaryMap() {
+    if (summaryMapPromise) return summaryMapPromise;
+    summaryMapPromise = apiFetch('/api/ratings/summary')
+      .then(function (data) {
+        var map = {};
+        ((data && data.ratings) || []).forEach(function (row) {
+          map[row.storyId] = { count: Number(row.count) || 0, average: Number(row.average) || 0 };
+        });
+        return map;
+      })
+      .catch(function () {
+        return {};
+      });
+    return summaryMapPromise;
+  }
+
+  // Small inline "★ 4.5 (12)" badge for a listing card. Returns '' when the
+  // story has no ratings yet so unrated cards stay clean.
+  function badgeHtml(summary) {
+    if (!summary || !summary.count) return '';
+    return '<span class="rr-inline-badge" title="' + summary.count + (summary.count === 1 ? ' rating' : ' ratings') + '">' +
+      '<span class="rr-inline-star" aria-hidden="true">★</span>' + summary.average.toFixed(1) +
+      '<span class="rr-inline-count">(' + summary.count + ')</span></span>';
+  }
+
   function mount(storyId, target) {
     if (!target || !storyId || target.querySelector('[data-rating-review-shell]')) return;
     var shell = document.createElement('section');
@@ -248,5 +278,9 @@
     loadReviews(shell, state);
   }
 
-  window.NightsRatingReview = { mount: mount };
+  window.NightsRatingReview = {
+    mount: mount,
+    getSummaryMap: getSummaryMap,
+    badgeHtml: badgeHtml,
+  };
 })();

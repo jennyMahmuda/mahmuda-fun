@@ -112,13 +112,27 @@
           '<div class="episode-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">' +
           eps.map(function (ep) {
             return '<a href="../index.html?story=' + encodeURIComponent(ep.id) + '" style="display:block;padding:14px 16px;border-radius:10px;background:var(--bg-secondary);border:1px solid var(--border);text-decoration:none;">' +
-              '<div style="font-size:0.75rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;">Episode ' + (ep.episode != null ? ep.episode : '—') + '</div>' +
+              '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+                '<span style="font-size:0.75rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;">Episode ' + (ep.episode != null ? ep.episode : '—') + '</span>' +
+                '<span data-rating-slot="' + esc(ep.id) + '"></span>' +
+              '</div>' +
               '<div style="font-family:var(--font-display);font-weight:600;color:var(--text-primary);margin-top:4px;line-height:1.35;">' + esc(ep.title) + '</div>' +
               '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">' + esc(ep.date || '') + ' · ' + esc(ep.readTime || '') + '</div>' +
             '</a>';
           }).join('') +
           '</div></section>';
       }).join('');
+      applyRatingBadges(listEl);
+    }
+
+    function applyRatingBadges(container) {
+      if (!container || !window.NightsRatingReview) return;
+      window.NightsRatingReview.getSummaryMap().then(function (map) {
+        container.querySelectorAll('[data-rating-slot]').forEach(function (slot) {
+          var summary = map[slot.getAttribute('data-rating-slot')];
+          if (summary && summary.count) slot.outerHTML = window.NightsRatingReview.badgeHtml(summary);
+        });
+      });
     }
     fetch('../stories/index.json', { cache: 'no-store' })
       .then(function (r) { return r.json(); })
@@ -134,6 +148,7 @@
   </script>
   <script src="../assets/js/navigation.js" defer></script>
   <script src="../assets/js/site-components.js" defer></script>
+  <script src="../assets/js/rating-review.js" defer></script>
   <script src="../assets/js/ads.js" defer></script>
 </body>
 </html>
