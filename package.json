@@ -12,8 +12,7 @@
     "cf:dev": "wrangler dev",
     "cf:deploy": "wrangler deploy",
     "cf:migrate:local": "wrangler d1 migrations apply mahmuda_fun_reviews --local",
-    "cf:migrate:remote": "wrangler d1 migrations apply mahmuda_fun_reviews --remote",
-    "cf:secret": "wrangler secret put API_SECRET"
+    "cf:migrate:remote": "wrangler d1 migrations apply mahmuda_fun_reviews --remote"
   },
   "engines": {
     "node": ">=18.0.0"

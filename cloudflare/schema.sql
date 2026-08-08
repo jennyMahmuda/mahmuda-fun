@@ -1,5 +1,7 @@
--- Cloudflare D1 (SQLite) schema for the future rating/review feature.
--- Do not run until the API, moderation policy and consent notice are reviewed.
+-- Canonical reference schema for Cloudflare D1.
+-- Production migrations live in cloudflare/migrations/0001_rating_review.sql.
+-- Apply through Wrangler: npm run cf:migrate:remote
+
 CREATE TABLE IF NOT EXISTS story_ratings (
   story_id TEXT NOT NULL,
   rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
