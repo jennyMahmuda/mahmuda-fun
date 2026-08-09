@@ -5,22 +5,25 @@
    smooth mobile drawer · scroll shadow
    ============================================ */
 
+/* Solid, not the semi-transparent + backdrop-filter "frosted glass" this
+   used to be: on iOS Safari, backdrop-filter on a sticky/fixed header
+   that content keeps scrolling past has repeatedly turned out to be the
+   root cause of ghosting/smearing bugs elsewhere on this site (the
+   story reader, the mobile nav drawer) — removing it here too rather
+   than waiting for the same class of bug to get reported here as well. */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--bg-glass, rgba(12, 12, 16, 0.78));
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  background: var(--bg-card, #121215);
   border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.06));
   transition: background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
 }
 
 .navbar.scrolled {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
-  background: var(--bg-glass, rgba(12, 12, 16, 0.92));
 }
 
 .nav-container {
@@ -182,6 +185,11 @@
   .menu-toggle { display: flex; }
 }
 
-/* Keep page content clear of fixed nav */
-body { padding-top: 70px; }
-@media (max-width: 768px) { body { padding-top: 62px; } }
+/* Keep page content clear of the *fixed* .navbar used by every page
+   except index.html (which uses .sc-navbar — position:sticky, not
+   fixed, so it already reserves its own space in normal document flow
+   and needs no compensating padding). This used to apply unscoped to
+   every page, adding an unwanted ~62-70px blank gap above index.html's
+   own header — the ugly empty strip right at the top of the site. */
+body:has(> .navbar) { padding-top: 70px; }
+@media (max-width: 768px) { body:has(> .navbar) { padding-top: 62px; } }

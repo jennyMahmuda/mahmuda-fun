@@ -48,6 +48,11 @@ function routeAdminStoryAction(pathname) {
   return match ? { storyId: decodeURIComponent(match[1]), action: match[2] } : null;
 }
 
+function routeAdminReviewAction(pathname) {
+  const match = pathname.match(/^\/api\/admin\/reviews\/(\d+)\/(approve|reject)$/);
+  return match ? { reviewId: Number(match[1]), action: match[2] } : null;
+}
+
 function validStoryId(value) {
   return typeof value === 'string' && /^[a-zA-Z0-9_-]{1,160}$/.test(value);
 }
@@ -619,6 +624,64 @@ async function handleContact(request, env, origin) {
   return json({ ok: true }, 200, corsHeaders(origin));
 }
 
+// ---------- newsletter ("email me new stories first") ----------
+// Capture-only: this records the subscription. Actually emailing
+// subscribers when a new story publishes is a separate, not-yet-built
+// piece (a campaign send, not a transactional one like the rest of
+// sendEmail's uses) — see cloudflare/README.md.
+
+async function handleNewsletterSubscribe(request, env, origin) {
+  const body = await readJson(request);
+  const email = validEmail(body?.email) ? String(body.email).trim().slice(0, 254) : '';
+  if (!email) return json({ error: 'A valid email is required' }, 400, corsHeaders(origin));
+  const source = typeof body?.source === 'string' && body.source.length <= 40 ? body.source : 'unknown';
+  await env.REVIEWS_DB.prepare(
+    'INSERT INTO newsletter_subscribers (email, source) VALUES (?, ?) ON CONFLICT(email) DO NOTHING'
+  ).bind(email, source).run();
+  return json({ ok: true }, 200, corsHeaders(origin));
+}
+
+// ---------- recent reviews (site-wide marquee) ----------
+// Same-shape data as the per-story GET .../reviews, just not scoped to
+// one story — the client maps storyId back to a title/link using
+// stories/index.json (already fetched on every page), the same pattern
+// blog.js's renderTrending() uses for GA4 storyIds.
+
+async function handleRecentReviews(request, env, origin) {
+  const result = await env.REVIEWS_DB.prepare(
+    "SELECT id, story_id AS storyId, display_name AS displayName, review_text AS reviewText, created_at AS createdAt " +
+    "FROM story_reviews WHERE status = 'approved' ORDER BY created_at DESC LIMIT 24"
+  ).all();
+  return json({ reviews: result.results || [] }, 200, corsHeaders(origin));
+}
+
+// ---------- admin review moderation ----------
+// Reviews default to status='pending' and the public GET only ever
+// returns 'approved' ones (see the ratings/reviews route below) — before
+// these three endpoints existed there was no way to move a review out of
+// 'pending' at all short of a manual `wrangler d1 execute` UPDATE.
+
+async function handleAdminListReviews(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const result = await env.REVIEWS_DB.prepare(
+    "SELECT id, story_id AS storyId, display_name AS displayName, review_text AS reviewText, email, website, status, created_at AS createdAt " +
+    "FROM story_reviews WHERE status = 'pending' ORDER BY created_at DESC LIMIT 100"
+  ).all();
+  return json({ reviews: result.results || [] }, 200, corsHeaders(origin));
+}
+
+async function handleAdminModerateReview(request, env, origin, reviewId, action) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const status = action === 'approve' ? 'approved' : 'rejected';
+  const result = await env.REVIEWS_DB.prepare(
+    "UPDATE story_reviews SET status = ?, updated_at = datetime('now') WHERE id = ?"
+  ).bind(status, reviewId).run();
+  if (!result.meta || !result.meta.changes) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+  return json({ ok: true, status }, 200, corsHeaders(origin));
+}
+
 // ---------- exclusive story content ----------
 
 async function handleStoryContent(request, env, origin, storyId) {
@@ -787,6 +850,12 @@ export default {
 
     if (pathname === '/api/analytics/top-content' && request.method === 'GET') return handleTopContent(request, env, origin);
 
+    if (pathname === '/api/reviews/recent' && request.method === 'GET') {
+      if (!origin && request.headers.get('Origin')) return json({ error: 'Origin not allowed' }, 403);
+      return handleRecentReviews(request, env, origin);
+    }
+    if (pathname === '/api/newsletter/subscribe' && request.method === 'POST') return handleNewsletterSubscribe(request, env, origin);
+
     // ----- auth -----
     if (pathname === '/api/auth/signup' && request.method === 'POST') return handleSignup(request, env, origin);
     if (pathname === '/api/auth/verify' && request.method === 'POST') return handleVerifyEmail(request, env, origin);
@@ -813,6 +882,11 @@ export default {
       if (adminAction.action === 'update') return handleAdminUpdateStory(request, env, origin, adminAction.storyId);
       if (adminAction.action === 'publish') return handleAdminPublishStory(request, env, origin, adminAction.storyId);
       if (adminAction.action === 'delete') return handleAdminDeleteStory(request, env, origin, adminAction.storyId);
+    }
+    if (pathname === '/api/admin/reviews' && request.method === 'GET') return handleAdminListReviews(request, env, origin);
+    const adminReviewAction = routeAdminReviewAction(pathname);
+    if (adminReviewAction && request.method === 'POST') {
+      return handleAdminModerateReview(request, env, origin, adminReviewAction.reviewId, adminReviewAction.action);
     }
 
     // ----- exclusive content -----
@@ -901,9 +975,26 @@ export default {
     if (reviewText.length < 2 || reviewText.length > 2000) {
       return json({ error: 'Review must be between 2 and 2000 characters' }, 400, corsHeaders(origin));
     }
+    // Every field below is optional — the review form works exactly as
+    // before if none of them are sent. Website is never validated as a
+    // real URL (it's a free-text credit field, same as WordPress) and
+    // never used for anything except display; it's stored, not fetched.
+    const reviewEmail = validEmail(body?.email) ? String(body.email).trim().slice(0, 254) : null;
+    const website = typeof body?.website === 'string' ? body.website.trim().slice(0, 300) : null;
+    const notifyFollowUp = body?.notifyFollowUp === true ? 1 : 0;
+    const notifyNewPosts = body?.notifyNewPosts === true;
     await env.REVIEWS_DB.prepare(
-      'INSERT INTO story_reviews (story_id, display_name, review_text, anonymous_key) VALUES (?, ?, ?, ?)'
-    ).bind(route.storyId, displayName, reviewText, anonymousKey).run();
+      'INSERT INTO story_reviews (story_id, display_name, review_text, anonymous_key, email, website, notify_follow_up) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(route.storyId, displayName, reviewText, anonymousKey, reviewEmail, website, notifyFollowUp).run();
+    // "Notify me of new posts by email" — a real newsletter opt-in,
+    // independent of review moderation (the review can sit pending while
+    // the subscription is active immediately). Silently no-ops without an
+    // email or without the checkbox — never required to leave a review.
+    if (notifyNewPosts && reviewEmail) {
+      await env.REVIEWS_DB.prepare(
+        "INSERT INTO newsletter_subscribers (email, source) VALUES (?, 'review_form') ON CONFLICT(email) DO NOTHING"
+      ).bind(reviewEmail).run();
+    }
     return json({ ok: true, status: 'pending_moderation' }, 201, corsHeaders(origin));
   },
 };

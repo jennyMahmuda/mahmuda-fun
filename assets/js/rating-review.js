@@ -27,17 +27,6 @@
     });
   }
 
-  function formatDate(iso) {
-    if (!iso) return '';
-    try {
-      var d = new Date(iso.replace(' ', 'T') + 'Z');
-      if (isNaN(d.getTime())) return '';
-      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-    } catch (e) {
-      return '';
-    }
-  }
-
   function apiFetch(path, options) {
     return fetch(API_BASE + path, options).then(function (res) {
       return res.json().catch(function () { return null; }).then(function (data) {
@@ -64,38 +53,19 @@
     return out;
   }
 
+  // Compact widget: Recommend (top), then star average + count, then
+  // tap-to-rate. No per-story review list/form here — text reviews are
+  // read-only and shown site-wide instead (assets/js/site-reviews-marquee.js,
+  // home page only); this widget is just the two lightweight, one-tap
+  // signals (star + recommend) every story keeps.
   function render(shell, state) {
     var avg = state.ratingSummary ? state.ratingSummary.average : 0;
     var count = state.ratingSummary ? state.ratingSummary.count : 0;
     var myRating = state.myRating || 0;
     var reactionCount = state.reactionSummary ? state.reactionSummary.count : 0;
 
-    var reviewsMarkup = '';
-    if (state.reviewsLoading) {
-      reviewsMarkup = '<p class="rr-hint">Loading reviews…</p>';
-    } else if (state.reviewsError) {
-      reviewsMarkup = '<p class="rr-hint rr-error">Could not load reviews right now.</p>';
-    } else if (!state.reviews || state.reviews.length === 0) {
-      reviewsMarkup = '<p class="rr-hint">No reviews yet. Be the first to share your thoughts.</p>';
-    } else {
-      reviewsMarkup = '<ul class="rr-list">' + state.reviews.map(function (r) {
-        return '<li class="rr-item">' +
-          '<div class="rr-item-head">' +
-            '<span class="rr-item-name">' + escapeHtml(r.displayName || 'Anonymous') + '</span>' +
-            '<span class="rr-item-date">' + escapeHtml(formatDate(r.createdAt)) + '</span>' +
-          '</div>' +
-          '<p class="rr-item-text">' + escapeHtml(r.reviewText) + '</p>' +
-        '</li>';
-      }).join('') + '</ul>';
-    }
-
     shell.innerHTML =
       '<h3>Ratings &amp; reviews</h3>' +
-      '<div class="rr-summary">' +
-        '<div class="rr-stars" data-role="static-stars">' + starsMarkup(avg, false) + '</div>' +
-        '<span class="rr-average">' + (count ? Number(avg).toFixed(1) : '—') + '</span>' +
-        '<span class="rr-count">' + (count ? count + (count === 1 ? ' rating' : ' ratings') : 'No ratings yet') + '</span>' +
-      '</div>' +
 
       '<div class="rr-reaction-block">' +
         '<button type="button" class="rr-reaction-btn' + (state.myReaction ? ' rr-reaction-active' : '') + '" data-role="reaction-btn"' + (state.reacting ? ' disabled' : '') + '>' +
@@ -106,28 +76,17 @@
         (state.reactStatus ? '<p class="rr-hint' + (state.reactStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.reactStatus.message) + '</p>' : '') +
       '</div>' +
 
+      '<div class="rr-summary">' +
+        '<div class="rr-stars" data-role="static-stars">' + starsMarkup(avg, false) + '</div>' +
+        '<span class="rr-average">' + (count ? Number(avg).toFixed(1) : '—') + '</span>' +
+        '<span class="rr-count">' + (count ? count + (count === 1 ? ' rating' : ' ratings') : 'No ratings yet') + '</span>' +
+      '</div>' +
+
       '<div class="rr-rate-block">' +
         '<p class="rr-label">' + (myRating ? 'Your rating' : 'Tap to rate') + '</p>' +
         '<div class="rr-stars rr-stars-interactive" data-role="my-stars">' + starsMarkup(myRating, true) + '</div>' +
         (state.rateStatus ? '<p class="rr-hint' + (state.rateStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.rateStatus.message) + '</p>' : '') +
-      '</div>' +
-
-      '<form class="rr-form" data-role="review-form">' +
-        '<label class="rr-field">' +
-          '<span>Name (optional)</span>' +
-          '<input type="text" name="displayName" maxlength="80" placeholder="Anonymous" autocomplete="off">' +
-        '</label>' +
-        '<label class="rr-field">' +
-          '<span>Your review</span>' +
-          '<textarea name="reviewText" rows="3" maxlength="2000" minlength="2" placeholder="Share what you thought of this story…" required></textarea>' +
-        '</label>' +
-        '<button type="submit" class="rr-submit"' + (state.submitting ? ' disabled' : '') + '>' +
-          (state.submitting ? 'Submitting…' : 'Submit review') +
-        '</button>' +
-        (state.reviewStatus ? '<p class="rr-hint' + (state.reviewStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.reviewStatus.message) + '</p>' : '') +
-      '</form>' +
-
-      '<div class="rr-reviews">' + reviewsMarkup + '</div>';
+      '</div>';
 
     // Wire the recommend/reaction button
     var reactionBtn = shell.querySelector('[data-role="reaction-btn"]');
@@ -144,20 +103,6 @@
         btn.addEventListener('click', function () {
           var value = Number(btn.getAttribute('data-star'));
           submitRating(shell, state, value);
-        });
-      });
-    }
-
-    // Wire review form
-    var form = shell.querySelector('[data-role="review-form"]');
-    if (form) {
-      form.addEventListener('submit', function (evt) {
-        evt.preventDefault();
-        if (state.submitting) return;
-        var formData = new FormData(form);
-        submitReview(shell, state, {
-          displayName: (formData.get('displayName') || '').toString().trim(),
-          reviewText: (formData.get('reviewText') || '').toString().trim(),
         });
       });
     }
@@ -211,22 +156,6 @@
       });
   }
 
-  function loadReviews(shell, state) {
-    state.reviewsLoading = true;
-    render(shell, state);
-    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/reviews')
-      .then(function (data) {
-        state.reviewsLoading = false;
-        state.reviews = (data && data.reviews) || [];
-        render(shell, state);
-      })
-      .catch(function () {
-        state.reviewsLoading = false;
-        state.reviewsError = true;
-        render(shell, state);
-      });
-  }
-
   function submitRating(shell, state, value) {
     state.myRating = value;
     state.rateStatus = null;
@@ -242,36 +171,6 @@
       })
       .catch(function (err) {
         state.rateStatus = { message: err.message || 'Could not save your rating. Try again.', error: true };
-        render(shell, state);
-      });
-  }
-
-  function submitReview(shell, state, payload) {
-    if (payload.reviewText.length < 2) {
-      state.reviewStatus = { message: 'Please write a little more before submitting.', error: true };
-      render(shell, state);
-      return;
-    }
-    state.submitting = true;
-    state.reviewStatus = null;
-    render(shell, state);
-    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/reviews', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-anonymous-key': state.anonymousKey },
-      body: JSON.stringify({
-        displayName: payload.displayName || undefined,
-        reviewText: payload.reviewText,
-        anonymousKey: state.anonymousKey,
-      }),
-    })
-      .then(function () {
-        state.submitting = false;
-        state.reviewStatus = { message: 'Thanks! Your review was submitted and will appear after a quick moderation check.', error: false };
-        render(shell, state);
-      })
-      .catch(function (err) {
-        state.submitting = false;
-        state.reviewStatus = { message: err.message || 'Could not submit your review. Try again.', error: true };
         render(shell, state);
       });
   }
@@ -324,17 +223,11 @@
       myReaction: false,
       reacting: false,
       reactStatus: null,
-      reviews: [],
-      reviewsLoading: true,
-      reviewsError: false,
-      reviewStatus: null,
-      submitting: false,
     };
 
     render(shell, state);
     loadSummary(shell, state);
     loadReactionSummary(shell, state);
-    loadReviews(shell, state);
   }
 
   var reactionSummaryMapPromise = null;

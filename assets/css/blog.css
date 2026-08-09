@@ -534,12 +534,37 @@ body.reader-open .reader-progress { display: block; }
 .rr-hint.rr-error { color: var(--danger); }
 .rr-hint.rr-success { color: var(--accent); }
 
-.rr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
-.rr-item { border-top: 1px solid var(--border); padding-top: 12px; }
 .rr-item-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
 .rr-item-name { font-weight: 600; color: var(--text-primary); font-size: .9rem; }
 .rr-item-date { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
 .rr-item-text { margin: 0; color: var(--text-secondary); font-size: .92rem; line-height: 1.6; white-space: pre-wrap; }
+
+/* Reviews marquee — auto-scrolls, pauses on hover/focus, and stays a
+   normal horizontally-scrollable strip the rest of the time (drag/swipe
+   or a trackpad works same as the homepage category ticker). */
+.rr-marquee { overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 4px; }
+.rr-marquee::-webkit-scrollbar { display: none; }
+.rr-marquee-track { display: inline-flex; gap: 12px; animation: rr-marquee-scroll 34s linear infinite; }
+.rr-marquee:hover .rr-marquee-track,
+.rr-marquee:focus-within .rr-marquee-track { animation-play-state: paused; }
+.rr-marquee-static .rr-marquee-track { animation: none; }
+@keyframes rr-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rr-marquee-track { animation: none; }
+}
+.rr-marquee .rr-item {
+  flex: 0 0 260px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 12px 14px; background: var(--bg-secondary);
+}
+/* Site-wide reviews marquee (assets/js/site-reviews-marquee.js) links each
+   card to the story it's about — reset the anchor and add the "on <story>"
+   line the per-story marquee doesn't need (it's already on that story). */
+a.rr-item { display: block; text-decoration: none; transition: border-color var(--transition); }
+a.rr-item:hover { border-color: var(--accent); }
+.rr-item-story { display: block; margin-top: 8px; font-size: .76rem; color: var(--accent); }
 
 /* =========================================
    CATEGORY-SECTIONED HOME FEED (assets/js/blog.js renderCategorySections)
