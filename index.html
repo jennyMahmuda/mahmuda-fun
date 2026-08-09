@@ -1,289 +1,1318 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Force HTTPS (GitHub Pages + client fallback) -->
+  <meta charset="UTF-8">
+
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
   <script>
     (function () {
-      if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        location.replace('https://' + location.host + location.pathname + location.search + location.hash);
+      if (
+        location.protocol === 'http:' &&
+        location.hostname !== 'localhost' &&
+        location.hostname !== '127.0.0.1'
+      ) {
+        location.replace(
+          'https://' +
+          location.host +
+          location.pathname +
+          location.search +
+          location.hash
+        );
       }
     })();
   </script>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Hushed Chapters | Premium Adult Stories – Feed, Series, Audio & Video</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  >
 
-  <meta name="description" content="Hushed Chapters – Premium adult stories with text, audio, video & picture+audio. Forbidden romance, intimate fantasy, series episodes. Dark glossy feed like X/Twitter. 18+ only." />
-  <meta name="keywords" content="premium adult stories, erotic fiction, adult fantasy, forbidden romance, intimate stories, audio erotica, video stories, series episodes, adult feed, sensual stories, bhabhi devar, night mood, romance novel, adult novel, chemistry between characters" />
-  <meta name="author" content="Hushed Chapters" />
-  <meta name="robots" content="index, follow, max-image-preview:large" />
-  <meta name="rating" content="adult" />
-  <meta name="theme-color" content="#0a0a0c" />
-  <meta name="color-scheme" content="dark light" />
+  <title>SecretChapters | Adult Romance Stories & Mature Fiction</title>
 
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Hushed Chapters – Premium Adult Stories" />
-  <meta property="og:title" content="Hushed Chapters | Premium Adult Stories Feed" />
-  <meta property="og:description" content="Immersive adult stories with audio, video & series. Dark glossy X-style feed. 18+ only." />
-  <meta property="og:url" content="https://mahmuda.fun" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:locale:alternate" content="bn_BD" />
+  <meta
+    name="description"
+    content="SecretChapters brings together adult romance stories, mature fiction, dark romance, billionaire romance, forbidden love, slow-burn romance and immersive serialized storytelling."
+  >
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Hushed Chapters | Premium Adult Stories" />
-  <meta name="twitter:description" content="Dark glossy adult feed with series, audio & video stories. 18+ only." />
+  <meta
+    name="keywords"
+    content="adult romance stories, mature romance stories, romantic fiction, dark romance, billionaire romance, mafia romance, forbidden romance, slow burn romance, spicy romance, romantic short stories"
+  >
 
-  <link rel="canonical" href="https://mahmuda.fun" />
+  <meta name="author" content="SecretChapters">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="rating" content="adult">
 
-  <!-- Critical CSS inlined: first paint without waiting for stylesheets -->
-  <style>
-    :root{--bg:#0a0a0c;--text:#f2f2f4;--text-muted:#9a9aa3;--accent:#c9a87c;--nav-h:56px}
-    html{scroll-behavior:smooth;background:var(--bg);color:var(--text)}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
-    .navbar{position:sticky;top:0;z-index:100;height:var(--nav-h);background:rgba(10,10,12,.92);backdrop-filter:blur(8px)}
-    .nav-container{max-width:1100px;margin:0 auto;padding:0 16px;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between}
-    .logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);font-weight:600}
-    .logo-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:#111;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
-    .hero{padding:48px 16px 24px;text-align:center}
-    .hero-title{font-size:clamp(1.8rem,5vw,2.6rem);margin:8px 0;font-weight:700}
-    .hero-subtitle,.hero-eyebrow{color:var(--text-muted);margin:0}
-    .feed-section{padding:16px}
-    .loading-state{text-align:center;padding:40px;color:var(--text-muted)}
-    .spinner{width:28px;height:28px;border:2px solid #333;border-top-color:var(--accent);border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-  </style>
+  <meta name="theme-color" content="#09080b">
+  <meta name="color-scheme" content="dark light">
 
-  <!-- Main CSS: preload then apply (less blocking) -->
-  <link rel="preload" href="assets/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/style.css"></noscript>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SecretChapters">
+  <meta
+    property="og:title"
+    content="SecretChapters | Adult Romance Stories & Mature Fiction"
+  >
+  <meta
+    property="og:description"
+    content="Discover mature romance, dark romance, emotional fiction and serialized stories on SecretChapters."
+  >
+  <meta property="og:url" content="https://mahmuda.fun">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="bn_BD">
+  <meta property="og:locale:alternate" content="hi_IN">
+  <meta property="og:locale:alternate" content="ru_RU">
 
-  <!-- Secondary CSS: fully non-blocking -->
-  <link rel="stylesheet" href="assets/css/navigation.css" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="assets/css/ads.css" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="assets/css/blog.css" media="print" onload="this.media='all'">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta
+    name="twitter:title"
+    content="SecretChapters | Adult Romance Stories"
+  >
+  <meta
+    name="twitter:description"
+    content="Mature romance, dark romance, emotional fiction and serialized stories."
+  >
+
+  <link rel="canonical" href="https://mahmuda.fun">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    rel="preload"
+    as="style"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'"
+  >
+
+  <noscript>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+    >
+  </noscript>
+
+  <!-- Existing styles retained as compatibility layer -->
+  <link
+    rel="preload"
+    href="assets/css/style.css"
+    as="style"
+    onload="this.onload=null;this.rel='stylesheet'"
+  >
+
+  <noscript>
+    <link rel="stylesheet" href="assets/css/style.css">
+  </noscript>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/navigation.css"
+    media="print"
+    onload="this.media='all'"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/ads.css"
+    media="print"
+    onload="this.media='all'"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/blog.css"
+    media="print"
+    onload="this.media='all'"
+  >
+
   <noscript>
     <link rel="stylesheet" href="assets/css/navigation.css">
     <link rel="stylesheet" href="assets/css/ads.css">
     <link rel="stylesheet" href="assets/css/blog.css">
   </noscript>
 
-  <!-- Google Fonts: preconnect + non-blocking stylesheet -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap">
-  </noscript>
+  <!-- NEW visual system -->
+  <link rel="stylesheet" href="assets/css/secretchapters-home.css">
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Hushed Chapters – Premium Adult Stories",
+    "name": "SecretChapters",
     "url": "https://mahmuda.fun",
-    "description": "Premium adult story platform with text, audio, video and series episodes.",
-    "inLanguage": ["en", "bn"]
+    "description": "Adult romance stories, mature fiction and serialized romantic storytelling.",
+    "inLanguage": ["en", "bn", "hi", "ru"],
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://mahmuda.fun/search/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
   }
   </script>
 </head>
+
 <body>
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo" aria-label="mahmuda.fun home"><img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" /></a>
-      <nav class="nav-links" id="navLinks">
-        <a href="index.html" class="nav-item active" data-i18n="footer.link.feed">Feed</a>
-        <a href="video/" class="nav-item" data-i18n="footer.link.video">Video</a>
-        <a href="gellery/" class="nav-item" data-i18n="footer.link.gallery">Gallery</a>
-        <a href="category/" class="nav-item" data-i18n="footer.link.categories">Categories</a>
-        <a href="series/" class="nav-item" data-i18n="footer.link.series">Series</a><a href="premium.html" class="nav-item"><span class="nav-icon">★</span>Premium</a>
-      <a href="account/" class="nav-item" id="navAccountLink"><span class="nav-icon">👤</span><span id="navAccountLabel">Log in</span></a></nav>
-      <div class="nav-actions">
-        <div class="lang-switcher-mount" aria-label="Language"></div>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+
+  <!-- =========================================================
+       TOP AGE / BRAND BAR
+       ========================================================= -->
+
+  <div class="sc-topline">
+    <div class="sc-topline-inner">
+
+      <div class="sc-age-label">
+        <span class="sc-age-dot"></span>
+        18+ Mature Fiction
+      </div>
+
+      <div class="sc-top-message">
+        Stories beyond the ordinary
+      </div>
+
+      <div class="sc-top-links">
+        <a href="category/">Explore</a>
+        <a href="premium.html">Premium</a>
+        <a href="faq.html">Help</a>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       MAIN NAVIGATION
+       Existing navigation URLs preserved
+       ========================================================= -->
+
+  <header class="sc-navbar">
+
+    <div class="sc-nav-inner">
+
+      <a
+        href="index.html"
+        class="sc-brand"
+        aria-label="SecretChapters home"
+      >
+
+        <span class="sc-brand-mark">
+          SC
+        </span>
+
+        <span class="sc-brand-text">
+          <strong>Secret</strong>Chapters
+        </span>
+
+      </a>
+
+
+      <nav
+        class="sc-main-nav"
+        id="navLinks"
+        aria-label="Primary navigation"
+      >
+
+        <a
+          href="index.html"
+          class="sc-nav-link active"
+          data-i18n="footer.link.feed"
+        >
+          Home
+        </a>
+
+        <a
+          href="video/"
+          class="sc-nav-link"
+          data-i18n="footer.link.video"
+        >
+          Video
+        </a>
+
+        <a
+          href="gellery/"
+          class="sc-nav-link"
+          data-i18n="footer.link.gallery"
+        >
+          Gallery
+        </a>
+
+        <a
+          href="category/"
+          class="sc-nav-link"
+          data-i18n="footer.link.categories"
+        >
+          Categories
+        </a>
+
+        <a
+          href="series/"
+          class="sc-nav-link"
+          data-i18n="footer.link.series"
+        >
+          Series
+        </a>
+
+        <a
+          href="premium.html"
+          class="sc-nav-link sc-premium-link"
+        >
+          <span>✦</span>
+          Premium
+        </a>
+
+        <a
+          href="account/"
+          class="sc-nav-link"
+          id="navAccountLink"
+        >
+          <span id="navAccountLabel">Log in</span>
+        </a>
+
+      </nav>
+
+
+      <div class="sc-nav-actions">
+
+        <div
+          class="lang-switcher-mount"
+          aria-label="Language"
+        ></div>
+
+        <button
+          class="sc-theme-button theme-toggle"
+          id="themeToggle"
+          aria-label="Toggle theme"
+        >
           <span class="icon-moon">☾</span>
           <span class="icon-sun">☀</span>
         </button>
-        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-          <span></span><span></span><span></span>
+
+        <button
+          class="sc-menu-button menu-toggle"
+          id="menuToggle"
+          aria-label="Menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
+
       </div>
+
     </div>
+
   </header>
-  <div class="category-ticker" id="categoryTicker" aria-label="Browse categories"></div>
 
-  <div class="ad-leaderboard-wrap">
-    <div data-ad="leaderboard" class="ad-slot" aria-hidden="true"></div>
+
+  <!-- =========================================================
+       CATEGORY SCROLLING RAIL
+       Existing #categoryTicker preserved
+       ========================================================= -->
+
+  <div
+    class="sc-category-rail"
+    id="categoryTicker"
+    aria-label="Browse categories"
+  ></div>
+
+
+  <!-- =========================================================
+       ADS — EXISTING INJECTION POINTS PRESERVED
+       ========================================================= -->
+
+  <div class="ad-leaderboard-wrap sc-ad-shell">
+    <div
+      data-ad="leaderboard"
+      class="ad-slot"
+      aria-hidden="true"
+    ></div>
   </div>
-  <div class="ad-mobile-wrap">
-    <div data-ad="mobile-banner" class="ad-slot" aria-hidden="true"></div>
+
+  <div class="ad-mobile-wrap sc-ad-shell">
+    <div
+      data-ad="mobile-banner"
+      class="ad-slot"
+      aria-hidden="true"
+    ></div>
   </div>
 
-  <div class="ad-sky-wrap" aria-hidden="true">
-    <div data-ad="sky" class="ad-slot"></div>
-  </div>
 
-  <section class="hero hero-compact">
-    <div class="hero-content">
-      <p class="hero-eyebrow" data-i18n="hero.eyebrow">Premium • Audio • Video • Series</p>
-      <h1 class="hero-title" data-i18n="hero.title">Enter the Night</h1>
-      <p class="hero-subtitle" data-i18n="hero.subtitle">Scroll the feed. Read more. Dive deeper.</p>
-    </div>
-  </section>
+  <!-- =========================================================
+       HERO
+       ========================================================= -->
 
-  <section class="top-rated-section" id="trendingSection" hidden>
-    <div class="container feed-container">
-      <h2 class="top-rated-title" data-i18n="section.trending">🔥 Trending Now</h2>
-      <div class="top-rated-grid" id="trendingGrid"></div>
-    </div>
-  </section>
+  <main>
 
-  <section class="top-rated-section" id="topStoriesSection" hidden>
-    <div class="container feed-container">
-      <h2 class="top-rated-title" data-i18n="section.topStories">★ Top Stories</h2>
-      <div class="top-rated-grid" id="topStoriesGrid"></div>
-    </div>
-  </section>
+    <section class="sc-hero">
 
-  <section class="section feed-section" id="feed">
-    <div class="container feed-container">
-      <div class="feed-header">
-        <h2 class="section-title" data-i18n="section.feed">Feed</h2>
-        <div class="feed-filters" id="feedFilters">
-          <button class="filter-btn active" data-filter="all" data-i18n="filter.all">All</button>
-          <button class="filter-btn" data-filter="text" data-i18n="filter.text">Text</button>
-          <button class="filter-btn" data-filter="audio" data-i18n="filter.audio">Audio</button>
-          <button class="filter-btn" data-filter="video" data-i18n="filter.video">Video</button>
-          <button class="filter-btn" data-filter="series" data-i18n="filter.series">Series</button>
+      <div class="sc-hero-backdrop"></div>
+
+      <div class="sc-hero-overlay"></div>
+
+      <div class="sc-hero-content">
+
+        <div class="sc-hero-kicker">
+          <span></span>
+          Premium Romance & Mature Fiction
         </div>
-      </div>
-      <div class="feed" id="storyFeed">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p data-i18n="feed.loading">Loading feed…</p>
+
+        <h1>
+          Every chapter
+          <em>hides a secret.</em>
+        </h1>
+
+        <p>
+          Discover adult romance stories, dark romance,
+          forbidden love, emotional fiction and unforgettable
+          characters — one chapter at a time.
+        </p>
+
+        <div class="sc-hero-actions">
+
+          <a
+            href="category/"
+            class="sc-btn sc-btn-primary"
+          >
+            Explore Stories
+            <span>→</span>
+          </a>
+
+          <a
+            href="#topStoriesSection"
+            class="sc-btn sc-btn-secondary"
+          >
+            Top Rated
+          </a>
+
         </div>
+
+        <div class="sc-hero-meta">
+
+          <span>
+            <strong id="heroStoryCount">—</strong>
+            Stories
+          </span>
+
+          <span class="sc-meta-separator"></span>
+
+          <span>
+            <strong id="heroReaderCount">—</strong>
+            Readers
+          </span>
+
+          <span class="sc-meta-separator"></span>
+
+          <span>
+            <strong>18+</strong>
+            Mature
+          </span>
+
+        </div>
+
       </div>
-      <div class="feed-end" id="feedEnd" hidden>
-        <p data-i18n="feed.endOfFeed">— End of feed —</p>
+
+    </section>
+
+
+    <!-- =======================================================
+         TRENDING — EXISTING JS INJECTION POINT
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-trending"
+      id="trendingSection"
+      hidden
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+            <span class="sc-section-eyebrow">
+              Live from readers
+            </span>
+
+            <h2>
+              Trending now
+            </h2>
+          </div>
+
+          <a href="category/" class="sc-view-all">
+            View all →
+          </a>
+
+        </div>
+
+        <div
+          class="sc-story-grid"
+          id="trendingGrid"
+        ></div>
+
       </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         TOP RATED — GA4 + RATING DATA TARGET
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-top-rated"
+      id="topStoriesSection"
+      hidden
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-top-rated-head">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Reader intelligence
+            </span>
+
+            <h2>
+              Readers' favorites
+            </h2>
+
+            <p>
+              Stories ranked from reader ratings,
+              engagement and recent activity.
+            </p>
+
+          </div>
+
+          <div class="sc-score-legend">
+
+            <span>
+              ★ Rating
+            </span>
+
+            <span>
+              ◉ Engagement
+            </span>
+
+            <span>
+              ↗ Growth
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="sc-ranked-grid top-rated-grid"
+          id="topStoriesGrid"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         FEATURED EDITORIAL
+         ======================================================= -->
+
+    <section class="sc-featured-section">
+
+      <div class="sc-container">
+
+        <div class="sc-featured-card">
+
+          <div class="sc-featured-image">
+            <div class="sc-image-badge">
+              Editor's Pick
+            </div>
+          </div>
+
+          <div class="sc-featured-content">
+
+            <span class="sc-section-eyebrow">
+              Featured Chapter
+            </span>
+
+            <h2>
+              Where desire meets destiny
+            </h2>
+
+            <p>
+              Explore emotionally driven romance, complicated
+              relationships and stories where every decision
+              changes what happens next.
+            </p>
+
+            <div class="sc-featured-tags">
+
+              <span>Romance</span>
+              <span>Slow Burn</span>
+              <span>Mature Fiction</span>
+
+            </div>
+
+            <a
+              href="category/"
+              class="sc-btn sc-btn-primary"
+            >
+              Discover the story →
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         FEED
+         Existing #storyFeed preserved
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-feed-section"
+      id="feed"
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Fresh chapters
+            </span>
+
+            <h2>
+              The story feed
+            </h2>
+
+          </div>
+
+          <div
+            class="feed-filters sc-feed-filters"
+            id="feedFilters"
+          >
+
+            <button
+              class="filter-btn active"
+              data-filter="all"
+              data-i18n="filter.all"
+            >
+              All
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="text"
+              data-i18n="filter.text"
+            >
+              Stories
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="audio"
+              data-i18n="filter.audio"
+            >
+              Audio
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="video"
+              data-i18n="filter.video"
+            >
+              Video
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="series"
+              data-i18n="filter.series"
+            >
+              Series
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="feed sc-feed"
+          id="storyFeed"
+        >
+
+          <div class="loading-state sc-loading">
+
+            <div class="spinner"></div>
+
+            <p data-i18n="feed.loading">
+              Loading stories…
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="feed-end"
+          id="feedEnd"
+          hidden
+        >
+
+          <p data-i18n="feed.endOfFeed">
+            You've reached the end.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         MID AD — PRESERVED
+         ======================================================= -->
+
+    <div class="ad-between-sections sc-ad-shell">
+
+      <div
+        data-ad="mid"
+        class="ad-slot"
+        id="adMidSection"
+      ></div>
+
     </div>
-  </section>
 
-  <div class="ad-between-sections">
-    <div data-ad="mid" class="ad-slot" id="adMidSection"></div>
-  </div>
 
-  <section class="section categories-section" id="categories">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" data-i18n="section.categories">Categories</h2>
-        <p class="section-desc" data-i18n="section.categoriesDesc">Browse by desire</p>
+    <!-- =======================================================
+         VISUAL CATEGORY DISCOVERY
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-category-section"
+      id="categories"
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Find your mood
+            </span>
+
+            <h2>
+              Explore by story world
+            </h2>
+
+            <p>
+              From dangerous attraction to impossible love,
+              find the category that fits your mood.
+            </p>
+
+          </div>
+
+          <a
+            href="category/"
+            class="sc-view-all"
+          >
+            All categories →
+          </a>
+
+        </div>
+
+
+        <div class="sc-category-grid" id="categoryGrid">
+
+
+          <a
+            href="category/dark-romance/"
+            class="sc-category-card sc-cat-dark"
+            data-cat="dark-romance"
+          >
+            <div class="sc-cat-content">
+              <span>01</span>
+              <h3>Dark Romance</h3>
+              <p>Danger, tension & complicated hearts</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/mafia-romance/"
+            class="sc-category-card sc-cat-mafia"
+            data-cat="mafia"
+          >
+            <div class="sc-cat-content">
+              <span>02</span>
+              <h3>Mafia Romance</h3>
+              <p>Power, loyalty & forbidden attraction</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/paranormal-romance/"
+            class="sc-category-card sc-cat-paranormal"
+            data-cat="paranormal"
+          >
+            <div class="sc-cat-content">
+              <span>03</span>
+              <h3>Paranormal & Fantasy</h3>
+              <p>Love beyond the ordinary</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/billionaire-romance/"
+            class="sc-category-card sc-cat-billionaire"
+            data-cat="billionaire"
+          >
+            <div class="sc-cat-content">
+              <span>04</span>
+              <h3>Billionaire Romance</h3>
+              <p>Luxury, ambition & unexpected love</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/forbidden-romance/"
+            class="sc-category-card sc-cat-forbidden"
+            data-cat="forbidden"
+          >
+            <div class="sc-cat-content">
+              <span>05</span>
+              <h3>Forbidden Romance</h3>
+              <p>Love that refuses to follow rules</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/slow-burn-romance/"
+            class="sc-category-card sc-cat-slowburn"
+            data-cat="slow-burn"
+          >
+            <div class="sc-cat-content">
+              <span>06</span>
+              <h3>Slow Burn</h3>
+              <p>Build the tension chapter by chapter</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/vampire-romance/"
+            class="sc-category-card sc-cat-vampire"
+            data-cat="vampire"
+          >
+            <div class="sc-cat-content">
+              <span>07</span>
+              <h3>Vampire Romance</h3>
+              <p>Immortal hearts & midnight secrets</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/cowboy-romance/"
+            class="sc-category-card sc-cat-cowboy"
+            data-cat="cowboy"
+          >
+            <div class="sc-cat-content">
+              <span>08</span>
+              <h3>Cowboy Romance</h3>
+              <p>Wild hearts & open horizons</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/second-chance-romance/"
+            class="sc-category-card sc-cat-second"
+            data-cat="second-chance"
+          >
+            <div class="sc-cat-content">
+              <span>09</span>
+              <h3>Second Chance</h3>
+              <p>Some stories deserve another beginning</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/enemies-to-lovers/"
+            class="sc-category-card sc-cat-enemies"
+            data-cat="enemies"
+          >
+            <div class="sc-cat-content">
+              <span>10</span>
+              <h3>Enemies to Lovers</h3>
+              <p>Conflict, chemistry & unexpected connection</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/fated-mates/"
+            class="sc-category-card sc-cat-fated"
+            data-cat="fated"
+          >
+            <div class="sc-cat-content">
+              <span>11</span>
+              <h3>Fated Mates</h3>
+              <p>When destiny chooses for you</p>
+            </div>
+          </a>
+
+
+          <a
+            href="category/sports-romance/"
+            class="sc-category-card sc-cat-sports"
+            data-cat="sports"
+          >
+            <div class="sc-cat-content">
+              <span>12</span>
+              <h3>Sports Romance</h3>
+              <p>Competition, ambition & chemistry</p>
+            </div>
+          </a>
+
+        </div>
+
       </div>
-      <div class="category-grid" id="categoryGrid">
-        <a href="#" class="category-card" data-cat="romance"><div class="cat-icon">♥</div><h3>Romance</h3><span>Slow burn & connection</span></a>
-        <a href="#" class="category-card" data-cat="forbidden"><div class="cat-icon">◈</div><h3>Forbidden</h3><span>Taboo & tension</span></a>
-        <a href="#" class="category-card" data-cat="fantasy"><div class="cat-icon">✦</div><h3>Fantasy</h3><span>Impossible desires</span></a>
-        <a href="#" class="category-card" data-cat="intimate"><div class="cat-icon">◉</div><h3>Intimate</h3><span>Close & sensual</span></a>
-        <a href="#" class="category-card" data-cat="audio"><div class="cat-icon">♪</div><h3>Audio</h3><span>Listen & feel</span></a>
-        <a href="#" class="category-card" data-cat="series"><div class="cat-icon">▣</div><h3>Series</h3><span>Episode by episode</span></a>
+
+    </section>
+
+
+    <!-- =======================================================
+         NEW RELEASES
+         ======================================================= -->
+
+    <section class="sc-section sc-new-section">
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Just published
+            </span>
+
+            <h2>
+              New releases
+            </h2>
+
+          </div>
+
+          <a
+            href="category/"
+            class="sc-view-all"
+          >
+            Browse new →
+          </a>
+
+        </div>
+
+
+        <div
+          class="sc-new-release-grid"
+          id="newReleasesGrid"
+        ></div>
+
       </div>
-    </div>
-  </section>
 
-  <section class="section" id="series">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" data-i18n="section.series">Series</h2>
-        <p class="section-desc" data-i18n="section.seriesDesc">Continue the story</p>
+    </section>
+
+
+    <!-- =======================================================
+         RECENTLY UPDATED
+         ======================================================= -->
+
+    <section class="sc-section sc-updated-section">
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Continue the journey
+            </span>
+
+            <h2>
+              Recently updated
+            </h2>
+
+          </div>
+
+          <a
+            href="series/"
+            class="sc-view-all"
+          >
+            View series →
+          </a>
+
+        </div>
+
+
+        <div
+          class="sc-updated-list"
+          id="recentlyUpdatedGrid"
+        ></div>
+
       </div>
-      <div class="series-grid" id="seriesGrid"></div>
-    </div>
-  </section>
 
-  <section class="section about-section" id="about">
-    <div class="container narrow">
-      <h2 class="section-title" data-i18n="section.about">About Hushed Chapters</h2>
-      <p class="about-text" data-i18n="about.text">
-        Premium adult stories with text, audio, video and picture+audio.
-        X-style feed. Series with automatic next-episode links.
-        Dark glossy. Day & night. Pure fantasy.
-      </p>
-    </div>
-  </section>
+    </section>
 
-  <div class="reader-modal" id="readerModal" aria-hidden="true">
-    <div class="reader-backdrop" id="readerBackdrop"></div>
+
+    <!-- =======================================================
+         SERIES
+         Existing #seriesGrid preserved
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-series-section"
+      id="series"
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Serialized fiction
+            </span>
+
+            <h2>
+              Follow the story
+            </h2>
+
+            <p>
+              New chapters, continuing characters and stories
+              designed to keep you reading.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="series-grid sc-series-grid"
+          id="seriesGrid"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         SEO CONTENT HUB
+         ======================================================= -->
+
+    <section class="sc-section sc-seo-section">
+
+      <div class="sc-container sc-seo-layout">
+
+        <div class="sc-seo-intro">
+
+          <span class="sc-section-eyebrow">
+            Discover SecretChapters
+          </span>
+
+          <h2>
+            Adult romance stories
+            with more to discover.
+          </h2>
+
+        </div>
+
+
+        <div class="sc-seo-copy">
+
+          <p>
+            SecretChapters is a destination for adult romance stories,
+            mature fiction and emotionally driven romantic storytelling.
+            Explore dark romance, billionaire romance, forbidden romance,
+            slow-burn relationships, paranormal romance and other popular
+            romance themes.
+          </p>
+
+          <p>
+            Browse stories by genre, relationship trope, character type
+            and reading mood. Discover new releases, follow serialized
+            fiction and find highly rated stories selected from reader
+            engagement and feedback.
+          </p>
+
+          <div class="sc-keyword-links">
+
+            <a href="category/adult-romance/">Adult Romance Stories</a>
+            <a href="category/mature-romance/">Mature Romance</a>
+            <a href="category/dark-romance/">Dark Romance</a>
+            <a href="category/forbidden-romance/">Forbidden Romance</a>
+            <a href="category/slow-burn-romance/">Slow Burn Romance</a>
+            <a href="category/billionaire-romance/">Billionaire Romance</a>
+            <a href="category/mafia-romance/">Mafia Romance</a>
+            <a href="category/paranormal-romance/">Paranormal Romance</a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================================
+       READER MODAL — PRESERVED
+       ========================================================= -->
+
+  <div
+    class="reader-modal"
+    id="readerModal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="reader-backdrop"
+      id="readerBackdrop"
+    ></div>
+
     <div class="reader-panel">
-      <button class="reader-close" id="readerClose" aria-label="Close">×</button>
-      <div class="reader-content" id="readerContent"></div>
+
+      <button
+        class="reader-close"
+        id="readerClose"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <div
+        class="reader-content"
+        id="readerContent"
+      ></div>
+
     </div>
+
   </div>
 
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <img class="logo-svg" src="assets/logo.svg" alt="mahmuda.fun" width="140" height="37" loading="lazy" decoding="async" style="height:30px;width:auto;" />
-          <p class="footer-tagline" data-i18n="footer.tagline">Premium Adult Fiction • 18+ Only</p>
-          <div class="footer-social">
-            <a href="https://www.facebook.com/share/1HCyEtHHvN/?mibextid=wwXIfr" rel="noopener noreferrer" target="_blank" aria-label="Facebook">Facebook</a>
-            <a href="https://x.com/jennydufun" rel="noopener noreferrer" target="_blank" aria-label="X (Twitter)">X / Twitter</a>
-            <a href="https://xhamster.com/users/profiles/safejenny69" rel="noopener noreferrer" target="_blank" aria-label="xHamster">xHamster</a>
-          </div>
-          <div class="footer-lang lang-switcher-mount" aria-label="Language"></div>
-          <div class="footer-cats" id="footerCats">
-            <div class="footer-cats-title" data-i18n="footer.popularTags">Popular tags</div>
-            <div class="footer-cats-list" id="footerCatsList"></div>
-          </div>
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+
+  <footer class="sc-footer">
+
+    <div class="sc-container">
+
+      <div class="sc-footer-top">
+
+        <div class="sc-footer-brand">
+
+          <a
+            href="index.html"
+            class="sc-brand sc-footer-logo"
+          >
+
+            <span class="sc-brand-mark">
+              SC
+            </span>
+
+            <span class="sc-brand-text">
+              <strong>Secret</strong>Chapters
+            </span>
+
+          </a>
+
+          <p>
+            Mature romance, emotional fiction and stories
+            worth staying up for.
+          </p>
+
+          <span class="footer-tagline">
+            Premium Adult Fiction • 18+ Only
+          </span>
+
+          <div
+            class="footer-lang lang-switcher-mount"
+            aria-label="Language"
+          ></div>
+
         </div>
-        <nav class="footer-links" aria-label="Footer">
-          <div class="footer-col">
-            <h4 data-i18n="footer.explore">Explore</h4>
-            <a href="index.html" data-i18n="footer.link.feed">Feed</a>
-            <a href="category/" data-i18n="footer.link.categories">Categories</a>
-            <a href="series/" data-i18n="footer.link.series">Series</a>
-            <a href="gellery/" data-i18n="footer.link.gallery">Gallery</a>
-            <a href="video/" data-i18n="footer.link.video">Video</a>
-            <a href="premium.html" data-i18n="footer.link.premium">Premium</a>
-            <a href="become-creator.html" data-i18n="footer.link.becomeCreator">Become a Creator</a>
-          </div>
-          <div class="footer-col">
-            <h4 data-i18n="footer.support">Support</h4>
-            <a href="faq.html" data-i18n="footer.link.faq">FAQ</a>
-            <a href="mailto:support@mahmuda.fun" data-i18n="footer.link.help">Help</a>
-            <a href="mailto:support@mahmuda.fun" data-i18n="footer.link.contact">Contact us</a>
-            <a href="advertising.html" data-i18n="footer.link.advertising">Advertising</a>
-            <a href="content-removal.html" data-i18n="footer.link.contentRemoval">Content Removal</a>
-          </div>
-          <div class="footer-col">
-            <h4 data-i18n="footer.legal">Legal</h4>
-            <a href="terms.html" data-i18n="footer.link.terms">Terms of Use</a>
-            <a href="privacy-policy.html" data-i18n="footer.link.privacy">Privacy Policy</a>
-            <a href="cookies.html" data-i18n="footer.link.cookies">Cookies Policy</a>
-            <a href="dmca.html" data-i18n="footer.link.dmca">DMCA / Copyright</a>
-            <a href="dmca.html#2257" data-i18n="footer.link.2257">18 U.S.C. 2257</a>
-            <a href="parental-controls.html" data-i18n="footer.link.parental">Parental Controls</a>
-            <a href="eu-dsa.html" data-i18n="footer.link.eudsa">EU DSA</a>
-            <a href="trust-safety.html" data-i18n="footer.link.trustSafety">Trust &amp; Safety</a>
-            <a href="sitemap.xml" data-i18n="footer.link.sitemap">Sitemap</a>
-          </div>
+
+
+        <nav class="sc-footer-column">
+
+          <h4>Explore</h4>
+
+          <a href="index.html">Home</a>
+          <a href="category/">Categories</a>
+          <a href="series/">Series</a>
+          <a href="gellery/">Gallery</a>
+          <a href="video/">Video</a>
+          <a href="premium.html">Premium</a>
+
         </nav>
+
+
+        <nav class="sc-footer-column">
+
+          <h4>Popular</h4>
+
+          <a href="category/dark-romance/">Dark Romance</a>
+          <a href="category/mafia-romance/">Mafia Romance</a>
+          <a href="category/billionaire-romance/">Billionaire Romance</a>
+          <a href="category/forbidden-romance/">Forbidden Romance</a>
+          <a href="category/slow-burn-romance/">Slow Burn</a>
+          <a href="category/paranormal-romance/">Paranormal Romance</a>
+
+        </nav>
+
+
+        <nav class="sc-footer-column">
+
+          <h4>Support</h4>
+
+          <a href="faq.html">FAQ</a>
+          <a href="mailto:support@mahmuda.fun">Contact</a>
+          <a href="content-removal.html">Content Removal</a>
+          <a href="trust-safety.html">Trust & Safety</a>
+          <a href="sitemap.xml">Sitemap</a>
+
+        </nav>
+
+
+        <nav class="sc-footer-column">
+
+          <h4>Legal</h4>
+
+          <a href="terms.html">Terms of Use</a>
+          <a href="privacy-policy.html">Privacy Policy</a>
+          <a href="cookies.html">Cookies Policy</a>
+          <a href="dmca.html">DMCA / Copyright</a>
+          <a href="eu-dsa.html">EU DSA</a>
+          <a href="parental-controls.html">Parental Controls</a>
+
+        </nav>
+
       </div>
-      <p class="footer-copy">Premium Adult Fiction • Audio • Video • Series • 18+ Only • mahmuda.fun<br>© <span class="footer-year">2026</span> mahmuda.fun. All rights reserved.</p>
+
+
+      <div class="sc-footer-bottom">
+
+        <span>
+          © <span class="footer-year">2026</span>
+          SecretChapters
+        </span>
+
+        <span>
+          Premium Adult Fiction • 18+ Only
+        </span>
+
+      </div>
+
     </div>
+
   </footer>
 
-  <!-- Polyfill for CSS preload onload in older browsers -->
+
+  <!-- Existing JavaScript injection architecture -->
+
   <script>
-    (function(){function r(l){var n=document.createElement('link');n.rel='stylesheet';n.href=l;document.head.appendChild(n)}
-var q=document.querySelectorAll('link[rel=preload][as=style]');for(var i=0;i<q.length;i++){if(!q[i].relList||!q[i].relList.supports||!q[i].relList.supports('preload')){r(q[i].href)}}})();
+    (function () {
+      function addStylesheet(href) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+      }
+
+      var links = document.querySelectorAll(
+        'link[rel="preload"][as="style"]'
+      );
+
+      for (var i = 0; i < links.length; i++) {
+        if (
+          !links[i].relList ||
+          !links[i].relList.supports ||
+          !links[i].relList.supports('preload')
+        ) {
+          addStylesheet(links[i].href);
+        }
+      }
+    })();
   </script>
+
+
+  <!-- Existing application modules -->
+
   <script src="assets/js/auth.js" defer></script>
-  <script src="assets/js/i18n.js" defer></script><script src="assets/js/category-ticker.js" defer></script><script src="assets/js/navigation.js" defer></script>
-  <script src="assets/js/site-components.js" defer></script>
-  <script src="assets/js/rating-review.js" defer></script>
-  <script src="assets/js/ads.js" defer></script>
-  <script src="assets/js/blog.js" defer></script>
+
+  <script src="assets/js/i18n.js" defer></script>
+
+  <script
+    src="assets/js/category-ticker.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/navigation.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/site-components.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/rating-review.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/ads.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/blog.js"
+    defer
+  ></script>
+
+
+  <!-- New homepage controller -->
+  <script
+    src="assets/js/secretchapters-home.js"
+    defer
+  ></script>
+
 </body>
 </html>
