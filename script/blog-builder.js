@@ -338,7 +338,13 @@ function writeCategoryPages(stories) {
   let written = 0;
   CATEGORIES.forEach(function (cat) {
     const matches = publicStories.filter(function (s) { return storyMatchesCategory(s, cat.slug); });
-    const cardsJson = JSON.stringify(matches.map(categoryCardData));
+    // JSON.stringify does not escape "<" — a title/excerpt containing the
+    // literal text "</script>" (increasingly plausible now that the
+    // admin content manager lets those fields through with only a length
+    // check) would otherwise close this tag early and let arbitrary HTML
+    // execute on every visitor of the page. < is valid inside both
+    // JSON strings and a <script> block, so this is safe either way.
+    const cardsJson = JSON.stringify(matches.map(categoryCardData)).replace(/</g, '\\u003c');
     const canonical = SITE_URL + '/category/' + cat.slug + '/';
     const pageTitle = cat.title + ' | mahmuda.fun – Premium Adult Stories';
     const html = '<!DOCTYPE html>\n<html lang="en" data-theme="dark">\n<head>\n' +
