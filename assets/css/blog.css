@@ -534,31 +534,6 @@ body.reader-open .reader-progress { display: block; }
 .rr-hint.rr-error { color: var(--danger); }
 .rr-hint.rr-success { color: var(--accent); }
 
-.rr-reviews-label { margin: 0 0 10px; font-size: .78rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); }
-
-/* "Leave a Reply" — a WordPress-style comment form: full-width textarea
-   first, then name/email/website in a row, then the notify checkboxes
-   and a short consent line. */
-.rr-reply-form { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-.rr-reply-form h4 { font-family: var(--font-display); font-size: 1.1rem; color: var(--text-primary); margin: 0 0 12px; }
-.rr-reply-form > textarea {
-  font: inherit; width: 100%; padding: 10px 12px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text-primary);
-  resize: vertical;
-}
-.rr-reply-form > textarea:focus { outline: none; border-color: var(--accent); }
-.rr-field-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
-.rr-checkbox-line {
-  display: flex; align-items: center; gap: 8px; margin-top: 8px;
-  font-size: .85rem; color: var(--text-secondary);
-}
-.rr-checkbox-line input { margin: 0; }
-.rr-consent { margin: 10px 0 14px; font-size: .78rem; color: var(--text-muted); line-height: 1.6; }
-.rr-consent a { color: var(--accent); }
-@media (max-width: 560px) {
-  .rr-field-row { grid-template-columns: 1fr; }
-}
-
 .rr-item-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
 .rr-item-name { font-weight: 600; color: var(--text-primary); font-size: .9rem; }
 .rr-item-date { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
