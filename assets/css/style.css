@@ -323,61 +323,6 @@ body.cat-theme-accent .section-header { background: radial-gradient(circle at 20
 }
 .footer-cats-list a:hover { color: var(--accent); }
 
-/* =========================================
-   LANGUAGE SWITCHER (assets/js/i18n.js)
-   One component, two mount points: .nav-actions (opens downward) and the
-   footer (opens upward, so the menu never overflows past the page bottom).
-   ========================================= */
-.lang-switcher { position: relative; }
-.lang-switcher-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 500;
-  color: var(--text-secondary); background: transparent; border: 1px solid var(--border);
-  transition: all var(--transition); cursor: pointer; white-space: nowrap;
-}
-.lang-switcher-btn:hover, .lang-switcher-btn[aria-expanded="true"] {
-  color: var(--accent); border-color: var(--accent); background: var(--accent-soft);
-}
-.lang-switcher-menu {
-  position: absolute; top: calc(100% + 8px); right: 0; min-width: 150px; max-height: 60vh;
-  overflow-y: auto; margin: 0; padding: 6px; list-style: none; z-index: 500;
-  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-}
-.lang-switcher-menu[hidden] { display: none; }
-.footer .lang-switcher-menu { top: auto; bottom: calc(100% + 8px); }
-.lang-option {
-  display: block; width: 100%; text-align: left; padding: 8px 12px; border-radius: 8px;
-  font-size: 0.9rem; color: var(--text-secondary); background: none; border: none; cursor: pointer;
-}
-.lang-option:hover { background: var(--accent-soft); color: var(--accent); }
-.lang-option.active { color: var(--accent); font-weight: 600; }
-.footer-lang { margin-top: 18px; }
-
-/* Small honest disclosure shown instead of pretending an untranslated
-   story is in the language the reader picked (assets/js/blog.js
-   ensureContent()). Sits above the original-language text it wraps. */
-.i18n-pending-notice {
-  font-size: 0.82rem; color: var(--text-muted); background: var(--bg-elevated);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 8px 12px; margin-bottom: 16px;
-}
-
-/* =========================================
-   RTL (Arabic) — pragmatic scope: correct reading direction and the
-   handful of hardcoded left/right values that would otherwise look
-   backwards. Not a full mirrored redesign of every grid/nav layout.
-   ========================================= */
-html[dir="rtl"] body { direction: rtl; }
-html[dir="rtl"] .feed-full-content,
-html[dir="rtl"] .reader-body { text-align: right; }
-html[dir="rtl"] .feed-full-content blockquote,
-html[dir="rtl"] .reader-body blockquote {
-  border-left: none; border-right: 3px solid var(--accent); padding: 8px 16px;
-}
-html[dir="rtl"] .lang-switcher-menu { right: auto; left: 0; }
-html[dir="rtl"] .lang-option { text-align: right; }
-
 .footer-links { display: flex; flex-wrap: wrap; gap: 40px; flex: 1 1 auto; justify-content: flex-end; }
 .footer-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-primary); margin: 0 0 12px; }
 .footer-col { display: flex; flex-direction: column; gap: 8px; min-width: 140px; }

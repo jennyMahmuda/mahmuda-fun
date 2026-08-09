@@ -89,7 +89,7 @@ Frontend pages: `/account/` (login + signup), `/account/verify.html`, `/account/
 |---|---|---|
 | `GOOGLE_CLIENT_EMAIL` | হ্যাঁ — JWT sign করতে | Service account JSON key file-এর `client_email` field |
 | `GOOGLE_PRIVATE_KEY` | হ্যাঁ — JWT sign করতে | Service account JSON key file-এর `private_key` field (পুরো PEM string, `-----BEGIN PRIVATE KEY-----` সহ) |
-| `GOOGLE_PROJECT_ID` | **হ্যাঁ** — Cloud Translation API call-এর URL-এ project ID লাগে (নিচের অনুবাদ সেকশন দেখুন) | Service account JSON key file-এর `project_id` field |
+| `GOOGLE_PROJECT_ID` | **না** — এই feature-এ প্রয়োজন হয় না, শুধু ভবিষ্যতের জন্য secret হিসেবে রাখা আছে | — |
 | `GA_PROPERTY_ID` | **হ্যাঁ, কিন্তু এখনো দেওয়া হয়নি** — এটা ছাড়া "Trending Now" section কখনো data দেখাবে না | GA4 Admin → Property Settings → **Property ID** (একটা plain number, যেমন `398765432` — measurement ID `G-XXXXXXX`-এর মতো নয়) |
 
 আরও দুইটা জিনিস verify করে নেবেন:
@@ -97,21 +97,6 @@ Frontend pages: `/account/` (login + signup), `/account/verify.html`, `/account/
 2. **`GA_PROPERTY_ID`** GitHub repository secret হিসেবে যোগ করুন (উপরের অন্য secret-গুলোর মতোই jagah থেকে)।
 
 Result cache হয় D1-এ (১ ঘণ্টা পর্যন্ত) — তাই প্রতিটা visitor সরাসরি Google API hit করে না, শুধু cache পড়ে।
-
-### 🌐 Reader-facing language switcher + story translation
-
-Navigation ও footer-এ একটা language switcher আছে (English, বাংলা, Русский, हिन्दी, 中文, Español, Français, العربية) — `assets/js/i18n.js`। UI text (nav/footer/button label) সবগুলো ভাষায় আগে থেকেই hand-written হয়ে আছে (`assets/i18n/*.json`), কোনো secret ছাড়াই কাজ করে। কিন্তু **গল্পের আসল লেখা** (title/excerpt/content) অনুবাদ করতে সেই **একই** Google service account লাগে, শুধু একটা নতুন permission সহ:
-
-1. **Cloud Translation API enable করুন** সেই একই Google Cloud project-এ (যেটাতে GA4-এর service account আছে) — Cloud Console → APIs & Services → Library → "Cloud Translation API" → Enable। এটা enable করতে project-এ একটা billing account link করা লাগবে (Google Cloud-এর সাধারণ নিয়ম) — কিন্তু bill আসবে না, কারণ:
-2. **Service account-কে "Cloud Translation API User" role দিন।** Cloud Console → IAM & Admin → IAM → `GOOGLE_CLIENT_EMAIL`-এর ঠিকানা খুঁজুন (অথবা "Grant Access" দিয়ে নতুন করে যোগ করুন) → role: **Cloud Translation API User** (`roles/cloudtranslate.user`)।
-
-এই দুইটা step করলেই `.github/workflows/translate-content.yml` workflow (প্রতিদিন একবার + যখনই `story-post/**`-এ নতুন push হয়) স্বয়ংক্রিয়ভাবে অনুবাদ করে `stories/i18n/` ফোল্ডারে commit করে দেবে — যেটা normal Pages deploy-এর সাথেই live হয়ে যায়।
-
-**সত্যিকারের zero-cost, প্রতি মাসে:** Google Cloud Translation Basic-এর free tier হলো প্রতি মাসে ৫,০০,০০০ character, চিরস্থায়ীভাবে (এক-বারের trial credit না)। `script/translate-content.js` নিজে থেকেই একটা মাসিক budget track করে (`stories/i18n/.usage-budget.json`, ৪,৫০,০০০ character-এ cap করা — free tier-এর নিচে একটা নিরাপদ মার্জিন রেখে) এবং সেই limit-এ পৌঁছালে বাকি অনুবাদ পরের মাসের জন্য রেখে দেয় — কখনো Google-কে bill করতে বলে না। প্রথমবার সবগুলো existing গল্প (২৫টা × ৭টা ভাষা) অনুবাদ করতে কয়েক মাস লাগতে পারে (এক ভাষা পুরোপুরি শেষ করে তারপর পরের ভাষায় যায়, যাতে কোনো একটা ভাষা নির্বাচন করলে reader অর্ধেক গল্প না দেখে) — নতুন গল্প যোগ হলে তখন সেটা খুবই ছোট incremental খরচ, budget-এর ধারেকাছেও যায় না।
-
-**Human tune (হাতে ঠিক করা):** যেকোনো `stories/i18n/<story-id>/<lang>.json` ফাইল সরাসরি edit করে, `"manual": true` set করলে সেই ফাইল আর কখনো automatic script দিয়ে overwrite হবে না — এটাই "auto-translate তারপর হাতে ঠিক করা" workflow-এর পুরোটা। কোনো special tool লাগে না, সাধারণ git commit-ই যথেষ্ট।
-
-এই feature গুলো configure না করা পর্যন্ত switcher পুরোপুরি কাজ করে (nav/footer সব ভাষায় বদলায়), শুধু গল্পের লেখা অনুবাদ ছাড়া মূল (বাংলা) ভাষায় থেকে যায়, আর একটা ছোট notice দেখায় ("এই গল্পটি এখনো [ভাষা]-এ অনুবাদ হয়নি") — silent ভুল তথ্য না দেখিয়ে।
 
 ## Security rules
 
