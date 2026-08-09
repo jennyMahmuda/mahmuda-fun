@@ -268,8 +268,20 @@
 /* =========================================
    READ MODE (immersive reader panel)
    ========================================= */
+/* Starts below the real, measured header height (--nav-h, set by
+   assets/js/navigation.js's updateNavHeightVar() — topline + navbar,
+   whichever is present) instead of covering the full viewport. The
+   header used to sit *behind* this modal (lower z-index, same screen
+   area), so the whole nav effectively vanished the moment a story
+   opened; a first pass at fixing that used a hardcoded top offset that
+   didn't account for index.html's announcement bar sitting above the
+   nav, which left the sticky close button positioned underneath the
+   real navbar — silently swallowing every click meant for it (the
+   navbar has the higher stacking position, so it wins hit-testing for
+   that whole overlapping region). Now it stays fixed/visible above the
+   reader at all times; only the content below it scrolls. */
 .reader-modal {
-  position: fixed; inset: 0; z-index: 2000;
+  position: fixed; top: var(--nav-h, 96px); right: 0; bottom: 0; left: 0; z-index: 900;
   display: flex; justify-content: center;
   visibility: hidden; opacity: 0;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -279,7 +291,7 @@
   overflow-y: auto;
 }
 .reader-modal.open { visibility: visible; opacity: 1; }
-.reader-backdrop { position: fixed; inset: 0; }
+.reader-backdrop { position: fixed; top: var(--nav-h, 96px); right: 0; bottom: 0; left: 0; }
 .reader-panel {
   position: relative;
   width: 100%; max-width: 760px;

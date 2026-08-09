@@ -50,7 +50,7 @@
       '<div class="related-grid">' + related.map(function (item) {
         var image = resolveImage(item);
         return '<a class="related-card" href="' + storyUrl(item.id) + '" data-story-link="' + escapeHtml(item.id) + '">' +
-          (image ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(item.title) + '" loading="lazy">' : '<div class="related-placeholder">N</div>') +
+          (image ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" onerror="this.remove()">' : '<div class="related-placeholder">N</div>') +
           '<span class="related-card-body"><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.category || 'Story') + '</small></span>' +
         '</a>';
       }).join('') + '</div></section>';
@@ -838,7 +838,7 @@
             '<span class="reader-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</span>' +
           '</div>' +
           '<h2 class="reader-title">' + escapeHtml(story.title) + '</h2>' +
-          (resolveImage(story) ? '<img class="reader-cover" src="' + escapeHtml(resolveImage(story)) + '" alt="' + escapeHtml(story.title) + '" loading="lazy" decoding="async">' : '') +
+          (resolveImage(story) ? '<img class="reader-cover" src="' + escapeHtml(resolveImage(story)) + '" alt="' + escapeHtml(story.title) + '" loading="lazy" decoding="async" onerror="this.remove()">' : '') +
           (story.video ? '<div class="feed-media-block"><video controls playsinline preload="metadata" style="width:100%">' +
               '<source src="' + escapeHtml(resolveMediaUrl(story.video)) + '">Your browser does not support the video tag.</video></div>' : '') +
           (story.audio ? '<div class="feed-media-block"><audio controls preload="metadata" style="width:100%">' +
@@ -974,6 +974,23 @@
       }
     });
   }
+
+  // The reader's visible "×" close button and the click-outside backdrop
+  // were both present in the markup but never actually wired to
+  // anything — clicking either did nothing. Same URL-cleanup logic as
+  // the in-content "← Back to stories" button (data-reader-back above).
+  function closeReaderAndCleanUrl() {
+    if (window.history.length > 1 && window.history.state && window.history.state.story) {
+      history.back();
+    } else {
+      history.replaceState({}, '', 'index.html');
+      closeReader();
+    }
+  }
+  var readerCloseBtn = document.getElementById('readerClose');
+  if (readerCloseBtn) readerCloseBtn.addEventListener('click', closeReaderAndCleanUrl);
+  var readerBackdropEl = document.getElementById('readerBackdrop');
+  if (readerBackdropEl) readerBackdropEl.addEventListener('click', closeReaderAndCleanUrl);
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeReader();

@@ -11,7 +11,7 @@ date: 2026-08-07
 language: bn
 readTime: 70 min
 author: Mahmudajenny69
-cover: image/University teacher.JPG
+cover: https://mahmuda.fun/assets/images/gallery/University.JPG
 images: "https://mahmuda.fun/assets/images/gallery/University.JPG"
 excerpt: বিশ্ববিদ্যালয়ের শিক্ষিকা আর সিনিয়র আপু—দুজনেই রাফির শরীর নিয়ে লড়াই। হেভি ডার্টি টক, বারবার চোষা, ডাবল ডগি, রাতভর থামা নেই। সিরিজের শেষ ধামাকা।
 ---

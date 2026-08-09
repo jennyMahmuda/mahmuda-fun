@@ -39,6 +39,31 @@ function resolveMediaUrl(ref) {
   return preferWebpSibling(local);
 }
 
+// Catches exactly the class of bug that shipped a broken cover image +
+// duplicated-looking header on a live story page: a cover/inline media
+// reference that points at a file nobody actually uploaded (typo'd
+// filename, wrong folder, or just never committed). Doesn't fail the
+// build — a missing photo shouldn't block every other story from
+// deploying — but prints a warning loud enough that it can't be missed
+// in the GitHub Actions log, and build() prints a summary count at the
+// very end. mahmuda.fun/... URLs are checked too (this repo *is* that
+// site, so the path after the domain maps 1:1 to a local file);
+// any other external URL can't be checked from here and is skipped.
+const mediaWarnings = [];
+function checkMediaRef(ref, storyId, field) {
+  if (!ref) return;
+  let local = ref;
+  if (/^https?:\/\/mahmuda\.fun\//i.test(ref)) {
+    local = ref.replace(/^https?:\/\/mahmuda\.fun\//i, '');
+  } else if (/^https?:\/\//i.test(ref) || ref.startsWith('data:')) {
+    return; // external URL, can't check from here
+  }
+  local = local.replace(/^\/+/, '');
+  if (!fs.existsSync(path.join(ROOT, local))) {
+    mediaWarnings.push(storyId + ' (' + field + '): ' + ref);
+  }
+}
+
 function mdToHtml(md) {
   let html = md;
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
@@ -56,7 +81,13 @@ function mdToHtml(md) {
   });
   html = html.replace(/!\[([^\]]*)\]\(([^)]+)(?:\s*"[^"]*")?\)/g, function (m, alt, src) {
     const url = resolveMediaUrl(src);
-    return '<img src="' + escapeAttr(url) + '" alt="' + escapeAttr(alt) + '" loading="lazy" decoding="async" />';
+    // A missing/mistyped image reference in story-post/*.md (wrong
+    // filename, file never uploaded) used to render as a broken-image
+    // icon with the alt text spilled out next to it — right under the
+    // real title, so it read as a duplicated header. Drop the element
+    // entirely on load failure instead; the story text carries on
+    // without it rather than showing a visibly broken page.
+    return '<img src="' + escapeAttr(url) + '" alt="' + escapeAttr(alt) + '" loading="lazy" decoding="async" onerror="this.remove()" />';
   });
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (m, text, href) {
     const url = resolveMediaUrl(href);
@@ -534,6 +565,15 @@ function buildStory(filePath) {
   const audio = meta.audio ? resolveMediaUrl(meta.audio) : null;
   const tags = Array.isArray(meta.tags) ? meta.tags : [];
 
+  checkMediaRef(cover, id, 'cover');
+  (Array.isArray(meta.images) ? meta.images : (typeof meta.images === 'string' ? [meta.images] : []))
+    .forEach(function (ref) { checkMediaRef(ref, id, 'images'); });
+  checkMediaRef(meta.video, id, 'video');
+  checkMediaRef(meta.audio, id, 'audio');
+  Array.from(body.matchAll(/!\[[^\]]*\]\(([^)\s]+)/g)).forEach(function (m) {
+    checkMediaRef(m[1], id, 'inline content');
+  });
+
   const story = {
     id: id,
     title: title,
@@ -662,6 +702,16 @@ function build() {
   writeCategoryPages(stories);
   writeCategoryBackgroundsManifest();
   writeSitemap(stories);
+
+  if (mediaWarnings.length) {
+    console.log('\n⚠️  ' + mediaWarnings.length + ' missing media reference(s) — file was referenced but never uploaded:');
+    mediaWarnings.forEach(function (w) { console.log('   - ' + w); });
+    console.log('   Upload the real file to assets/images/... (or story-post/image/...) via GitHub,');
+    console.log('   or fix the path in the story\'s frontmatter/content, then rebuild. Not failing the');
+    console.log('   build over this — everything else still deploys — but this exact gap is what shipped');
+    console.log('   a broken cover image on a live story page before.');
+  }
+
   console.log('Done.\n');
 }
 

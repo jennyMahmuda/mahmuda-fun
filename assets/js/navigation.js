@@ -56,13 +56,17 @@
     var file = path.split('/').pop() || 'index.html';
     if (file === '' || file === '/') file = 'index.html';
     var query = (window.location.search || '').toLowerCase();
+    // Was declared *inside* the forEach below, so the "Story page →
+    // highlight Feed" block further down threw "isStoryPage is not
+    // defined" on every story page (?story=... is only ever set on
+    // index.html) — an uncaught ReferenceError that aborted the rest of
+    // this function, silently skipping that highlight block every time.
+    var isStoryPage = query.indexOf('story=') !== -1;
 
     document.querySelectorAll('.nav-item').forEach(function (item) {
       item.classList.remove('active');
       var href = (item.getAttribute('href') || '').toLowerCase();
       var hrefFile = href.split('/').pop().split('#')[0].split('?')[0] || '';
-
-      var isStoryPage = query.indexOf('story=') !== -1;
 
       if (hrefFile === 'index.html' || hrefFile === '' || href === '/') {
         if ((file === 'index.html' || file === '') && !isStoryPage) item.classList.add('active');
@@ -147,11 +151,53 @@
     onScroll();
   }
 
+  // --nav-h was referenced by a couple of stylesheets (.category-ticker's
+  // sticky offset, .reader-modal's top offset) but never actually set
+  // anywhere — everything relied on a hardcoded fallback value that
+  // didn't match the real header height once an announcement bar
+  // (.sc-topline) sat above the nav (and, on index.html, body's own
+  // top padding — meant to clear a *different* page's fixed .navbar —
+  // adds still more space above that). That mismatch let the reader's
+  // sticky close button end up positioned *underneath* the real navbar,
+  // where the navbar (a higher stacking element) silently absorbed
+  // every click meant for it.
+  //
+  // Reading the navbar's own rect.bottom (rather than summing each
+  // element's own height) sidesteps all of that — measured while the
+  // page is scrolled to the very top, it's exactly the on-screen offset
+  // everything below the header needs to clear, whatever is stacked
+  // above the nav and however it's spaced. Only updates at scrollY===0:
+  // .sc-topline isn't sticky (it scrolls away) while the nav is, so the
+  // "safe" height shrinks once scrolled past it — freezing the
+  // measurement at the top avoids the CSS var chasing that shrinking
+  // value back down while a reader has the page scrolled.
+  function updateNavHeightVar() {
+    if (window.scrollY > 0) return;
+    var nav = document.querySelector('.sc-navbar, .navbar');
+    if (!nav) return;
+    var bottom = nav.getBoundingClientRect().bottom;
+    if (bottom > 0) {
+      document.documentElement.style.setProperty('--nav-h', Math.ceil(bottom) + 'px');
+    }
+  }
+
+  function initNavHeightVar() {
+    updateNavHeightVar();
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateNavHeightVar, 150);
+    }, { passive: true });
+    // Fonts/wrapping can settle a frame or two after load.
+    window.addEventListener('load', updateNavHeightVar);
+  }
+
   function init() {
     initThemeToggle();
     initMobileMenu();
     markActiveNav();
     initScrollState();
+    initNavHeightVar();
   }
 
   if (document.readyState === 'loading') {

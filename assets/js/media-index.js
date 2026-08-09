@@ -20,7 +20,7 @@
     var video = story.video ? mediaUrl(story.video) : '';
     var visual = kind === 'video' && video
       ? '<video muted playsinline preload="metadata" poster="' + esc(image) + '"><source src="' + esc(video) + '"></video>'
-      : (image ? '<img src="' + esc(image) + '" alt="' + esc(story.title) + ' — ' + esc(story.excerpt || story.description || '') + '" loading="lazy" decoding="async">' : '<div class="media-empty">Nights</div>');
+      : (image ? '<img src="' + esc(image) + '" alt="' + esc(story.title) + ' — ' + esc(story.excerpt || story.description || '') + '" loading="lazy" decoding="async" onerror="this.remove()">' : '<div class="media-empty">Nights</div>');
     return '<article class="media-pin" data-category="' + esc(categoryKey(story.category)) + '">' +
       '<a href="' + base + 'index.html?story=' + encodeURIComponent(story.id) + '" class="media-pin-link">' +
       '<div class="media-pin-visual">' + visual + '<span class="media-pin-type">' + (kind === 'video' ? '▶ Video' : '▧ Image') + '</span></div>' +

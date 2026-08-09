@@ -65,9 +65,13 @@
   .ad-smartlink { flex-wrap: wrap; }
 }
 
-/* Navigation isolation: no ad may occupy, overlay or receive clicks inside the header. */
-.navbar { position: sticky; top: 0; z-index: 1000 !important; isolation: isolate; }
-.navbar .ad-slot, .navbar [data-ad], .navbar iframe, .navbar script { display: none !important; }
+/* Navigation isolation: no ad may occupy, overlay or receive clicks inside the header.
+   .navbar is this site's usual header class; .sc-navbar is the home page
+   redesign's — same protection, both names, so neither header can end
+   up hidden behind an ad or another high-z-index overlay. */
+.navbar, .sc-navbar { position: sticky; top: 0; z-index: 1000 !important; isolation: isolate; }
+.navbar .ad-slot, .navbar [data-ad], .navbar iframe, .navbar script,
+.sc-navbar .ad-slot, .sc-navbar [data-ad], .sc-navbar iframe, .sc-navbar script { display: none !important; }
 .ad-leaderboard-wrap, .ad-mobile-wrap, .ad-sky-wrap, .ad-between-sections, .ad-native-slot { position: relative; z-index: 0; }
 .premium-nav { color: var(--accent, #c9a87c) !important; font-weight: 700; }
 .cookie-consent { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 2000; display: flex; gap: 18px; align-items: center; justify-content: space-between; max-width: 940px; margin: 0 auto; padding: 14px 16px; border: 1px solid var(--border, #333); border-radius: 14px; background: rgba(20, 20, 24, .97); color: var(--text, #f2f2f4); box-shadow: 0 12px 40px rgba(0,0,0,.45); }
