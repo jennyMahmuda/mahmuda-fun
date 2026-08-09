@@ -159,8 +159,12 @@
       .catch(function () { section.hidden = true; });
   }
 
-  // Home-page "★ Top Stories" — same ranking approach as the category page:
-  // stories with at least one rating, sorted by average (ties by count).
+  // Home-page "★ Top Stories" — same ranking approach as the category page
+  // and the full /top-rated/ page: a minimum of 3 ratings to qualify, so a
+  // story can't hit #1 off a single 5-star review, sorted by average
+  // (ties by count). Keep TOP_RATED_MIN_RATINGS in sync with MIN_RATINGS
+  // in top-rated/index.html and category/index.html if it ever changes.
+  var TOP_RATED_MIN_RATINGS = 3;
   function renderTopStories() {
     if (!window.NightsRatingReview || typeof window.NightsRatingReview.getSummaryMap !== 'function') return;
     var section = document.getElementById('topStoriesSection');
@@ -170,7 +174,7 @@
       var byId = {};
       allStories.forEach(function (s) { byId[s.id] = s; });
       var ranked = Object.keys(map)
-        .filter(function (id) { return byId[id] && map[id].count > 0; })
+        .filter(function (id) { return byId[id] && map[id].count >= TOP_RATED_MIN_RATINGS; })
         .sort(function (a, b) { return map[b].average - map[a].average || map[b].count - map[a].count; })
         .slice(0, 6);
       if (!ranked.length) { section.hidden = true; return; }

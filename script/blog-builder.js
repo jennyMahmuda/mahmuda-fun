@@ -209,6 +209,11 @@ function writeSitemap(stories) {
     { path: '/gellery/', changefreq: 'weekly', priority: '0.7' },
     { path: '/video/', changefreq: 'weekly', priority: '0.8' },
     { path: '/series/', changefreq: 'weekly', priority: '0.8' },
+    { path: '/top-rated/', changefreq: 'daily', priority: '0.8' },
+    { path: '/trending/', changefreq: 'daily', priority: '0.8' },
+    { path: '/new-releases/', changefreq: 'daily', priority: '0.8' },
+    { path: '/faq.html', changefreq: 'monthly', priority: '0.4' },
+    { path: '/premium.html', changefreq: 'monthly', priority: '0.5' },
     { path: '/privacy-policy.html', changefreq: 'monthly', priority: '0.3' },
     { path: '/llms.txt', changefreq: 'monthly', priority: '0.2' }
   ].concat(CATEGORIES.map(function (c) {
