@@ -16,7 +16,7 @@
   "type": "text",
   "series": "Senior Apu",
   "episode": 4,
-  "cover": "story-post/image/senior-apu-cover.jpg",
+  "cover": "story-post/image/senior-apu-cover.webp",
   "audio": null,
   "video": null,
   "images": [],
@@ -44,7 +44,7 @@
       "dirtytalk",
       "mahmuda.fun"
     ],
-    "ogImage": "story-post/image/senior-apu-cover.jpg",
+    "ogImage": "story-post/image/senior-apu-cover.webp",
     "canonical": "https://mahmuda.fun/?story=senior-apu-ep04"
   },
   "ads": {

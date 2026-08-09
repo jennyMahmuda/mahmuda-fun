@@ -38,30 +38,18 @@
     banner.querySelector('[data-cookie-reject]').addEventListener('click', function () { setConsent('rejected'); });
   }
 
-  function addSharedLinks() {
-    document.querySelectorAll('.nav-links').forEach(function (nav) {
-      if (!nav.querySelector('[data-premium-link]')) {
-        var premium = document.createElement('a');
-        premium.href = root + 'premium.html';
-        premium.className = 'nav-item premium-nav';
-        premium.setAttribute('data-premium-link', '1');
-        premium.textContent = 'Premium';
-        nav.appendChild(premium);
-      }
-    });
-    document.querySelectorAll('.footer-copy').forEach(function (footer) {
-      if (footer.querySelector('[data-legal-links]')) return;
-      var sep = document.createTextNode(' · ');
-      var links = document.createElement('span');
-      links.setAttribute('data-legal-links', '1');
-      links.innerHTML = '<a href="' + root + 'terms.html">Terms</a> · <a href="' + root + 'faq.html">FAQ</a> · <a href="' + root + 'cookies.html">Cookies</a> · <a href="' + root + 'premium.html">Premium</a>';
-      footer.appendChild(sep);
-      footer.appendChild(links);
-    });
+  // Nav's Premium link and the footer's full Legal/Support/Explore columns
+  // are now real static markup on every page (see fix_footers.py-generated
+  // output) — this used to inject a duplicate fallback copy of both, which
+  // would now just create a second "Premium" nav item. Only the dynamic
+  // copyright year still needs JS.
+  function updateFooterYear() {
+    var year = String(new Date().getFullYear());
+    document.querySelectorAll('.footer-year').forEach(function (el) { el.textContent = year; });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    addSharedLinks();
+    updateFooterYear();
     var consent = null;
     try { consent = localStorage.getItem(CONSENT_KEY); } catch (e) {}
     if (consent === 'accepted') loadAnalytics();

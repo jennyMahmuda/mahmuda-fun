@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="mahmuda.fun">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a1f"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="moonGrad2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5d77a"/>
+      <stop offset="100%" stop-color="#d4af37"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+  <g transform="translate(500,255)" opacity="0.9">
+    <path d="M120 40 A80 80 0 1 0 150 200 A62.5 62.5 0 1 1 120 40 Z" fill="url(#moonGrad2)" stroke="#d4af37" stroke-width="2"/>
+    <path d="M260 70 l8 21 22 2 -17 14 5 21.5 -18-11.5 -18 11.5 5-21.5 -17-14 22-2 Z" fill="#d4af37"/>
+    <path d="M60 170 l5.5 14.5 15.5 1.5 -12 9.5 3.5 15 -12-8 -12 8 3.5-15 -12-9.5 15.5-1.5 Z" fill="#d4af37" opacity="0.85"/>
+  </g>
+  <text x="600" y="520" font-family="Georgia, 'Playfair Display', serif" font-weight="700" font-size="42" fill="#e7e2d8" text-anchor="middle" letter-spacing="1">mahmuda.fun</text>
+  <text x="600" y="558" font-family="system-ui, sans-serif" font-size="20" fill="#9a9aa3" text-anchor="middle" letter-spacing="2">PREMIUM ADULT FICTION</text>
+</svg>

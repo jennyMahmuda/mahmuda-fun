@@ -8,6 +8,7 @@
     "watch": "node script/builder.js --watch",
     "images:report": "python3 script/imageoptimization.py",
     "images:optimize": "python3 script/imageoptimization.py --write",
+    "images:webp": "python3 script/imageoptimization.py --write-webp-siblings",
     "validate": "node script/validate-site.js",
     "cf:dev": "wrangler dev",
     "cf:deploy": "wrangler deploy",

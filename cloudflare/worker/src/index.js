@@ -51,6 +51,19 @@ function validEmail(value) {
   return typeof value === 'string' && value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function validContactCategory(value) {
+  return typeof value === 'string' && ['creator', 'advertising', 'other'].includes(value);
+}
+
+// HTML-escapes text going into an email body built from visitor input —
+// this is server-generated HTML (unlike the JSON API responses elsewhere
+// in this file), so it needs its own escaping, not the frontend's.
+function escapeHtmlEmail(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function validPassword(value) {
   return typeof value === 'string' && value.length >= 8 && value.length <= 256;
 }
@@ -137,13 +150,15 @@ async function getSessionUser(request, env) {
 
 // ---------- email ----------
 
-async function sendEmail(env, to, subject, html) {
+async function sendEmail(env, to, subject, html, options) {
   if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) return false;
   try {
+    const body = { from: env.RESEND_FROM_EMAIL, to: [to], subject, html };
+    if (options && options.replyTo) body.reply_to = options.replyTo;
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { authorization: 'Bearer ' + env.RESEND_API_KEY, 'content-type': 'application/json' },
-      body: JSON.stringify({ from: env.RESEND_FROM_EMAIL, to: [to], subject, html }),
+      body: JSON.stringify(body),
     });
     return res.ok;
   } catch {
@@ -377,6 +392,31 @@ async function handleResetPassword(request, env, origin) {
   return json({ ok: true }, 200, corsHeaders(origin));
 }
 
+// ---------- contact form (Become a Creator, Advertising, etc.) ----------
+
+async function handleContact(request, env, origin) {
+  const body = await readJson(request);
+  const category = validContactCategory(body?.category) ? body.category : 'other';
+  const name = typeof body?.name === 'string' ? body.name.trim().slice(0, 120) : '';
+  const email = typeof body?.email === 'string' ? body.email.trim() : '';
+  const message = typeof body?.message === 'string' ? body.message.trim() : '';
+
+  if (!validEmail(email)) return json({ error: 'A valid email is required' }, 400, corsHeaders(origin));
+  if (message.length < 10 || message.length > 4000) {
+    return json({ error: 'Message must be between 10 and 4000 characters' }, 400, corsHeaders(origin));
+  }
+
+  const subject = '[mahmuda.fun ' + category + ' inquiry] from ' + (name || email);
+  const html = '<p><strong>Category:</strong> ' + escapeHtmlEmail(category) + '</p>' +
+    '<p><strong>Name:</strong> ' + escapeHtmlEmail(name || '(not provided)') + '</p>' +
+    '<p><strong>Email:</strong> ' + escapeHtmlEmail(email) + '</p>' +
+    '<p><strong>Message:</strong></p><p>' + escapeHtmlEmail(message).replace(/\n/g, '<br>') + '</p>';
+
+  const sent = await sendEmail(env, 'support@mahmuda.fun', subject, html, { replyTo: email });
+  if (!sent) return json({ error: 'Could not send right now — please email support@mahmuda.fun directly' }, 503, corsHeaders(origin));
+  return json({ ok: true }, 200, corsHeaders(origin));
+}
+
 // ---------- exclusive story content ----------
 
 async function handleStoryContent(request, env, origin, storyId) {
@@ -426,6 +466,9 @@ export default {
     if (pathname === '/api/auth/me' && request.method === 'GET') return handleMe(request, env, origin);
     if (pathname === '/api/auth/request-password-reset' && request.method === 'POST') return handleRequestPasswordReset(request, env, origin);
     if (pathname === '/api/auth/reset-password' && request.method === 'POST') return handleResetPassword(request, env, origin);
+
+    // ----- contact form -----
+    if (pathname === '/api/contact' && request.method === 'POST') return handleContact(request, env, origin);
 
     // ----- exclusive content -----
     const contentStoryId = routeStoryContent(pathname);
