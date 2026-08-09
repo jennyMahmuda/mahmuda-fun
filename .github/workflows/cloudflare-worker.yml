@@ -108,7 +108,7 @@ jobs:
           if [ -n "$GOOGLE_PROJECT_ID" ]; then
             printf '%s' "$GOOGLE_PROJECT_ID" | npx wrangler secret put GOOGLE_PROJECT_ID
           else
-            echo "GOOGLE_PROJECT_ID not set — skipping (not currently read by any Worker code, kept for future use)"
+            echo "GOOGLE_PROJECT_ID not set — skipping (not read by the Worker itself; kept here in case future Worker code needs it. The story-translation pipeline reads it separately as a GitHub secret in translate-content.yml, not from here.)"
           fi
           if [ -n "$GOOGLE_CLIENT_EMAIL" ]; then
             printf '%s' "$GOOGLE_CLIENT_EMAIL" | npx wrangler secret put GOOGLE_CLIENT_EMAIL

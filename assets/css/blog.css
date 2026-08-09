@@ -162,6 +162,11 @@
   margin-bottom: 10px;
 }
 .feed-excerpt { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.65; }
+/* Bengali reading comfort: script needs more breathing room than Latin
+   text to avoid eye strain — kept strictly >= the English values above/
+   below, never smaller. font-size ~16-18px, line-height 1.6-1.8+ per the
+   site owner's explicit typography request. */
+html.lang-bn .feed-excerpt { font-size: 1.05rem; line-height: 1.75; }
 
 /* =========================================
    FULL STORY CONTENT (simple reader typography)
@@ -183,6 +188,7 @@
 }
 .feed-full-content h2 { font-size: 1.5rem; }
 .feed-full-content h3 { font-size: 1.2rem; }
+html.lang-bn .feed-full-content { font-size: 1.13rem; line-height: 1.95; }
 .feed-full-content p { margin-bottom: 1.15em; }
 .feed-full-content blockquote {
   border-left: 3px solid var(--accent);
@@ -332,6 +338,7 @@
   font-family: var(--font-body);
 }
 [data-theme="light"] .reader-body { font-weight: 400; }
+html.lang-bn .reader-body { font-size: 1.2rem; line-height: 2.05; }
 .reader-body h1, .reader-body h2, .reader-body h3 {
   font-family: var(--font-display);
   margin: 1.8em 0 0.7em; line-height: 1.3;
