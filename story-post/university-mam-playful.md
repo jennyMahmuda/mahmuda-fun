@@ -1,15 +1,13 @@
 ---
-title: ক্লাসের পর · ম্যাম ও আমি
-id: university-mam-playful
-slug: university-mam-playful
-category: Forbidden
+title: "ক্লাসের পর ম্যাম আমাকে খেলা শিখাবে বললেন"
+category: "High School Romance"
 tags: [Romance, Playful, Intimate, University, Teacher]
 type: text
 date: 2026-08-03
-language: bn
-readTime: 32 min
+readTime: 5 min
 excerpt: ম্যাম বললেন—একটা খেলা খেলব। হারলে হোমওয়ার্ক। জিতলে… যা চাইবে। আরহান ভেবেছিল সহজ। কেবিনের দরজা বন্ধ হওয়ার পর বুঝল—ম্যাম কখনো সহজ খেলেন না।
-cover: story-post/image/senior-apu-cover.jpg
+images: "assets/images/gallery/university-medam-say-please-take-photo.jpg"
+
 ---
 সব শুরু হয়েছিল একটা লাল কালির নোট দিয়ে।
 
@@ -27,7 +25,7 @@ cover: story-post/image/senior-apu-cover.jpg
 
 রুমাইসা ম্যাম টেবিলে বসে নন। জানালার কাছে দাঁড়িয়ে, পর্দা একটু সরিয়ে বাইরে তাকিয়ে। শাড়ি হালকা বেগুনি। চুল খোলা—ক্লাসের খোঁপা নেই। গলায় সেই সরু চেইন। তিনি ঘুরে তাকালেন, এবং আরহান বুঝল—আজকের ম্যাম অন্য কেউ।
 
-“খাতা দেখাও।”
+[খাতা দেখাও imags]("assets/images/gallery/madam-02-cabin.jpg")
 
 আরহান দিল। ম্যাম পাতা উল্টে সেই নোটের ওপর আঙুল রাখলেন। “তুমি কী এনেছ যা আমি চাই না?”
 
