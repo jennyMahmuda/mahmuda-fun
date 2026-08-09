@@ -584,6 +584,12 @@ body.reader-open .reader-progress { display: block; }
   flex: 0 0 260px; border: 1px solid var(--border); border-radius: var(--radius-sm);
   padding: 12px 14px; background: var(--bg-secondary);
 }
+/* Site-wide reviews marquee (assets/js/site-reviews-marquee.js) links each
+   card to the story it's about — reset the anchor and add the "on <story>"
+   line the per-story marquee doesn't need (it's already on that story). */
+a.rr-item { display: block; text-decoration: none; transition: border-color var(--transition); }
+a.rr-item:hover { border-color: var(--accent); }
+.rr-item-story { display: block; margin-top: 8px; font-size: .76rem; color: var(--accent); }
 
 /* =========================================
    CATEGORY-SECTIONED HOME FEED (assets/js/blog.js renderCategorySections)

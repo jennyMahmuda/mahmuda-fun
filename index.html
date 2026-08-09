@@ -1125,6 +1125,35 @@
 
 
     <!-- =======================================================
+         READER REVIEWS (site-wide marquee, GET /api/reviews/recent)
+         ======================================================= -->
+
+    <section class="sc-section sc-reviews-section" id="siteReviewsSection" hidden>
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+            <span class="sc-section-eyebrow">
+              From readers
+            </span>
+
+            <h2>
+              What readers are saying
+            </h2>
+          </div>
+
+        </div>
+
+        <div id="siteReviewsMarqueeMount"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
          SEO CONTENT HUB
          ======================================================= -->
 
@@ -1497,6 +1526,10 @@
 
   <script
     src="assets/js/rating-review.js"
+    defer
+  ></script>
+  <script
+    src="assets/js/site-reviews-marquee.js"
     defer
   ></script>
 
