@@ -179,7 +179,7 @@
         var badge = s.series ? esc(s.series) : esc(s.category || s.type || 'Story');
         return '<a class="feed-card" href="../index.html?story=' + encodeURIComponent(s.id) + '" style="text-decoration:none">' +
           (img ? '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>' : '') +
-          '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">Hushed Chapters</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
+          '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">SecretChapters</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
           '<span class="feed-type-badge">' + badge + '</span>' +
           '<span data-rating-slot="' + esc(s.id) + '"></span>' +
           '</div>' +
@@ -205,7 +205,10 @@
       });
     }
 
-    // Shows the best-rated stories (at least one rating) above the grid.
+    // Shows the best-rated stories above the grid — same 3-rating minimum
+    // as top-rated/index.html and assets/js/blog.js's renderTopStories(),
+    // so a story can't rank #1 off a single review.
+    var TOP_RATED_MIN_RATINGS = 3;
     function renderTopRated(stories) {
       if (!window.NightsRatingReview) return;
       var section = document.getElementById('topRatedSection');
@@ -214,7 +217,7 @@
         var byId = {};
         stories.forEach(function (s) { byId[s.id] = s; });
         var ranked = Object.keys(map)
-          .filter(function (id) { return byId[id] && map[id].count > 0; })
+          .filter(function (id) { return byId[id] && map[id].count >= TOP_RATED_MIN_RATINGS; })
           .sort(function (a, b) {
             return map[b].average - map[a].average || map[b].count - map[a].count;
           })

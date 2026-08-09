@@ -112,6 +112,19 @@ const CATEGORIES = [
     description: 'College romance stories on mahmuda.fun for adult readers (18+). All characters are written as adults.',
     intro: 'The freedom, chaos and firsts of college life, written for adult readers — all characters depicted are adults.',
     theme: 'warm' },
+  // Added on request to match the site's actual most-used tags (relationship
+  // tropes, not explicit act descriptors — kept to that same line as the
+  // rest of this list; see the PR notes for what was deliberately left out).
+  { slug: 'bhabi-romance', label: 'Bhabi Romance', emoji: '💍',
+    title: 'Bhabi Romance Stories',
+    description: 'Bhabi romance stories on mahmuda.fun: forbidden closeness within the family, tension and desire. 18+ fiction — all characters are adults.',
+    intro: 'A recurring trope in South Asian romance fiction — closeness inside the family that turns into something forbidden. All characters depicted are adults.',
+    theme: 'accent', image: 'assets/images/categories/Bhabi-saree.jpg' },
+  { slug: 'affair-romance', label: 'Affair & Cheating Romance', emoji: '💋',
+    title: 'Affair & Cheating Romance Stories',
+    description: 'Affair and cheating-wife romance stories on mahmuda.fun: infidelity, guilt and desire that won’t stay hidden. 18+ fiction.',
+    intro: 'Affair fiction leans into what happens when desire crosses a line that was never meant to be crossed.',
+    theme: 'rose' },
 ];
 
 module.exports = { CATEGORIES };

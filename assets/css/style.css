@@ -296,6 +296,22 @@ body.cat-theme-warm .section-header { background: radial-gradient(circle at 20% 
 body.cat-theme-accent .section-header { background: radial-gradient(circle at 20% 0%, var(--accent-soft), transparent 65%); }
 [class*="cat-theme-"] .section-header { padding: 20px 20px 4px; margin: -20px -20px 0; }
 
+/* Category hero background image (photo or mood-art SVG, resolved at
+   build time by script/blog-builder.js's resolveCategoryBackground()).
+   The inline background-image (set per-page) already bakes in a dark
+   gradient overlay for text contrast, so this just handles the shared
+   box treatment — bigger padding, rounded corners, light text. */
+.cat-hero {
+  padding: 56px 24px 40px !important;
+  margin: -20px -20px 0 !important;
+  border-radius: var(--radius);
+  background-color: #0a0a0a;
+}
+.cat-hero .section-title,
+.cat-hero .section-desc { color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
+.cat-hero .section-desc { color: rgba(255,255,255,0.82); }
+@media (max-width: 640px) { .cat-hero { padding: 44px 18px 32px !important; } }
+
 /* =========================================
    FOOTER
    ========================================= */

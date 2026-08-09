@@ -1,0 +1,90 @@
+{
+  "dark-romance": {
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
+  },
+  "mafia-romance": {
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
+  },
+  "paranormal-fantasy-romance": {
+    "path": "assets/images/categories/theme-mystic.svg",
+    "photo": false
+  },
+  "billionaire-romance": {
+    "path": "assets/images/categories/theme-luxury.svg",
+    "photo": false
+  },
+  "alpha-males": {
+    "path": "assets/images/categories/theme-luxury.svg",
+    "photo": false
+  },
+  "high-school-romance": {
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": false
+  },
+  "spicy-romance": {
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  },
+  "age-gap-romance": {
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  },
+  "vampire-romance": {
+    "path": "assets/images/categories/vampire-romance.webp",
+    "photo": true
+  },
+  "cowboy-romance": {
+    "path": "assets/images/categories/theme-earthy.svg",
+    "photo": false
+  },
+  "forbidden-romance": {
+    "path": "assets/images/categories/theme-accent.svg",
+    "photo": false
+  },
+  "second-chance-romance": {
+    "path": "assets/images/categories/theme-accent.svg",
+    "photo": false
+  },
+  "clean-wholesome": {
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": false
+  },
+  "fated-mates": {
+    "path": "assets/images/categories/theme-mystic.svg",
+    "photo": false
+  },
+  "comedy": {
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": false
+  },
+  "bad-boys": {
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
+  },
+  "slow-burn": {
+    "path": "assets/images/categories/theme-accent.svg",
+    "photo": false
+  },
+  "enemies-to-lovers": {
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
+  },
+  "sports": {
+    "path": "assets/images/categories/theme-earthy.svg",
+    "photo": false
+  },
+  "college": {
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": false
+  },
+  "bhabi-romance": {
+    "path": "assets/images/categories/Bhabi-saree.jpg",
+    "photo": true
+  },
+  "affair-romance": {
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  }
+}

@@ -1,21 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 62" role="img" aria-label="Hushed Chapters — mahmuda.fun">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 62" role="img" aria-label="SecretChapters — mahmuda.fun">
   <defs>
-    <!-- Glossy, layered gradients simulate a dimensional/3D mark using pure
-         SVG (no raster figure) — a bright top highlight fading into a deep
-         base gives the crescent + book-spine mark real depth/sheen. -->
-    <linearGradient id="moon3d" x1="0.15" y1="0" x2="0.85" y2="1">
-      <stop offset="0%" stop-color="#fbe7a8"/>
-      <stop offset="35%" stop-color="#eec367"/>
-      <stop offset="70%" stop-color="#c99a2e"/>
-      <stop offset="100%" stop-color="#93701c"/>
+    <!-- Warm rose-gold gradient for the lips mark — glossy, layered, no
+         raster image, matching the site's existing gold/dark palette
+         rather than a jarring pure red. -->
+    <linearGradient id="lipsGrad" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#f2b3c2"/>
+      <stop offset="45%" stop-color="#d9718f"/>
+      <stop offset="100%" stop-color="#8f2f4a"/>
     </linearGradient>
-    <linearGradient id="moonHighlight" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
-      <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="pageGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f5efe0"/>
-      <stop offset="100%" stop-color="#d8cba3"/>
+    <linearGradient id="lipsHighlight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="textGrad3d" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#ffffff"/>
@@ -26,18 +21,30 @@
     </filter>
   </defs>
 
-  <!-- Mark: crescent moon wrapped around a slim open-book spine ("chapters") -->
-  <g transform="translate(3,5)" filter="url(#softShadow)">
-    <path d="M25 4 A21 21 0 1 0 32 44 A16.5 16.5 0 1 1 25 4 Z" fill="url(#moon3d)" stroke="#7c5e17" stroke-width="0.6"/>
-    <path d="M25 4 A21 21 0 0 0 12 9 A16.5 16.5 0 0 1 25 4 Z" fill="url(#moonHighlight)"/>
-    <!-- book-spine chevrons peeking from the moon's hollow, echoing "chapters" -->
-    <path d="M19 17 l5.8 6 -5.8 6" fill="none" stroke="url(#pageGrad)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M26 17 l5.8 6 -5.8 6" fill="none" stroke="url(#pageGrad)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+  <!-- Mark: a simplified, stylized kiss/lips glyph — a tasteful, common
+       romance-imprint motif (like a lipstick kiss print), not a
+       photographic or explicit image. -->
+  <g transform="translate(3,17)" filter="url(#softShadow)">
+    <path d="M2 8
+             C2 3, 8 1, 13 4
+             C15.2 5.3, 16.8 5.3, 19 4
+             C20.6 3, 22.4 3, 24 4
+             C26.2 5.3, 27.8 5.3, 30 4
+             C35 1, 41 3, 41 8
+             C35 5.3, 28.5 6.3, 24.8 8
+             C22.4 6.6, 20.6 6.6, 19 8
+             C16.5 6.3, 9 5.3, 2 8 Z"
+          fill="url(#lipsGrad)" stroke="#5c1c30" stroke-width="0.5"/>
+    <path d="M2 8 C 8 20, 35 20, 41 8 C 34 15, 9 15, 2 8 Z"
+          fill="url(#lipsGrad)" stroke="#5c1c30" stroke-width="0.5"/>
+    <path d="M6 7 C10 3, 15 3, 18 5.5 C13 4.5, 9 5 6 7 Z" fill="url(#lipsHighlight)"/>
   </g>
 
-  <!-- Wordmark -->
+  <!-- Wordmark: SecretChapters as one word, "Secret" lighter weight, per
+       the site owner's own convention on the home page. -->
   <g font-family="Georgia, 'Playfair Display', serif" font-weight="700" filter="url(#softShadow)">
-    <text x="58" y="27" font-size="19" letter-spacing="0.3" fill="url(#textGrad3d)">Hushed</text>
-    <text x="58" y="48" font-size="19" letter-spacing="0.3" fill="url(#textGrad3d)">Chapters</text>
+    <text x="58" y="38" font-size="21" letter-spacing="0.2" fill="url(#textGrad3d)">
+      <tspan font-weight="400" font-style="italic">Secret</tspan><tspan font-weight="700">Chapters</tspan>
+    </text>
   </g>
 </svg>

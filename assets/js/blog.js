@@ -1,5 +1,5 @@
 /**
- * Hushed Chapters – Blog Feed v3 (mahmuda.fun)
+ * SecretChapters – Blog Feed v3 (mahmuda.fun)
  * - First story = HERO POST (cover with fetchpriority=high)
  * - Other stories = card grid (lazy images)
  */
@@ -121,6 +121,8 @@
     renderTopStories();
     renderTrending();
     renderHeroStats();
+    renderNewReleases();
+    renderContinueReading();
     renderCategorySections();
     openDeepLink();
   }
@@ -157,8 +159,12 @@
       .catch(function () { section.hidden = true; });
   }
 
-  // Home-page "★ Top Stories" — same ranking approach as the category page:
-  // stories with at least one rating, sorted by average (ties by count).
+  // Home-page "★ Top Stories" — same ranking approach as the category page
+  // and the full /top-rated/ page: a minimum of 3 ratings to qualify, so a
+  // story can't hit #1 off a single 5-star review, sorted by average
+  // (ties by count). Keep TOP_RATED_MIN_RATINGS in sync with MIN_RATINGS
+  // in top-rated/index.html and category/index.html if it ever changes.
+  var TOP_RATED_MIN_RATINGS = 3;
   function renderTopStories() {
     if (!window.NightsRatingReview || typeof window.NightsRatingReview.getSummaryMap !== 'function') return;
     var section = document.getElementById('topStoriesSection');
@@ -168,7 +174,7 @@
       var byId = {};
       allStories.forEach(function (s) { byId[s.id] = s; });
       var ranked = Object.keys(map)
-        .filter(function (id) { return byId[id] && map[id].count > 0; })
+        .filter(function (id) { return byId[id] && map[id].count >= TOP_RATED_MIN_RATINGS; })
         .sort(function (a, b) { return map[b].average - map[a].average || map[b].count - map[a].count; })
         .slice(0, 6);
       if (!ranked.length) { section.hidden = true; return; }
@@ -228,6 +234,98 @@
   function renderHeroStats() {
     var el = document.getElementById('heroStoryCount');
     if (el) el.textContent = allStories.length;
+  }
+
+  // Home-page "New releases" — allStories is already sorted newest-first
+  // (loadStories()), so this is just the head of that list. There used to
+  // be a #newReleasesGrid container on the page with nothing populating
+  // it (permanently empty, contributing to the "messy" home page report).
+  function renderNewReleases() {
+    var grid = document.getElementById('newReleasesGrid');
+    if (!grid) return;
+    var list = allStories.slice(0, 8);
+    if (!list.length) { grid.innerHTML = ''; return; }
+    grid.innerHTML = list.map(function (s) {
+      var img = resolveImage(s);
+      var badge = s.series ? (s.series + ' · Ep ' + (s.episode || '?')) : (s.category || typeLabel(s.type || 'text'));
+      return '<a class="sc-new-release-card" href="' + storyUrl(s.id) + '" data-story-link="' + escapeHtml(s.id) + '"' +
+        ' style="background-image:linear-gradient(180deg, rgba(5,4,7,.1), rgba(5,4,7,.92)), url(\'' + escapeHtml(img) + '\');background-size:cover;background-position:center;">' +
+        '<span class="feed-type-badge">' + escapeHtml(badge) + '</span>' +
+        '<h3 class="sc-new-release-title">' + escapeHtml(s.title) + '</h3>' +
+        '<span class="sc-new-release-meta">' + escapeHtml(s.date || '') + '</span>' +
+        '</a>';
+    }).join('');
+    wireMediaButtons(grid);
+  }
+
+  // ---------------------------------------------------------------------
+  // CONTINUE READING — local reading history only. There's no per-user
+  // server-side "last read position" yet (that needs a logged-in sync
+  // endpoint, out of scope this round), so this tracks progress in this
+  // browser's localStorage: which stories were opened, how far the reader
+  // scrolled, and when. The home page section stays hidden entirely for a
+  // first-time visitor rather than show an empty state.
+  // ---------------------------------------------------------------------
+  var CONTINUE_KEY = 'nights-continue-reading';
+  var CONTINUE_MAX = 8;
+
+  function loadContinueReading() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(CONTINUE_KEY) || '[]');
+      return Array.isArray(raw) ? raw : [];
+    } catch (e) { return []; }
+  }
+
+  function saveContinueReading(list) {
+    try { localStorage.setItem(CONTINUE_KEY, JSON.stringify(list.slice(0, CONTINUE_MAX))); } catch (e) {}
+  }
+
+  // Called when a story opens (progress starts at 0) and again as the
+  // reader scrolls (updateReadingProgress). Most-recently-touched story
+  // moves to the front; a story finished (progress >= 96%) drops off the
+  // list entirely — nothing left to "continue".
+  function upsertReadingProgress(id, progress) {
+    if (!id) return;
+    var list = loadContinueReading().filter(function (e) { return e.id !== id; });
+    if (progress < 96) {
+      list.unshift({ id: id, progress: Math.max(0, Math.min(100, Math.round(progress))), ts: Date.now() });
+    }
+    saveContinueReading(list);
+  }
+
+  function updateReadingProgress(id) {
+    if (!id) return;
+    var readerModal = document.getElementById('readerModal');
+    if (!readerModal) return;
+    var scrollable = readerModal.scrollHeight - readerModal.clientHeight;
+    var pct = scrollable > 0 ? (readerModal.scrollTop / scrollable) * 100 : 0;
+    upsertReadingProgress(id, pct);
+  }
+
+  function renderContinueReading() {
+    var section = document.getElementById('continueReadingSection');
+    var grid = document.getElementById('continueReadingGrid');
+    if (!section || !grid) return;
+    var byId = {};
+    allStories.forEach(function (s) { byId[s.id] = s; });
+    var entries = loadContinueReading().filter(function (e) { return byId[e.id]; }).slice(0, 6);
+    if (!entries.length) { section.hidden = true; return; }
+    grid.innerHTML = entries.map(function (e) {
+      var s = byId[e.id];
+      var img = resolveImage(s);
+      return '<a class="sc-continue-card" href="' + storyUrl(s.id) + '" data-story-link="' + escapeHtml(s.id) + '">' +
+        '<div class="sc-continue-top">' +
+          '<img class="sc-continue-cover" src="' + escapeHtml(img) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
+          '<div class="sc-continue-info">' +
+            '<h3>' + escapeHtml(s.title) + '</h3>' +
+            '<span>' + e.progress + '% read</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="sc-continue-bar"><div class="sc-continue-bar-fill" style="width:' + e.progress + '%"></div></div>' +
+        '</a>';
+    }).join('');
+    section.hidden = false;
+    wireMediaButtons(grid);
   }
 
   // Picks a real link for a category row's "View all" — a genuine
@@ -581,7 +679,7 @@
     html += '<div class="feed-card-header">' +
               '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author">Hushed Chapters (Featured)</div>' +
+                '<div class="feed-author">SecretChapters (Featured)</div>' +
                 '<div class="feed-time">' + escapeHtml(heroStory.date || '') + ' · ' + escapeHtml(heroStory.readTime || '') + '</div>' +
               '</div>' + heroBadge +
               '<span data-rating-slot="' + escapeHtml(heroStory.id) + '"></span>' +
@@ -637,7 +735,7 @@
             '<div class="feed-card-header">' +
               '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author">Hushed Chapters</div>' +
+                '<div class="feed-author">SecretChapters</div>' +
                 '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
               '</div>' + badge +
               '<span data-rating-slot="' + escapeHtml(story.id) + '"></span>' +
@@ -693,7 +791,10 @@
       if (story) {
         expandedId = null;
         renderFeed();
-        openReader(id, { silent: true });
+        // initialLoad: true — this is the page the browser actually
+        // requested, so gtag's own automatic page_view already covers
+        // it; sending a second one here would double-count the view.
+        openReader(id, { silent: true, initialLoad: true });
       }
     }
   }
@@ -706,6 +807,22 @@
     var story = allStories.find(function (s) { return s.id === id; });
     if (!story) return;
     currentStoryId = id;
+    // gtag's automatic page_view only ever fires for whatever URL the
+    // browser actually loaded — a story opened from the home feed via
+    // this SPA's history.pushState(), or reached via back/forward
+    // (popstate), is otherwise invisible to GA4, which starves the
+    // server-side "Trending" section (GET /api/analytics/top-content) of
+    // the very data it's supposed to read. Skipped only for the initial
+    // deep-link open (?story=… on first page load), since gtag's own
+    // automatic page_view already covers that exact URL — sending a
+    // second one here would double-count the view.
+    if (!options.initialLoad && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_location: window.location.href,
+        page_path: window.location.pathname + window.location.search,
+        page_title: story.title,
+      });
+    }
     var content = await ensureContent(id);
     updateSeoForStory(story);
     updateStoryStructuredData(story);
@@ -747,7 +864,26 @@
       readerModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       readerModal.scrollTop = 0;
+      bindReaderProgressTracking(readerModal);
     }
+    // Opening a story is itself "progress starting" — records it even if
+    // the reader never scrolls (short stories that fit on one screen).
+    var existing = loadContinueReading().find(function (e) { return e.id === id; });
+    upsertReadingProgress(id, existing ? existing.progress : 0);
+  }
+
+  var readerProgressBound = false;
+  var readerProgressTimer = null;
+  function bindReaderProgressTracking(readerModal) {
+    if (readerProgressBound) return;
+    readerProgressBound = true;
+    readerModal.addEventListener('scroll', function () {
+      if (readerProgressTimer) return;
+      readerProgressTimer = setTimeout(function () {
+        readerProgressTimer = null;
+        if (currentStoryId) updateReadingProgress(currentStoryId);
+      }, 400);
+    }, { passive: true });
   }
 
   function closeReader() {
@@ -756,6 +892,10 @@
       readerModal.classList.remove('open');
       readerModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+    }
+    if (currentStoryId) {
+      updateReadingProgress(currentStoryId);
+      renderContinueReading();
     }
     currentStoryId = null;
     document.querySelectorAll('#readerContent video, #readerContent audio').forEach(function (m) {
