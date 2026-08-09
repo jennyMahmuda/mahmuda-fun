@@ -347,7 +347,18 @@ body.cat-theme-accent .section-header { background: radial-gradient(circle at 20
 
 @media (max-width: 720px) {
   .footer-inner { flex-direction: column; gap: 28px; }
-  .footer-links { justify-content: flex-start; gap: 28px; }
+  /* flex-wrap here used to left-align each .footer-col at its own
+     min-width (140px), so on a narrow screen two columns would clump
+     together on the left with a big unused gap on the right, and any
+     odd column out (Legal) restarted flush-left below them — the
+     "footer text squeezed to one side" look. A real 2-column grid fills
+     the actual available width evenly instead. */
+  .footer-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 20px; }
+  .footer-col { min-width: 0; }
+}
+
+@media (max-width: 420px) {
+  .footer-links { grid-template-columns: 1fr; }
 }
 
 /* =========================================
