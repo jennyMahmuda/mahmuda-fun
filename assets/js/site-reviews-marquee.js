@@ -12,6 +12,12 @@
 
   var API_BASE = 'https://mahmuda-fun-api.mahmudajenny6.workers.dev';
 
+  // Reviews submitted through the footer's "Rate our site" form (see
+  // site-review-footer.js) aren't about any one story — they're posted
+  // against this pseudo-story id, reusing the same rating/review API and
+  // moderation path as every real story instead of a second system.
+  var SITE_STORY_ID = 'site-feedback';
+
   var mount = document.getElementById('siteReviewsMarqueeMount');
   if (!mount) return;
   var section = document.getElementById('siteReviewsSection');
@@ -34,16 +40,17 @@
   function render(reviews, storyMap) {
     if (!reviews.length) return;
     var cardsHtml = reviews.map(function (r) {
+      var isSiteReview = r.storyId === SITE_STORY_ID;
       var story = storyMap[r.storyId];
-      var title = story ? story.title : r.storyId;
-      var href = 'index.html?story=' + encodeURIComponent(r.storyId);
+      var href = isSiteReview ? 'index.html' : 'index.html?story=' + encodeURIComponent(r.storyId);
+      var subLabel = isSiteReview ? '★ Site review' : 'on ' + escapeHtml(story ? story.title : r.storyId);
       return '<a class="rr-item" href="' + href + '">' +
         '<div class="rr-item-head">' +
           '<span class="rr-item-name">' + escapeHtml(r.displayName || 'Anonymous') + '</span>' +
           '<span class="rr-item-date">' + escapeHtml(formatDate(r.createdAt)) + '</span>' +
         '</div>' +
         '<p class="rr-item-text">' + escapeHtml(r.reviewText) + '</p>' +
-        '<span class="rr-item-story">on ' + escapeHtml(title) + '</span>' +
+        '<span class="rr-item-story">' + subLabel + '</span>' +
       '</a>';
     }).join('');
 

@@ -68,7 +68,12 @@ function buildFrontMatter(row) {
   if (row.episode) lines.push('episode: ' + row.episode);
   lines.push('category: ' + yamlScalar(row.category));
   if (tags.length) lines.push('tags: ' + yamlList(tags));
-  lines.push('type: text');
+  // Was hardcoded to 'text' regardless of content_type — meaning an
+  // admin-created video/gallery post could never actually be typed as
+  // one, and /video/ and /gellery/ (which key off this exact field, see
+  // guideline.md) would never pick it up. content_type now comes from
+  // the "Content type" field in the admin story editor.
+  lines.push('type: ' + (row.content_type === 'video' || row.content_type === 'image' ? row.content_type : 'text'));
   lines.push('date: ' + new Date().toISOString().slice(0, 10));
   lines.push('language: ' + yamlScalar(row.language || 'bn'));
   lines.push('excerpt: ' + yamlScalar(row.excerpt));

@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: sync-admin-stories
@@ -53,6 +54,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Commit and push new story files, if any
+        id: sync
         run: |
           if git status --porcelain -- story-post | grep -q .; then
             git config user.name "github-actions[bot]"
@@ -61,7 +63,28 @@ jobs:
             git commit -m "chore: sync admin-published stories"
             git pull --rebase origin main
             git push origin HEAD:main
-            echo "Pushed new story-post files — the Pages deploy workflow will pick them up."
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+            echo "Pushed new story-post files."
           else
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             echo "Nothing new to sync this run."
           fi
+
+      - name: Trigger the Pages deploy workflow
+        # A commit pushed with the default GITHUB_TOKEN does NOT fire other
+        # workflows' `on: push` triggers — this is a deliberate GitHub
+        # loop-prevention rule, not a bug in this repo, but it means the
+        # push above never actually kicked off "Build and Deploy Pages" on
+        # its own (it just sat there until the next scheduled Pages build,
+        # if any). Firing Deploy.yml's workflow_dispatch explicitly via
+        # the API — allowed by this job's own `actions: write` permission,
+        # no extra secret needed — closes that gap so a published story
+        # goes live right after this run, not "eventually, maybe".
+        if: steps.sync.outputs.pushed == 'true'
+        run: |
+          curl -sS -f -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/Deploy.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "Triggered the Pages deploy workflow."

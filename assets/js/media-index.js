@@ -37,7 +37,16 @@
   fetch(base + 'stories/index.json', { cache: 'no-store' }).then(function (res) { return res.json(); }).then(function (data) {
     stories = Array.isArray(data) ? data : (data.stories || []);
     var kind = videoGrid ? 'video' : 'gallery';
-    var list = stories.filter(function (story) { return kind === 'video' ? !!story.video : !!(story.cover || (story.images && story.images.length)); });
+    // Primarily keyed off the `type` frontmatter field (video/image — see
+    // guideline.md), which is what a post is actually meant to be
+    // filed under. Falls back to "has the relevant media field" for a
+    // story that has a video/cover but its author forgot to set `type`
+    // — same forgiving-by-default pattern used elsewhere on this site
+    // rather than hiding content over a missed field.
+    var list = stories.filter(function (story) {
+      if (kind === 'video') return story.type === 'video' || !!story.video;
+      return story.type === 'image' || (story.type !== 'text' && story.type !== 'video' && !!(story.cover || (story.images && story.images.length)));
+    });
     render(videoGrid || galleryGrid, list, kind);
     var categories = Array.from(new Set(list.map(function (story) { return story.category || 'Uncategorized'; })));
     var heading = document.querySelector('.section-header');
