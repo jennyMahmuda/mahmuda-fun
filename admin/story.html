@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Story | Content Manager | mahmuda.fun</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="https://mahmuda.fun/admin/story.html" />
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/navigation.css" />
+  <link rel="stylesheet" href="../assets/css/blog.css" />
+  <link rel="stylesheet" href="../assets/css/ads.css" />
+  <style>
+    .admin-wrap { max-width: 760px; margin: 0 auto; padding: 100px 16px 60px; }
+    .admin-wrap h1 { font-family: var(--font-display); font-size: 1.5rem; margin: 0 0 4px; }
+    .admin-form-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-top: 18px; }
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .admin-grid .rr-field.full { grid-column: 1 / -1; }
+    .rr-field textarea { min-height: 90px; resize: vertical; }
+    .rr-field textarea#storyContent { min-height: 320px; font-family: var(--font-body); }
+    .admin-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    .admin-actions button { min-width: 140px; }
+    .admin-btn-secondary { background: var(--bg-elevated) !important; color: var(--text-primary) !important; }
+    .admin-gate { max-width: 420px; margin: 0 auto; padding: 100px 16px 60px; text-align: center; }
+    .rr-checkbox { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="mahmuda.fun home">
+        <img class="logo-svg" src="../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" decoding="async" />
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="index.html" class="nav-item"><span class="nav-icon">📚</span>Content Manager</a>
+        <a href="../account/" class="nav-item" id="navAccountLink"><span class="nav-icon">👤</span><span id="navAccountLabel">Account</span></a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="adminMain">
+    <div class="admin-gate"><p>Loading…</p></div>
+  </main>
+
+  <script src="../assets/js/auth.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/site-components.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function qs(name) {
+      var m = (window.location.search || '').match(new RegExp('[?&]' + name + '=([^&]+)'));
+      return m ? decodeURIComponent(m[1]) : null;
+    }
+
+    function renderGate(message, showLoginLink) {
+      var main = document.getElementById('adminMain');
+      main.innerHTML =
+        '<div class="admin-gate">' +
+          '<h1>Content Manager</h1>' +
+          '<p class="rr-hint">' + escapeHtml(message) + '</p>' +
+          (showLoginLink ? '<p><a class="rr-submit" style="display:inline-block;text-decoration:none;margin-top:10px;" href="../account/">Log in</a></p>' : '') +
+        '</div>';
+    }
+
+    function renderForm(existing) {
+      var isNew = !existing;
+      var main = document.getElementById('adminMain');
+      main.innerHTML =
+        '<div class="admin-wrap">' +
+          '<h1>' + (isNew ? 'New story' : 'Edit story') + '</h1>' +
+          (!isNew && existing.syncedAt ? '<p class="rr-hint rr-error">This story already went live from an earlier save — editing it here updates the draft record but will NOT change the live page. Edit story-post/' + escapeHtml(existing.id) + '.md directly in the repo for that.</p>' : '') +
+          '<form class="admin-form-card" id="storyForm">' +
+            '<div class="admin-grid">' +
+              '<label class="rr-field full"><span>Story ID (used in the URL, letters/numbers/-/_ only — can\'t change after creating)</span>' +
+                '<input type="text" name="id" id="storyId" pattern="[a-zA-Z0-9_-]{1,160}" required ' + (isNew ? '' : 'readonly') + ' value="' + escapeHtml(existing ? existing.id : '') + '"></label>' +
+              '<label class="rr-field full"><span>Title</span><input type="text" name="title" required maxlength="300" value="' + escapeHtml(existing ? existing.title : '') + '"></label>' +
+              '<label class="rr-field full"><span>Excerpt (short teaser shown on cards)</span><textarea name="excerpt" required maxlength="600">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></label>' +
+              '<label class="rr-field"><span>Category</span><input type="text" name="category" required maxlength="60" value="' + escapeHtml(existing ? existing.category : '') + '"></label>' +
+              '<label class="rr-field"><span>Tags (comma separated)</span><input type="text" name="tags" value="' + escapeHtml(existing && existing.tags ? existing.tags.join(', ') : '') + '"></label>' +
+              '<label class="rr-field"><span>Series (optional)</span><input type="text" name="series" maxlength="120" value="' + escapeHtml(existing && existing.series ? existing.series : '') + '"></label>' +
+              '<label class="rr-field"><span>Episode number (optional)</span><input type="number" name="episode" min="1" value="' + (existing && existing.episode ? existing.episode : '') + '"></label>' +
+              '<label class="rr-field"><span>Cover image URL (optional)</span><input type="text" name="coverUrl" value="' + escapeHtml(existing && existing.coverUrl ? existing.coverUrl : '') + '"></label>' +
+              '<label class="rr-field"><span>Video URL (optional)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"></label>' +
+              '<label class="rr-field"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
+              '<label class="rr-checkbox"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
+              '<label class="rr-field full"><span>Story text — plain paragraphs (blank line = new paragraph). # / ## for headings, ![alt](url) for images.</span>' +
+                '<textarea name="content" id="storyContent" required>' + escapeHtml(existing ? existing.content : '') + '</textarea></label>' +
+            '</div>' +
+            '<div class="admin-actions">' +
+              '<button type="submit" class="rr-submit admin-btn-secondary" data-action="draft">Save draft</button>' +
+              '<button type="submit" class="rr-submit" data-action="publish">Save &amp; publish</button>' +
+            '</div>' +
+            '<div id="formStatus" style="margin-top:12px;"></div>' +
+          '</form>' +
+        '</div>';
+
+      var form = document.getElementById('storyForm');
+      var submitAction = 'draft';
+      form.querySelectorAll('[data-action]').forEach(function (btn) {
+        btn.addEventListener('click', function () { submitAction = btn.getAttribute('data-action'); });
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var status = document.getElementById('formStatus');
+        var fd = new FormData(form);
+        var id = String(fd.get('id') || '').trim();
+        if (!/^[a-zA-Z0-9_-]{1,160}$/.test(id)) {
+          status.innerHTML = '<p class="rr-hint rr-error">Story ID must be letters, numbers, - or _ only.</p>';
+          return;
+        }
+        var payload = {
+          id: id,
+          title: String(fd.get('title') || '').trim(),
+          excerpt: String(fd.get('excerpt') || '').trim(),
+          content: String(fd.get('content') || ''),
+          category: String(fd.get('category') || '').trim(),
+          tags: String(fd.get('tags') || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean),
+          series: String(fd.get('series') || '').trim() || null,
+          episode: fd.get('episode') ? Number(fd.get('episode')) : null,
+          coverUrl: String(fd.get('coverUrl') || '').trim() || null,
+          videoUrl: String(fd.get('videoUrl') || '').trim() || null,
+          audioUrl: String(fd.get('audioUrl') || '').trim() || null,
+          exclusive: fd.get('exclusive') === 'on',
+        };
+
+        status.innerHTML = '<p class="rr-hint">Saving…</p>';
+        var save = isNew
+          ? window.NightsAuth.adminCreateStory(payload)
+          : window.NightsAuth.adminUpdateStory(id, payload);
+
+        save.then(function () {
+          if (submitAction === 'publish') {
+            return window.NightsAuth.adminPublishStory(id).then(function () {
+              status.innerHTML = '<p class="rr-hint rr-success">Saved and published — it will appear on the live site automatically within about 20 minutes.</p>';
+            });
+          }
+          status.innerHTML = '<p class="rr-hint rr-success">Draft saved.</p>';
+        }).then(function () {
+          setTimeout(function () { window.location.href = 'index.html'; }, 1400);
+        }).catch(function (err) {
+          status.innerHTML = '<p class="rr-hint rr-error">' + escapeHtml(err.message) + '</p>';
+        });
+      });
+    }
+
+    function init() {
+      if (!window.NightsAuth) { renderGate('Something didn\'t load — try refreshing.', false); return; }
+      window.NightsAuth.me().then(function (data) {
+        if (!data.authenticated) { renderGate('Log in with an admin account to manage stories.', true); return; }
+        if (!data.isAdmin) { renderGate('This account does not have content-manager access.', false); return; }
+
+        var editId = qs('id');
+        if (!editId) { renderForm(null); return; }
+
+        window.NightsAuth.adminListStories().then(function (data) {
+          var story = (data.stories || []).find(function (s) { return s.id === editId; });
+          if (!story) { renderGate('Story "' + editId + '" not found.', false); return; }
+          renderForm(story);
+        }).catch(function (err) {
+          renderGate('Could not load story: ' + err.message, false);
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>

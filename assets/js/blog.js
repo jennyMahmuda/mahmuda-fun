@@ -22,22 +22,6 @@
     return 'index.html?story=' + encodeURIComponent(id);
   }
 
-  // Reader-facing language switcher (assets/js/i18n.js) hooks in here:
-  // trTitle()/trExcerpt() swap in the translated text for the language the
-  // reader picked (falling back to native if none exists yet), and
-  // ensureContent() below does the same for the full story body. Every
-  // render function in this file goes through these instead of reading
-  // story.title/story.excerpt directly, so switching language updates the
-  // whole page consistently rather than just the nav chrome.
-  function trStory(story) {
-    if (!story) return { title: '', excerpt: '' };
-    if (!window.NightsI18n) return { title: story.title, excerpt: story.excerpt };
-    return window.NightsI18n.translateTitleExcerpt(story);
-  }
-  function trTitle(story) { return trStory(story).title; }
-  function trExcerpt(story) { return trStory(story).excerpt; }
-  function t(key, vars) { return window.NightsI18n ? window.NightsI18n.t(key, vars) : key; }
-
   function normalizeCategory(value) {
     return String(value || '').trim().toLowerCase();
   }
@@ -65,10 +49,9 @@
       '<div class="related-heading"><span>Related in ' + escapeHtml(story.category || 'this category') + '</span></div>' +
       '<div class="related-grid">' + related.map(function (item) {
         var image = resolveImage(item);
-        var itemTitle = trTitle(item);
         return '<a class="related-card" href="' + storyUrl(item.id) + '" data-story-link="' + escapeHtml(item.id) + '">' +
-          (image ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(itemTitle) + '" loading="lazy">' : '<div class="related-placeholder">N</div>') +
-          '<span class="related-card-body"><strong>' + escapeHtml(itemTitle) + '</strong><small>' + escapeHtml(item.category || 'Story') + '</small></span>' +
+          (image ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(item.title) + '" loading="lazy">' : '<div class="related-placeholder">N</div>') +
+          '<span class="related-card-body"><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.category || 'Story') + '</small></span>' +
         '</a>';
       }).join('') + '</div></section>';
   }
@@ -137,6 +120,7 @@
     bindCategoryCards();
     renderTopStories();
     renderTrending();
+    renderHeroStats();
     openDeepLink();
   }
 
@@ -163,7 +147,7 @@
           var img = resolveImage(s);
           return '<a class="top-rated-card" href="' + storyUrl(row.storyId) + '" data-story-link="' + escapeHtml(row.storyId) + '">' +
             (img ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:8px;" onerror="this.remove()">' : '') +
-            '<div class="top-rated-name">' + escapeHtml(trTitle(s)) + '</div>' +
+            '<div class="top-rated-name">' + escapeHtml(s.title) + '</div>' +
             '</a>';
         }).join('');
         section.hidden = false;
@@ -193,7 +177,7 @@
         return '<a class="top-rated-card" href="' + storyUrl(id) + '" data-story-link="' + escapeHtml(id) + '">' +
           (img ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:8px;" onerror="this.remove()">' : '') +
           window.NightsRatingReview.badgeHtml(map[id]) +
-          '<div class="top-rated-name">' + escapeHtml(trTitle(s)) + '</div>' +
+          '<div class="top-rated-name">' + escapeHtml(s.title) + '</div>' +
           '</a>';
       }).join('');
       section.hidden = false;
@@ -202,13 +186,16 @@
   }
 
   // Home page "Categories" section ships as static cards with data-cat
-  // attributes and href="#" placeholders — wires each to the real category
-  // page filter (or straight to /series/ for the "Series" card).
+  // attributes — wires each to its real static category/<slug>/ page
+  // (script/blog-builder.js's writeCategoryPages(), one per canonical
+  // category in script/categories-data.js), or straight to /series/ for
+  // the "Series" card. .category-card is this site's usual class;
+  // .sc-category-card is the new home page redesign's.
   function bindCategoryCards() {
-    document.querySelectorAll('.category-card[data-cat]').forEach(function (card) {
+    document.querySelectorAll('.category-card[data-cat], .sc-category-card[data-cat]').forEach(function (card) {
       var cat = card.getAttribute('data-cat');
       if (!cat) return;
-      card.href = cat === 'series' ? 'series/' : 'category/?cat=' + encodeURIComponent(cat);
+      card.href = cat === 'series' ? 'series/' : 'category/' + encodeURIComponent(cat) + '/';
     });
   }
 
@@ -231,6 +218,15 @@
         '<p class="feed-excerpt">' + eps.length + ' episode' + (eps.length > 1 ? 's' : '') + '</p>' +
         '</a>';
     }).join('');
+  }
+
+  // Home page hero stat strip (#heroStoryCount) — the real story count,
+  // nothing fabricated. There used to be a "Readers" stat next to it with
+  // no real data source behind it; removed rather than showing a made-up
+  // number (see index.html).
+  function renderHeroStats() {
+    var el = document.getElementById('heroStoryCount');
+    if (el) el.textContent = allStories.length;
   }
 
   // Footer "Popular tags" — same aggregation the category page's filter
@@ -294,66 +290,30 @@
     }
   }
 
-  // The native-language body text — same fetch-fallback this always did,
-  // just split out so ensureContent() below can also use it as the
-  // fallback when a translation isn't ready yet.
-  async function ensureNativeContent(id, story) {
+  async function ensureContent(id) {
+    if (contentCache[id]) return contentCache[id];
+    var story = allStories.find(function (s) { return s.id === id; });
+    if (story && story.exclusive) {
+      return ensureExclusiveContent(id, story);
+    }
     if (story && story.content && String(story.content).length > 120) {
+      contentCache[id] = story.content;
       return story.content;
     }
     try {
       var r = await fetch('stories/' + id + '.json', { cache: 'no-store' });
       if (r.ok) {
         var full = await r.json();
+        contentCache[id] = full.content || '';
         if (story) {
           Object.assign(story, { content: full.content, video: full.video || story.video,
             audio: full.audio || story.audio, images: full.images || story.images,
             cover: full.cover || story.cover });
         }
-        return full.content || '';
+        return contentCache[id];
       }
     } catch (err) {}
     return story ? (story.content || '') : '';
-  }
-
-  // Cache key includes the language so switching languages doesn't serve
-  // stale HTML from a different one — each combination is fetched (or
-  // composed) once per page visit.
-  async function ensureContent(id) {
-    var story = allStories.find(function (s) { return s.id === id; });
-
-    // Exclusive/members-only text lives only in D1 (see
-    // ensureExclusiveContent) and isn't part of the translation pipeline —
-    // it's always served in its native language, same as before. Never
-    // cached here either, per the original comment: the auth check must
-    // be re-evaluated every time.
-    if (story && story.exclusive) {
-      return ensureExclusiveContent(id, story);
-    }
-
-    var lang = window.NightsI18n ? window.NightsI18n.getLang() : 'bn';
-    var cacheKey = id + ':' + lang;
-    if (contentCache[cacheKey]) return contentCache[cacheKey];
-
-    var nativeLang = story ? (story.language || 'bn') : 'bn';
-    var nativeHtml = await ensureNativeContent(id, story);
-
-    var html;
-    if (!window.NightsI18n || lang === nativeLang) {
-      html = nativeHtml;
-    } else {
-      var translated = await window.NightsI18n.fetchTranslatedStory(id, lang);
-      if (translated && translated.content) {
-        html = translated.content;
-      } else {
-        var langMeta = window.NightsI18n.LANGS.find(function (l) { return l.code === lang; });
-        html = '<div class="i18n-pending-notice">' +
-          window.NightsI18n.t('lang.pendingNotice', { lang: langMeta ? langMeta.native : lang }) +
-          '</div>' + nativeHtml;
-      }
-    }
-    contentCache[cacheKey] = html;
-    return html;
   }
 
   function getFiltered() {
@@ -505,7 +465,7 @@
     if (!feedEl) return;
     var list = getFiltered();
     if (!list.length) {
-      feedEl.innerHTML = '<div class="loading-state"><p>' + t('feed.noStories') + '</p></div>';
+      feedEl.innerHTML = '<div class="loading-state"><p>কোনো স্টোরি নেই। একটু পর আবার চেষ্টা করুন।</p></div>';
       if (feedEnd) feedEnd.hidden = true;
       return;
     }
@@ -521,10 +481,9 @@
       (heroStory.exclusive ? '<span class="feed-type-badge feed-exclusive-badge">🔒 Members</span>' : '');
 
     var heroCover = resolveImage(heroStory);
-    var heroTr = trStory(heroStory);
     // LCP: discoverable in HTML, fetchpriority=high, NO lazy-load
     var heroCoverHtml = heroCover
-      ? '<figure class="feed-hero-cover"><img src="' + escapeHtml(heroCover) + '" alt="' + escapeHtml(heroTr.title) + '" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" onerror="this.closest(\'figure\').style.display=\'none\'"></figure>'
+      ? '<figure class="feed-hero-cover"><img src="' + escapeHtml(heroCover) + '" alt="' + escapeHtml(heroStory.title) + '" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" onerror="this.closest(\'figure\').style.display=\'none\'"></figure>'
       : '';
 
     html += '<div class="hero-section">';
@@ -538,10 +497,10 @@
               '</div>' + heroBadge +
               '<span data-rating-slot="' + escapeHtml(heroStory.id) + '"></span>' +
             '</div>';
-    html += '<h1 class="feed-title hero-title">' + escapeHtml(heroTr.title) + '</h1>';
-    html += '<div class="feed-full-content" id="content-' + heroStory.id + '"><p class="loading-text" data-i18n="feed.loadingStory">' + t('feed.loadingStory') + '</p></div>';
+    html += '<h1 class="feed-title hero-title">' + escapeHtml(heroStory.title) + '</h1>';
+    html += '<div class="feed-full-content" id="content-' + heroStory.id + '"><p class="loading-text">ফুল স্টোরি লোড হচ্ছে...</p></div>';
     if (heroStory.nextEpisodeId) {
-      html += '<div class="feed-actions"><button class="inline-next" data-next="' + escapeHtml(heroStory.nextEpisodeId) + '" data-i18n="feed.nextEpisode">' + t('feed.nextEpisode') + '</button></div>';
+      html += '<div class="feed-actions"><button class="inline-next" data-next="' + escapeHtml(heroStory.nextEpisodeId) + '">পরের পর্ব →</button></div>';
     }
     html += '<div class="feed-tags">' +
               (heroStory.tags || []).map(function (tg) { return '<span class="feed-tag">#' + escapeHtml(tg) + '</span>'; }).join('') +
@@ -560,24 +519,23 @@
           : '<span class="feed-type-badge">' + typeLabel(t) + '</span>') +
           (story.exclusive ? '<span class="feed-type-badge feed-exclusive-badge">🔒 Members</span>' : '');
 
-        var cardTr = trStory(story);
         var coverImg = resolveImage(story);
         var coverHtml = (coverImg && !isExpanded)
-          ? '<div class="feed-card-media"><img src="' + escapeHtml(coverImg) + '" alt="' + escapeHtml(cardTr.title) + '" width="600" height="338" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>'
+          ? '<div class="feed-card-media"><img src="' + escapeHtml(coverImg) + '" alt="' + escapeHtml(story.title) + ' কভার" width="600" height="338" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>'
           : '';
 
         var mediaIcons = [];
-        if (story.video) mediaIcons.push('<span title="Video">▶</span>');
-        if (story.audio) mediaIcons.push('<span title="Audio">♫</span>');
+        if (story.video) mediaIcons.push('<span title="ভিডিও আছে">▶</span>');
+        if (story.audio) mediaIcons.push('<span title="অডিও আছে">♫</span>');
         var mediaChips = mediaIcons.length
           ? '<div class="media-chips">' + mediaIcons.join('') + '</div>'
           : '';
 
         var bodyPlaceholder = isExpanded
-          ? '<div class="feed-full-content" id="content-' + story.id + '"><p class="loading-text">' + t('feed.loadingStory') + '</p></div>'
+          ? '<div class="feed-full-content" id="content-' + story.id + '"><p class="loading-text">লোড হচ্ছে...</p></div>'
           : '';
         var nextBtn = (isExpanded && story.nextEpisodeId)
-          ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">' + t('feed.nextEpisode') + '</button>'
+          ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>'
           : '';
 
         var gridStyle = isExpanded ? 'grid-column: 1 / -1;' : '';
@@ -594,11 +552,11 @@
               '</div>' + badge +
               '<span data-rating-slot="' + escapeHtml(story.id) + '"></span>' +
             '</div>' +
-            '<h2 class="feed-title">' + escapeHtml(cardTr.title) + '</h2>' +
-            (isExpanded ? '' : '<p class="feed-excerpt">' + escapeHtml(cardTr.excerpt || '') + '</p>') +
+            '<h2 class="feed-title">' + escapeHtml(story.title) + '</h2>' +
+            (isExpanded ? '' : '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>') +
             bodyPlaceholder +
             '<div class="feed-actions">' +
-              '<button class="read-more-btn">' + (isExpanded ? t('feed.showLess') : t('feed.readMore')) + '</button>' +
+              '<button class="read-more-btn">' + (isExpanded ? 'ছোট করে দেখুন ↑' : 'সবটুকু পড়ুন →') + '</button>' +
               nextBtn +
             '</div>' +
             (isExpanded ? '<div class="rating-review-mount" data-rating-review-mount></div>' : '') +
@@ -657,23 +615,21 @@
     if (!story) return;
     currentStoryId = id;
     var content = await ensureContent(id);
-    var readerTr = trStory(story);
     updateSeoForStory(story);
     updateStoryStructuredData(story);
 
     var readerContent = document.getElementById('readerContent');
     var readerModal = document.getElementById('readerModal');
-    var prevScrollTop = readerModal ? readerModal.scrollTop : 0;
     if (readerContent) {
       readerContent.innerHTML =
-        '<button class="reader-back" type="button" data-reader-back aria-label="Back to stories">' + t('feed.backToStories') + '</button>' +
+        '<button class="reader-back" type="button" data-reader-back aria-label="Back to stories">← Back to stories</button>' +
         '<div class="reader-head">' +
           '<div class="reader-meta">' +
             (story.series ? '<span class="feed-type-badge">' + escapeHtml(story.series) + ' · Ep ' + (story.episode || '?') + '</span>' : '<span class="feed-type-badge">' + typeLabel(story.type || 'text') + '</span>') +
             '<span class="reader-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</span>' +
           '</div>' +
-          '<h2 class="reader-title">' + escapeHtml(readerTr.title) + '</h2>' +
-          (resolveImage(story) ? '<img class="reader-cover" src="' + escapeHtml(resolveImage(story)) + '" alt="' + escapeHtml(readerTr.title) + '" loading="lazy" decoding="async">' : '') +
+          '<h2 class="reader-title">' + escapeHtml(story.title) + '</h2>' +
+          (resolveImage(story) ? '<img class="reader-cover" src="' + escapeHtml(resolveImage(story)) + '" alt="' + escapeHtml(story.title) + '" loading="lazy" decoding="async">' : '') +
           (story.video ? '<div class="feed-media-block"><video controls playsinline preload="metadata" style="width:100%">' +
               '<source src="' + escapeHtml(resolveMediaUrl(story.video)) + '">Your browser does not support the video tag.</video></div>' : '') +
           (story.audio ? '<div class="feed-media-block"><audio controls preload="metadata" style="width:100%">' +
@@ -682,8 +638,8 @@
         '<div class="reader-body">' + content + '</div>' +
         renderRelatedStories(story) +
         '<div class="reader-nav">' +
-          '<button class="inline-next" data-next="' + escapeHtml(id) + '" data-prev="1">' + t('feed.prevEpisode') + '</button>' +
-          (story.nextEpisodeId ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">' + t('feed.nextEpisode') + '</button>' : '') +
+          '<button class="inline-next" data-next="' + escapeHtml(id) + '" data-prev="1">← আগের পর্ব</button>' +
+          (story.nextEpisodeId ? '<button class="inline-next" data-next="' + escapeHtml(story.nextEpisodeId) + '">পরের পর্ব →</button>' : '') +
         '</div>' +
         '<div class="rating-review-mount" data-rating-review-mount></div>';
       wireMediaButtons(readerContent);
@@ -698,12 +654,7 @@
       readerModal.classList.add('open');
       readerModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      // A language switch re-opens the same story "silently" to re-render
-      // it in the new language — keep the reader's scroll position in
-      // that case instead of jumping back to the top (see the
-      // hc:langchange listener below). A genuinely fresh open still
-      // starts at the top as before.
-      readerModal.scrollTop = (options.preserveScroll) ? prevScrollTop : 0;
+      readerModal.scrollTop = 0;
     }
   }
 
@@ -800,16 +751,6 @@
     var match = (window.location.search || '').match(/[?&]story=([^&]+)/);
     if (match) openReader(decodeURIComponent(match[1]), { silent: true });
     else closeReader();
-  });
-
-  // Instant, no-reload language switching (assets/js/i18n.js dispatches
-  // this once the new UI dictionary is ready): re-render whatever is on
-  // screen — the feed's titles/excerpts, and the open reader's full body
-  // if one is open — in the newly selected language. Nothing here touches
-  // the URL or history, and the reader keeps its scroll position.
-  document.addEventListener('hc:langchange', function () {
-    if (feedEl) renderFeed();
-    if (currentStoryId) openReader(currentStoryId, { silent: true, preserveScroll: true });
   });
 
   window.NightsBlog = {

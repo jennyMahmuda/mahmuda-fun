@@ -136,6 +136,29 @@
     return apiFetch('/api/stories/' + encodeURIComponent(storyId) + '/content');
   }
 
+  // ---- Admin content manager (assets/js/admin.js) ----
+  // Every call here 401s/403s server-side for a non-admin session — these
+  // are thin wrappers, not the actual access control.
+  function adminListStories() {
+    return apiFetch('/api/admin/stories');
+  }
+  function adminCreateStory(story) {
+    return apiFetch('/api/admin/stories', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(story),
+    });
+  }
+  function adminUpdateStory(id, story) {
+    return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/update', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(story),
+    });
+  }
+  function adminPublishStory(id) {
+    return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/publish', { method: 'POST' });
+  }
+  function adminDeleteStory(id) {
+    return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/delete', { method: 'POST' });
+  }
+
   // Updates the shared #navAccountLink / #navAccountLabel present on every
   // page's nav (points at /account/ either way — that page itself shows a
   // login form or an account summary depending on session state).
@@ -163,5 +186,10 @@
     me: me,
     getToken: getToken,
     fetchExclusiveContent: fetchExclusiveContent,
+    adminListStories: adminListStories,
+    adminCreateStory: adminCreateStory,
+    adminUpdateStory: adminUpdateStory,
+    adminPublishStory: adminPublishStory,
+    adminDeleteStory: adminDeleteStory,
   };
 })();

@@ -59,8 +59,6 @@ jobs:
           node --check assets/js/navigation.js
           node --check assets/js/site-components.js
           node --check assets/js/rating-review.js
-          node --check assets/js/i18n.js
-          node --check script/translate-content.js
           node --check cloudflare/worker/src/index.js
 
       - name: Validate all pages and required assets

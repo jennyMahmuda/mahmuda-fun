@@ -5,6 +5,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { CATEGORIES } = require('./categories-data.js');
 const ROOT = path.resolve(__dirname, '..');
 const SOURCE_DIR = path.join(ROOT, 'story-post');
 const OUTPUT_DIR = path.join(ROOT, 'stories');
@@ -210,7 +211,9 @@ function writeSitemap(stories) {
     { path: '/series/', changefreq: 'weekly', priority: '0.8' },
     { path: '/privacy-policy.html', changefreq: 'monthly', priority: '0.3' },
     { path: '/llms.txt', changefreq: 'monthly', priority: '0.2' }
-  ];
+  ].concat(CATEGORIES.map(function (c) {
+    return { path: '/category/' + c.slug + '/', changefreq: 'weekly', priority: '0.7' };
+  }));
   const seen = new Set();
   const urls = [];
   const addUrl = function (loc, lastmod, changefreq, priority) {
@@ -267,6 +270,7 @@ function writeSitemap(stories) {
     'Allow: /',
     'Disallow: /script/',
     'Disallow: /_site/',
+    'Disallow: /admin/',
     '',
     '# Public text, image, video and story paths remain crawlable.',
     'Allow: /llms.txt',
@@ -280,7 +284,7 @@ function writeSitemap(stories) {
     '# allowed by the wildcard rule at the top of this file.'
   ]
     .concat(openCrawlers.reduce(function (lines, ua) {
-      return lines.concat(['User-agent: ' + ua, 'Allow: /', 'Disallow: /script/', 'Disallow: /_site/', '']);
+      return lines.concat(['User-agent: ' + ua, 'Allow: /', 'Disallow: /script/', 'Disallow: /_site/', 'Disallow: /admin/', '']);
     }, []))
     .concat([
       'Sitemap: ' + SITE_URL + '/sitemap.xml',
@@ -289,6 +293,157 @@ function writeSitemap(stories) {
     .join('\n');
   fs.writeFileSync(ROBOTS_FILE, robots, 'utf8');
   console.log('✓ robots.txt');
+}
+
+// Same loose "does this story belong to this category" match category/
+// index.html's client-side filter already used (type/category/tags/
+// series contain the slug as a case-insensitive substring) — kept
+// consistent so a story that shows up under a tag on the hub page shows
+// up on that category's real page too.
+// Hyphens and spaces are treated as equivalent ("slow-burn" ~ "Slow
+// Burn") — the canonical slugs in script/categories-data.js are
+// hyphenated, but tags/categories are hand-typed free text almost always
+// space-separated, and without this a canonical page would falsely show
+// "no stories yet" for content that's clearly tagged for it.
+function normCategoryText(value) {
+  return String(value || '').toLowerCase().replace(/[-\s]+/g, ' ').trim();
+}
+function storyMatchesCategory(story, slug) {
+  const needle = normCategoryText(slug);
+  const haystack = [story.type || 'text', story.category || '']
+    .concat(story.tags || [])
+    .concat(story.series ? [story.series] : [])
+    .map(normCategoryText);
+  return haystack.indexOf(needle) !== -1 || haystack.join(' ').indexOf(needle) !== -1;
+}
+
+function categoryCardData(story) {
+  const img = story.cover || (story.images && story.images.length ? story.images[0] : '') || null;
+  return {
+    id: story.id, title: story.title, excerpt: story.excerpt, date: story.date,
+    readTime: story.readTime, series: story.series, category: story.category,
+    type: story.type, cover: img, exclusive: !!story.exclusive,
+  };
+}
+
+// Real, static, individually-crawlable landing pages — one per canonical
+// category (script/categories-data.js) — replacing the old approach of a
+// single category/?cat=slug page for these (category/index.html itself
+// stays in place as a "browse everything, including tags outside this
+// list" hub, linked from every category page here). Matching stories are
+// computed and embedded at build time, not fetched client-side, so the
+// page has real content on first paint with zero extra requests.
+function writeCategoryPages(stories) {
+  const publicStories = stories.map(publicStoryJson);
+  let written = 0;
+  CATEGORIES.forEach(function (cat) {
+    const matches = publicStories.filter(function (s) { return storyMatchesCategory(s, cat.slug); });
+    const cardsJson = JSON.stringify(matches.map(categoryCardData));
+    const canonical = SITE_URL + '/category/' + cat.slug + '/';
+    const pageTitle = cat.title + ' | mahmuda.fun – Premium Adult Stories';
+    const html = '<!DOCTYPE html>\n<html lang="en" data-theme="dark">\n<head>\n' +
+      '<meta charset="UTF-8" />\n' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n' +
+      '<title>' + escapeXml(pageTitle) + '</title>\n' +
+      '<meta name="description" content="' + escapeXml(cat.description) + '" />\n' +
+      '<meta name="author" content="mahmuda.fun" />\n' +
+      '<meta name="robots" content="index, follow, max-image-preview:large" />\n' +
+      '<meta name="rating" content="adult" />\n' +
+      '<meta name="theme-color" content="#050505" />\n' +
+      '<link rel="canonical" href="' + escapeXml(canonical) + '" />\n' +
+      '<meta property="og:type" content="website" /><meta property="og:site_name" content="mahmuda.fun" />' +
+      '<meta property="og:title" content="' + escapeXml(pageTitle) + '" /><meta property="og:description" content="' + escapeXml(cat.description) + '" />' +
+      '<meta property="og:url" content="' + escapeXml(canonical) + '" /><meta property="og:image" content="' + escapeXml(SITE_URL) + '/assets/logo.svg" />' +
+      '<meta property="og:locale" content="en_US" />\n' +
+      '<meta name="twitter:card" content="summary" /><meta name="twitter:title" content="' + escapeXml(pageTitle) + '" /><meta name="twitter:description" content="' + escapeXml(cat.description) + '" />\n' +
+      '<link rel="icon" type="image/svg+xml" href="../../assets/logo.svg" />\n' +
+      '<link rel="stylesheet" href="../../assets/css/style.css" />\n' +
+      '<link rel="stylesheet" href="../../assets/css/navigation.css" />\n' +
+      '<link rel="stylesheet" href="../../assets/css/blog.css" />\n' +
+      '<link rel="stylesheet" href="../../assets/css/ads.css" />\n' +
+      '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />\n' +
+      '</head>\n<body class="cat-theme-' + cat.theme + '">\n' +
+      '<header class="navbar"><div class="nav-container">' +
+      '<a href="../../index.html" class="logo" aria-label="mahmuda.fun home"><img class="logo-svg" src="../../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" /></a>' +
+      '<nav class="nav-links" id="navLinks" aria-label="Main navigation">' +
+      '<a href="../../index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>' +
+      '<a href="../../video/" class="nav-item"><span class="nav-icon">▶</span>Video</a>' +
+      '<a href="../../category/" class="nav-item active"><span class="nav-icon">◈</span>Category</a>' +
+      '<a href="../../gellery/" class="nav-item"><span class="nav-icon">🖼</span>Gallery</a>' +
+      '<a href="../../series/" class="nav-item"><span class="nav-icon">▣</span>Series</a><a href="../../premium.html" class="nav-item"><span class="nav-icon">★</span>Premium</a>' +
+      '<a href="../../account/" class="nav-item" id="navAccountLink"><span class="nav-icon">👤</span><span id="navAccountLabel">Log in</span></a></nav>' +
+      '<div class="nav-actions"><button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>' +
+      '<button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></div>' +
+      '</div></header>\n' +
+      '<div class="category-ticker" id="categoryTicker" aria-label="Browse categories"></div>\n' +
+      '<div class="ad-leaderboard-wrap"><div data-ad="leaderboard" class="ad-slot"></div></div>\n' +
+      '<div class="ad-mobile-wrap"><div data-ad="mobile-banner" class="ad-slot"></div></div>\n' +
+      '<main class="section" style="padding-top: 80px;"><div class="container">' +
+      '<div class="section-header"><h1 class="section-title">' + (cat.emoji ? escapeXml(cat.emoji) + ' ' : '') + escapeXml(cat.label) + '</h1>' +
+      '<p class="section-desc">' + matches.length + ' ' + (matches.length === 1 ? 'story' : 'stories') + '</p></div>' +
+      '<div class="cat-intro"><p>' + escapeXml(cat.intro) + '</p></div>' +
+      '<p style="margin:0 0 24px;"><a href="../" style="color:var(--accent);text-decoration:none;">← Browse all categories</a></p>' +
+      '<div class="regular-stories-grid" id="catGrid"><div class="loading-state"><p>Loading…</p></div></div>' +
+      '</div></main>\n' +
+      '<div class="ad-between-sections"><div data-ad="mid" class="ad-slot"></div></div>\n' +
+      writeCategoryFooterHtml() +
+      '<script>var CATEGORY_STORIES = ' + cardsJson + ';</script>\n' +
+      '<script>(function(){\n' +
+      '  "use strict";\n' +
+      '  function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/\'/g,"&#039;");}\n' +
+      '  function coverUrl(s){var p=s.cover;if(!p)return "../../assets/images/default-cover.svg";if(/^https?:\\/\\//i.test(p))return p;if(p.charAt(0)==="/")return "../.."+p;return "../../"+p;}\n' +
+      '  var grid=document.getElementById("catGrid");\n' +
+      '  if(!CATEGORY_STORIES.length){grid.innerHTML="<div class=\\"loading-state\\"><p>No stories in this category yet — check back soon.</p></div>";}\n' +
+      '  else{grid.innerHTML=CATEGORY_STORIES.map(function(s){\n' +
+      '    var img=coverUrl(s);\n' +
+      '    var badge=s.exclusive?"🔒 Members":(s.series?esc(s.series):esc(s.category||s.type||"Story"));\n' +
+      '    return "<a class=\\"feed-card\\" href=\\"../../index.html?story="+encodeURIComponent(s.id)+"\\" style=\\"text-decoration:none\\">"+\n' +
+      '      "<div class=\\"feed-card-media\\"><img src=\\""+esc(img)+"\\" alt=\\""+esc(s.title)+"\\" loading=\\"lazy\\" decoding=\\"async\\" onerror=\\"this.style.display=\'none\'\\"></div>"+\n' +
+      '      "<div class=\\"feed-card-header\\"><div class=\\"feed-avatar\\">N</div><div class=\\"feed-meta\\"><div class=\\"feed-author\\">Hushed Chapters</div><div class=\\"feed-time\\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+\n' +
+      '      "<span class=\\"feed-type-badge\\">"+badge+"</span><span data-rating-slot=\\""+esc(s.id)+"\\"></span></div>"+\n' +
+      '      "<h2 class=\\"feed-title\\">"+esc(s.title)+"</h2><p class=\\"feed-excerpt\\">"+esc(s.excerpt||"")+"</p></a>";\n' +
+      '  }).join("");}\n' +
+      '  if(window.NightsRatingReview&&window.NightsRatingReview.getSummaryMap){\n' +
+      '    window.NightsRatingReview.getSummaryMap().then(function(map){\n' +
+      '      grid.querySelectorAll("[data-rating-slot]").forEach(function(slot){\n' +
+      '        var summary=map[slot.getAttribute("data-rating-slot")];\n' +
+      '        if(summary&&summary.count)slot.outerHTML=window.NightsRatingReview.badgeHtml(summary);\n' +
+      '      });\n' +
+      '    });\n' +
+      '  }\n' +
+      '})();</script>\n' +
+      '<script src="../../assets/js/auth.js" defer></script>\n' +
+      '<script src="../../assets/js/category-ticker.js" defer></script>\n' +
+      '<script src="../../assets/js/navigation.js" defer></script>\n' +
+      '<script src="../../assets/js/site-components.js" defer></script>\n' +
+      '<script src="../../assets/js/rating-review.js" defer></script>\n' +
+      '<script src="../../assets/js/ads.js" defer></script>\n' +
+      '</body>\n</html>\n';
+
+    const dir = path.join(ROOT, 'category', cat.slug);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf8');
+    written++;
+  });
+  console.log('✓ ' + written + ' category/<slug>/index.html pages (' + CATEGORIES.length + ' categories)');
+}
+
+function writeCategoryFooterHtml() {
+  return '<footer class="footer"><div class="container"><div class="footer-inner">' +
+    '<div class="footer-brand"><img class="logo-svg" src="../../assets/logo.svg" alt="mahmuda.fun" width="140" height="37" loading="lazy" decoding="async" style="height:30px;width:auto;" />' +
+    '<p class="footer-tagline">Premium Adult Fiction • 18+ Only</p>' +
+    '<div class="footer-social">' +
+    '<a href="https://www.facebook.com/share/1HCyEtHHvN/?mibextid=wwXIfr" rel="noopener noreferrer" target="_blank" aria-label="Facebook">Facebook</a>' +
+    '<a href="https://x.com/jennydufun" rel="noopener noreferrer" target="_blank" aria-label="X (Twitter)">X / Twitter</a>' +
+    '<a href="https://xhamster.com/users/profiles/safejenny69" rel="noopener noreferrer" target="_blank" aria-label="xHamster">xHamster</a>' +
+    '</div></div>' +
+    '<nav class="footer-links" aria-label="Footer">' +
+    '<div class="footer-col"><h4>Explore</h4><a href="../../index.html">Feed</a><a href="../../category/">Categories</a><a href="../../series/">Series</a><a href="../../gellery/">Gallery</a><a href="../../video/">Video</a><a href="../../premium.html">Premium</a><a href="../../become-creator.html">Become a Creator</a></div>' +
+    '<div class="footer-col"><h4>Support</h4><a href="../../faq.html">FAQ</a><a href="mailto:support@mahmuda.fun">Help</a><a href="mailto:support@mahmuda.fun">Contact us</a><a href="../../advertising.html">Advertising</a><a href="../../content-removal.html">Content Removal</a></div>' +
+    '<div class="footer-col"><h4>Legal</h4><a href="../../terms.html">Terms of Use</a><a href="../../privacy-policy.html">Privacy Policy</a><a href="../../cookies.html">Cookies Policy</a><a href="../../dmca.html">DMCA / Copyright</a><a href="../../dmca.html#2257">18 U.S.C. 2257</a><a href="../../parental-controls.html">Parental Controls</a><a href="../../eu-dsa.html">EU DSA</a><a href="../../trust-safety.html">Trust &amp; Safety</a><a href="../../sitemap.xml">Sitemap</a></div>' +
+    '</nav></div>' +
+    '<p class="footer-copy">Premium Adult Fiction • Audio • Video • Series • 18+ Only • mahmuda.fun<br>© <span class="footer-year">2026</span> mahmuda.fun. All rights reserved.</p>' +
+    '</div></footer>\n';
 }
 
 function buildStory(filePath) {
@@ -433,6 +588,7 @@ function build() {
   fs.writeFileSync(INDEX_FILE, JSON.stringify(stories.map(publicStoryJson), null, 2), 'utf8');
 
   console.log('\n✓ stories/index.json (' + stories.length + ' stories)');
+  writeCategoryPages(stories);
   writeSitemap(stories);
   console.log('Done.\n');
 }

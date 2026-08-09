@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Manager | mahmuda.fun</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="https://mahmuda.fun/admin/" />
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/navigation.css" />
+  <link rel="stylesheet" href="../assets/css/blog.css" />
+  <link rel="stylesheet" href="../assets/css/ads.css" />
+  <style>
+    .admin-wrap { max-width: 900px; margin: 0 auto; padding: 100px 16px 60px; }
+    .admin-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
+    .admin-head h1 { font-family: var(--font-display); font-size: 1.6rem; margin: 0; }
+    .admin-list { display: flex; flex-direction: column; gap: 10px; }
+    .admin-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; align-items: center; gap: 14px; justify-content: space-between; }
+    .admin-row-title { font-weight: 600; color: var(--text-primary); }
+    .admin-row-meta { font-size: .8rem; color: var(--text-muted); margin-top: 3px; }
+    .admin-badge { font-size: .72rem; padding: 3px 9px; border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .admin-badge.draft { background: var(--bg-elevated); color: var(--text-secondary); }
+    .admin-badge.published { background: var(--accent-soft); color: var(--accent); }
+    .admin-badge.live { background: rgba(120, 200, 130, .16); color: #78c882; }
+    .admin-row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .admin-row-actions a, .admin-row-actions button { font-size: .82rem; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); background: none; cursor: pointer; }
+    .admin-row-actions a:hover, .admin-row-actions button:hover { color: var(--accent); border-color: var(--accent); }
+    .admin-empty { color: var(--text-muted); text-align: center; padding: 40px 0; }
+    .admin-gate { max-width: 420px; margin: 0 auto; padding: 100px 16px 60px; text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="logo" aria-label="mahmuda.fun home">
+        <img class="logo-svg" src="../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" decoding="async" />
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="../index.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+        <a href="../account/" class="nav-item" id="navAccountLink"><span class="nav-icon">👤</span><span id="navAccountLabel">Account</span></a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="icon-moon">☾</span><span class="icon-sun">☀</span></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="adminMain">
+    <div class="admin-gate"><p>Loading…</p></div>
+  </main>
+
+  <script src="../assets/js/auth.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/site-components.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderGate(message, showLoginLink) {
+      var main = document.getElementById('adminMain');
+      main.innerHTML =
+        '<div class="admin-gate">' +
+          '<h1>Content Manager</h1>' +
+          '<p class="rr-hint">' + escapeHtml(message) + '</p>' +
+          (showLoginLink ? '<p><a class="rr-submit" style="display:inline-block;text-decoration:none;margin-top:10px;" href="../account/">Log in</a></p>' : '') +
+        '</div>';
+    }
+
+    function statusBadge(story) {
+      if (story.status === 'draft') return '<span class="admin-badge draft">Draft</span>';
+      if (story.syncedAt) return '<span class="admin-badge live">Live</span>';
+      return '<span class="admin-badge published">Publishing…</span>';
+    }
+
+    function renderList(stories) {
+      var main = document.getElementById('adminMain');
+      var rowsHtml = stories.length ? stories.map(function (s) {
+        return '<div class="admin-row">' +
+          '<div>' +
+            '<div class="admin-row-title">' + escapeHtml(s.title) + ' ' + statusBadge(s) + '</div>' +
+            '<div class="admin-row-meta">' + escapeHtml(s.id) + ' · ' + escapeHtml(s.category) +
+              (s.updatedAt ? ' · updated ' + escapeHtml(s.updatedAt) : '') +
+              (s.status === 'published' && !s.syncedAt ? ' · syncs to the live site automatically within ~20 min' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="admin-row-actions">' +
+            '<a href="story.html?id=' + encodeURIComponent(s.id) + '">Edit</a>' +
+          '</div>' +
+        '</div>';
+      }).join('') : '<p class="admin-empty">No stories yet. Create your first one.</p>';
+
+      main.innerHTML =
+        '<div class="admin-wrap">' +
+          '<div class="admin-head">' +
+            '<h1>Content Manager</h1>' +
+            '<a class="rr-submit" style="text-decoration:none;" href="story.html">+ New story</a>' +
+          '</div>' +
+          '<p class="rr-hint" style="margin-bottom:18px;">Stories you publish here are written as real story-post files and go live automatically within about 20 minutes (or trigger the "Sync admin-submitted stories" GitHub Action manually for right away). Editing a story after it has gone live needs to be done in the repo directly — this panel writes the file once, it does not keep overwriting it.</p>' +
+          '<div class="admin-list">' + rowsHtml + '</div>' +
+        '</div>';
+    }
+
+    function init() {
+      if (!window.NightsAuth) { renderGate('Something didn\'t load — try refreshing.', false); return; }
+      window.NightsAuth.me().then(function (data) {
+        if (!data.authenticated) { renderGate('Log in with an admin account to manage stories.', true); return; }
+        if (!data.isAdmin) { renderGate('This account does not have content-manager access.', false); return; }
+        window.NightsAuth.adminListStories().then(function (data) {
+          renderList(data.stories || []);
+        }).catch(function (err) {
+          renderGate('Could not load stories: ' + err.message, false);
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>
