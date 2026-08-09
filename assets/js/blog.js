@@ -120,6 +120,7 @@
     bindCategoryCards();
     renderTopStories();
     renderTrending();
+    renderHeroStats();
     openDeepLink();
   }
 
@@ -185,10 +186,14 @@
   }
 
   // Home page "Categories" section ships as static cards with data-cat
-  // attributes and href="#" placeholders — wires each to the real category
-  // page filter (or straight to /series/ for the "Series" card).
+  // attributes — wires each to the real category page filter (or straight
+  // to /series/ for the "Series" card). .category-card is this site's
+  // usual class; .sc-category-card is the new home page redesign's — its
+  // cards shipped with href="category/<slug>/" (a page that doesn't
+  // exist, a dead link) instead of the real ?cat= filter, so this rewrite
+  // is required there, not just a nicety.
   function bindCategoryCards() {
-    document.querySelectorAll('.category-card[data-cat]').forEach(function (card) {
+    document.querySelectorAll('.category-card[data-cat], .sc-category-card[data-cat]').forEach(function (card) {
       var cat = card.getAttribute('data-cat');
       if (!cat) return;
       card.href = cat === 'series' ? 'series/' : 'category/?cat=' + encodeURIComponent(cat);
@@ -214,6 +219,15 @@
         '<p class="feed-excerpt">' + eps.length + ' episode' + (eps.length > 1 ? 's' : '') + '</p>' +
         '</a>';
     }).join('');
+  }
+
+  // Home page hero stat strip (#heroStoryCount) — the real story count,
+  // nothing fabricated. There used to be a "Readers" stat next to it with
+  // no real data source behind it; removed rather than showing a made-up
+  // number (see index.html).
+  function renderHeroStats() {
+    var el = document.getElementById('heroStoryCount');
+    if (el) el.textContent = allStories.length;
   }
 
   // Footer "Popular tags" — same aggregation the category page's filter

@@ -84,7 +84,10 @@
 
     // Story page → highlight Feed
     if ((file === 'index.html' || file === '') && isStoryPage) {
-      document.querySelectorAll('.nav-item').forEach(function (item) {
+      // .nav-item is this site's usual nav-link class; .sc-nav-link is the
+      // new home page redesign's — support both so this keeps working on
+      // every page without the redesign needing to match old naming.
+      document.querySelectorAll('.nav-item, .sc-nav-link').forEach(function (item) {
         var hrefFile = (item.getAttribute('href') || '').toLowerCase().split('/').pop().split('?')[0];
         if (hrefFile === 'index.html' || hrefFile === '' || hrefFile === '/') {
           item.classList.add('active');
@@ -107,7 +110,7 @@
 
     menuToggle.addEventListener('click', toggle);
 
-    navLinks.querySelectorAll('.nav-item').forEach(function (link) {
+    navLinks.querySelectorAll('.nav-item, .sc-nav-link').forEach(function (link) {
       link.addEventListener('click', function () {
         navLinks.classList.remove('open');
         menuToggle.classList.remove('active');
