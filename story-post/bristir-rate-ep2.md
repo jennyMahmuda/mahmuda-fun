@@ -1,18 +1,13 @@
 ---
 title: বৃষ্টির রাতে – পর্ব ৩ · নিষিদ্ধ দুপুর
 series: Bhabhi Devar Rain
-image: https://i.ibb.co/Lh0gpvvw/IMG-7853.jpg
+image: "https://mahmuda.fun/assets/images/gallery/bhabi-seduces-me.jpg"
 episode: 3
 category: Forbidden
 tags: [Romance, Intimate, Fantasy, Intense]
-type: text
 date: 2026-08-02
-language: bn
-readTime: 22 min
-excerpt: আবার একা। আবার সেই দরজার শব্দ। কিন্তু এবার রিয়া অপেক্ষা করছিল—আর আদিত্য জানত সে থামবে না।
-cover: story-post/image/bristir-rat-cover.jpg
+excerpt: আবার একা। আবার সেই দরজার শব্দ। কিন্তু এবার রিয়া অপেক্ষা করছিল—আর আদিত্য জানত সে থামবে না।তিন দিন পরে।
 ---
-তিন দিন পরে।
 
 রিয়া রান্নাঘরে দাঁড়িয়ে ছিল। চায়ের কেটলি ফুটছিল। বাইরে রোদ—কোনো বৃষ্টি নেই। কিন্তু তার শরীরে এখনো সেই রাতের স্মৃতি কাঁপছিল। প্রতিবার জানালার দিকে তাকালেই মনে পড়ত আদিত্যের চোখ। প্রতিবার একা হলেই মনে পড়ত তার স্পর্শ।
 
@@ -58,4 +53,4 @@ cover: story-post/image/bristir-rat-cover.jpg
 
 বাইরে রোদ এখনো ছিল। কিন্তু রিয়ার মনে হচ্ছিল—বৃষ্টি আবার নামবে। শীঘ্রই।
 
-*— পর্ব ৩ শেষ।*
+*— পর্ব ৩ শেষ।*[তিন দিন পরে](https://mahmuda.fun/?story=gorom-bhabi-orange-3)
