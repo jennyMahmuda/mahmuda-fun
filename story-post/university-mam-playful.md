@@ -1,6 +1,6 @@
 ---
-title: "ক্লাসের পর ম্যাম আমাকে খেলা শিখাবে বললেন"
-category: "High School Romance"
+title: ক্লাসের পর ম্যাম আমাকে খেলা শিখাবে বললেন
+category: High School Romance
 tags: [Romance, Playful, Intimate, University, Teacher]
 type: text
 date: 2026-08-03
