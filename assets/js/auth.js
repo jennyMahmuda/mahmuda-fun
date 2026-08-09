@@ -170,6 +170,13 @@
     return apiFetch('/api/admin/reviews/' + encodeURIComponent(id) + '/' + action, { method: 'POST' });
   }
 
+  // ---- Admin newsletter subscriber list ----
+  // Emails are the only PII this site collects outside of accounts —
+  // admin-gated, no public endpoint reads the list.
+  function adminListNewsletter() {
+    return apiFetch('/api/admin/newsletter');
+  }
+
   // Updates the shared #navAccountLink / #navAccountLabel present on every
   // page's nav (points at /account/ either way — that page itself shows a
   // login form or an account summary depending on session state).
@@ -204,5 +211,6 @@
     adminDeleteStory: adminDeleteStory,
     adminListReviews: adminListReviews,
     adminModerateReview: adminModerateReview,
+    adminListNewsletter: adminListNewsletter,
   };
 })();
