@@ -198,100 +198,6 @@
       </a>
 
 
-      <nav
-        class="sc-main-nav"
-        id="navLinks"
-        aria-label="Primary navigation"
-      >
-
-        <a
-          href="index.html"
-          class="sc-nav-link active"
-        >
-          Home
-        </a>
-
-        <a
-          href="video/"
-          class="sc-nav-link"
-        >
-          Video
-        </a>
-
-        <a
-          href="gellery/"
-          class="sc-nav-link"
-        >
-          Gallery
-        </a>
-
-        <details class="sc-nav-mega" id="navCategoriesMega">
-          <summary class="sc-mega-trigger">
-            Categories
-            <span class="sc-mega-caret" aria-hidden="true">▾</span>
-          </summary>
-          <div class="sc-mega-panel">
-            <div class="sc-mega-col">
-              <h4>Romance</h4>
-              <a href="category/dark-romance/">Dark Romance</a>
-              <a href="category/mafia-romance/">Mafia Romance</a>
-              <a href="category/billionaire-romance/">Billionaire Romance</a>
-              <a href="category/forbidden-romance/">Forbidden Romance</a>
-              <a href="category/slow-burn/">Slow Burn</a>
-              <a href="category/second-chance-romance/">Second Chance Romance</a>
-            </div>
-            <div class="sc-mega-col">
-              <h4>Fantasy &amp; Paranormal</h4>
-              <a href="category/paranormal-fantasy-romance/">Paranormal &amp; Fantasy Romance</a>
-              <a href="category/vampire-romance/">Vampire Romance</a>
-              <a href="category/fated-mates/">Fated Mates</a>
-              <a href="category/alpha-males/">Alpha Male Romance</a>
-            </div>
-            <div class="sc-mega-col">
-              <h4>Lifestyle &amp; Trope</h4>
-              <a href="category/college/">College Romance</a>
-              <a href="category/sports/">Sports Romance</a>
-              <a href="category/cowboy-romance/">Cowboy Romance</a>
-              <a href="category/age-gap-romance/">Age Gap Romance</a>
-              <a href="category/enemies-to-lovers/">Enemies to Lovers</a>
-              <a href="category/spicy-romance/">Spicy Romance</a>
-            </div>
-            <div class="sc-mega-col sc-mega-col-tags">
-              <h4>Trending Tags</h4>
-              <a href="category/bhabi-romance/">Bhabi Romance</a>
-              <a href="category/affair-romance/">Affair &amp; Cheating</a>
-              <a href="category/age-gap-romance/">Adults 18+ / Mature</a>
-              <a href="category/" class="sc-mega-all">Explore All 22 Categories →</a>
-            </div>
-          </div>
-        </details>
-
-        <a
-          href="series/"
-          class="sc-nav-link"
-        >
-          Series
-        </a>
-
-        <a
-          href="premium.html"
-          class="sc-nav-link sc-premium-link"
-        >
-          <span>✦</span>
-          Premium
-        </a>
-
-        <a
-          href="account/"
-          class="sc-nav-link"
-          id="navAccountLink"
-        >
-          <span id="navAccountLabel">Log in</span>
-        </a>
-
-      </nav>
-
-
       <div class="sc-nav-actions">
 
         <button
@@ -306,7 +212,9 @@
         <button
           class="sc-menu-button menu-toggle"
           id="menuToggle"
-          aria-label="Menu"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="sideDrawer"
         >
           <span></span>
           <span></span>
@@ -318,6 +226,83 @@
     </div>
 
   </header>
+
+
+  <!-- =========================================================
+       SIDE-DRAWER NAVIGATION
+       Single nav pattern for both mobile and desktop — the header only
+       ever holds the logo + theme/menu buttons; every link (including
+       the category mega-menu, now an accordion) lives in here.
+       ========================================================= -->
+
+  <div class="sc-drawer-backdrop" id="drawerBackdrop"></div>
+
+  <nav class="sc-side-drawer" id="sideDrawer" aria-label="Site navigation" aria-hidden="true">
+
+    <div class="sc-drawer-head">
+      <span class="sc-drawer-brand">
+        <span class="sc-brand-mark">SC</span>
+        SecretChapters
+      </span>
+      <button class="sc-drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+    </div>
+
+    <div class="sc-drawer-body">
+
+      <a href="index.html" class="sc-nav-link active">Home</a>
+      <a href="video/" class="sc-nav-link">Video</a>
+      <a href="gellery/" class="sc-nav-link">Gallery</a>
+      <a href="series/" class="sc-nav-link">Series</a>
+      <a href="top-rated/" class="sc-nav-link">Top Rated</a>
+      <a href="trending/" class="sc-nav-link">Trending</a>
+      <a href="new-releases/" class="sc-nav-link">New Releases</a>
+
+      <details class="sc-drawer-accordion" id="navCategoriesMega">
+        <summary>
+          Categories
+          <span class="sc-accordion-icon" aria-hidden="true"></span>
+        </summary>
+
+        <div class="sc-drawer-group">
+          <h4>Romance</h4>
+          <a href="category/dark-romance/">Dark Romance</a>
+          <a href="category/mafia-romance/">Mafia Romance</a>
+          <a href="category/billionaire-romance/">Billionaire Romance</a>
+          <a href="category/forbidden-romance/">Forbidden Romance</a>
+          <a href="category/slow-burn/">Slow Burn</a>
+          <a href="category/second-chance-romance/">Second Chance Romance</a>
+        </div>
+        <div class="sc-drawer-group">
+          <h4>Fantasy &amp; Paranormal</h4>
+          <a href="category/paranormal-fantasy-romance/">Paranormal &amp; Fantasy Romance</a>
+          <a href="category/vampire-romance/">Vampire Romance</a>
+          <a href="category/fated-mates/">Fated Mates</a>
+          <a href="category/alpha-males/">Alpha Male Romance</a>
+        </div>
+        <div class="sc-drawer-group">
+          <h4>Lifestyle &amp; Trope</h4>
+          <a href="category/college/">College Romance</a>
+          <a href="category/sports/">Sports Romance</a>
+          <a href="category/cowboy-romance/">Cowboy Romance</a>
+          <a href="category/age-gap-romance/">Age Gap Romance</a>
+          <a href="category/enemies-to-lovers/">Enemies to Lovers</a>
+          <a href="category/spicy-romance/">Spicy Romance</a>
+        </div>
+        <div class="sc-drawer-group">
+          <h4>Trending Tags</h4>
+          <a href="category/bhabi-romance/">Bhabi Romance</a>
+          <a href="category/affair-romance/">Affair &amp; Cheating</a>
+          <a href="category/age-gap-romance/">Adults 18+ / Mature</a>
+          <a href="category/" class="sc-drawer-all">Explore All 22 Categories →</a>
+        </div>
+      </details>
+
+      <a href="premium.html" class="sc-nav-link sc-premium-link"><span>✦</span> Premium</a>
+      <a href="account/" class="sc-nav-link" id="navAccountLink"><span id="navAccountLabel">Log in</span></a>
+
+    </div>
+
+  </nav>
 
 
   <!-- =========================================================
@@ -1478,6 +1463,11 @@
 
   <script
     src="assets/js/navigation.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/side-drawer.js"
     defer
   ></script>
 
