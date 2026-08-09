@@ -1,0 +1,47 @@
+name: Grant admin access
+
+# One-off, manual-only. Verifies an account's email and grants is_admin
+# in a single step — for when transactional email (RESEND_API_KEY /
+# RESEND_FROM_EMAIL) isn't configured/working yet and someone who signed
+# up for a real account is stuck unable to log in at all (login is
+# rejected for any unverified account, admin or not — see handleLogin in
+# cloudflare/worker/src/index.js). The account must already exist,
+# created normally on /account/ with a real password; this never creates
+# a login or sets a password, only unblocks one that's already there.
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: 'Email of the account to verify + make admin (must have already signed up on /account/)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  grant-admin:
+    name: Verify email + grant is_admin for one account
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate script source
+        run: node --check script/grant-admin.js
+
+      - name: Grant admin
+        run: node script/grant-admin.js
+        env:
+          ADMIN_EMAIL: ${{ github.event.inputs.email }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
