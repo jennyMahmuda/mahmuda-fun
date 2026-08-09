@@ -1,0 +1,67 @@
+name: Sync admin-submitted stories
+
+# Turns stories published through the /admin/ content manager into real
+# story-post/<id>.md files and commits them — which then triggers the
+# normal "Build and Deploy Pages" workflow, exactly like a hand-authored
+# story would. See script/sync-admin-stories.js for the full design.
+#
+# Safe to run on a schedule even when nothing was published — it just
+# finds zero rows and exits without committing anything.
+
+on:
+  schedule:
+    # Every 20 minutes — close enough to "goes live shortly after you
+    # click Publish" without needing the Worker to have GitHub write
+    # access just to trigger this on demand.
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-admin-stories
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  sync:
+    name: Write newly published admin stories and commit them
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate script source
+        run: node --check script/sync-admin-stories.js
+
+      - name: Sync newly published admin stories
+        run: node script/sync-admin-stories.js
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Commit and push new story files, if any
+        run: |
+          if git status --porcelain -- story-post | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add story-post
+            git commit -m "chore: sync admin-published stories"
+            git pull --rebase origin main
+            git push origin HEAD:main
+            echo "Pushed new story-post files — the Pages deploy workflow will pick them up."
+          else
+            echo "Nothing new to sync this run."
+          fi

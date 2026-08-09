@@ -98,6 +98,18 @@ Frontend pages: `/account/` (login + signup), `/account/verify.html`, `/account/
 
 Result cache হয় D1-এ (১ ঘণ্টা পর্যন্ত) — তাই প্রতিটা visitor সরাসরি Google API hit করে না, শুধু cache পড়ে।
 
+## Content Manager (/admin/) — no separate password, ever
+
+`/admin/` browser page দিয়ে GitHub না ছুঁয়ে নতুন story লেখা/publish করা যায় (`cloudflare/migrations/0004_admin_content.sql`)। **কোনো আলাদা admin username/password এই feature-এ নেই** — যে account admin হবে সেটা প্রথমে normal signup দিয়ে তৈরি করতে হবে (`/account/`, real email + password, সেই একই PBKDF2-hashed accounts system যেটা আগে থেকেই আছে), তারপর সেই একটা account-কে flag করতে হবে:
+
+```sql
+UPDATE users SET is_admin = 1 WHERE email = 'you@example.com';
+```
+
+এই query D1-এ চালাতে হবে (Cloudflare dashboard-এর D1 console থেকে, অথবা `npx wrangler d1 execute mahmuda_fun_reviews --remote --command "UPDATE users SET is_admin = 1 WHERE email = '...'"`)। এরপর সেই email দিয়ে `/account/`-এ normal login করলেই `/admin/` access পাওয়া যাবে — আলাদা কোনো credential মনে রাখতে হবে না।
+
+**Flow:** `/admin/` → নতুন story লিখুন (title, excerpt, category, tags, cover/video/audio URL, plain-text body) → "Save draft" অথবা "Save & publish" → publish করলে সেটা D1-এর `admin_stories` table-এ যায় → `.github/workflows/sync-admin-stories.yml` (প্রতি ২০ মিনিটে চলে, চাইলে GitHub Actions থেকে manually run করা যায়) সেটাকে real `story-post/<id>.md` file বানিয়ে commit করে → normal Pages deploy সেটা live করে। একবার sync হয়ে গেলে সেই story আর যেকোনো hand-authored story-র মতোই — `/admin/`-এ পরে edit করলে সেটা শুধু D1-এর draft record বদলায়, live file বদলাতে চাইলে `story-post/<id>.md` সরাসরি repo-তে edit করতে হবে (ইচ্ছাকৃতভাবে — কেউ hand-edit করার পর panel সেটা silently overwrite করে না)।
+
 ## Security rules
 
 API token কখনো `wrangler.toml`, `.env`, Markdown, commit message বা frontend JavaScript-এ রাখবেন না। GitHub Actions secret-এই token রাখবেন। Token-এর permission প্রয়োজনের চেয়ে বেশি দেবেন না এবং সন্দেহ হলে Cloudflare Dashboard থেকে token rotate করবেন।

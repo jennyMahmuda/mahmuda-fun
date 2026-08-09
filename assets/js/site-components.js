@@ -3,7 +3,11 @@
   'use strict';
   var GA_ID = 'G-1Z0TLKJZ9R';
   var CONSENT_KEY = 'nights_cookie_consent_v1';
-  var root = /\/(category|gellery|video|series)\/?$/.test(location.pathname) ? '../' : '';
+  // category/<slug>/ pages (script/blog-builder.js's writeCategoryPages)
+  // are two directories deep — check that before the one-deep case, since
+  // a path like /category/dark-romance/ doesn't match the one-deep regex.
+  var root = /\/category\/[^/]+\/?$/.test(location.pathname) ? '../../'
+    : /\/(category|gellery|video|series|account)\/?$/.test(location.pathname) ? '../' : '';
 
   function loadAnalytics() {
     if (window.__nightsAnalyticsLoaded) return;

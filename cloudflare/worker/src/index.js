@@ -39,6 +39,15 @@ function routeStoryContent(pathname) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+// Action-suffixed POST routes (/update, /publish, /delete) rather than
+// PUT/DELETE verbs — this Worker only accepts GET/POST at the top of the
+// dispatcher (see fetch() below); reusing that instead of widening the
+// allowed-methods/CORS surface for one feature.
+function routeAdminStoryAction(pathname) {
+  const match = pathname.match(/^\/api\/admin\/stories\/([^/]+)\/(update|publish|delete)$/);
+  return match ? { storyId: decodeURIComponent(match[1]), action: match[2] } : null;
+}
+
 function validStoryId(value) {
   return typeof value === 'string' && /^[a-zA-Z0-9_-]{1,160}$/.test(value);
 }
@@ -66,6 +75,40 @@ function escapeHtmlEmail(value) {
 
 function validPassword(value) {
   return typeof value === 'string' && value.length >= 8 && value.length <= 256;
+}
+
+// ---------- admin content validators ----------
+// Content submitted here goes through the same admin-only trust boundary
+// as a direct GitHub commit already has (see getAdminUser/requireAdmin
+// below) — these are sanity limits (size, obviously-bad values), not
+// public-input sanitization.
+
+function validAdminTitle(value) {
+  return typeof value === 'string' && value.trim().length >= 2 && value.length <= 300;
+}
+function validAdminExcerpt(value) {
+  return typeof value === 'string' && value.trim().length >= 2 && value.length <= 600;
+}
+function validAdminContent(value) {
+  return typeof value === 'string' && value.trim().length >= 20 && value.length <= 200000;
+}
+function validAdminCategory(value) {
+  return typeof value === 'string' && value.trim().length >= 1 && value.length <= 60;
+}
+function validAdminTags(value) {
+  return Array.isArray(value) && value.length <= 15 &&
+    value.every((t) => typeof t === 'string' && t.length >= 1 && t.length <= 40);
+}
+// Optional media reference: a URL or a relative path already inside this
+// repo (e.g. "story-post/image/x.jpg"). Rejects control characters and
+// the javascript: scheme; does not otherwise restrict — the site owner's
+// own markdown files already reference arbitrary paths/URLs the same way.
+function validAdminMediaRef(value) {
+  if (value === null || value === undefined || value === '') return true;
+  if (typeof value !== 'string' || value.length > 600) return false;
+  if (/[\x00-\x1f]/.test(value)) return false;
+  if (/^\s*javascript:/i.test(value)) return false;
+  return true;
 }
 
 function validToken(value) {
@@ -166,10 +209,22 @@ async function getSessionUser(request, env) {
   const token = getBearerToken(request);
   if (!validToken(token) || !env.REVIEWS_DB) return null;
   return env.REVIEWS_DB.prepare(
-    `SELECT u.id AS userId, u.email AS email, u.email_verified AS emailVerified
+    `SELECT u.id AS userId, u.email AS email, u.email_verified AS emailVerified, u.is_admin AS isAdmin
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token = ? AND s.expires_at > datetime('now')`
   ).bind(token).first();
+}
+
+// Admin gate: reuses the exact same session/Bearer-token lookup as every
+// other authenticated endpoint — there is no separate admin credential.
+// "Admin" is just an is_admin=1 flag on a normal, real, password-hashed
+// account (see cloudflare/migrations/0004_admin_content.sql and
+// cloudflare/README.md for how to grant it). Returns the user row, or
+// null if not logged in / not an admin — callers must check for null and
+// return 401/403, never assume this succeeded.
+async function getAdminUser(request, env) {
+  const user = await getSessionUser(request, env);
+  return user && user.isAdmin ? user : null;
 }
 
 // ---------- email ----------
@@ -373,7 +428,7 @@ async function handleLogout(request, env, origin) {
 async function handleMe(request, env, origin) {
   const user = await getSessionUser(request, env);
   if (!user) return json({ authenticated: false }, 200, corsHeaders(origin));
-  return json({ authenticated: true, email: user.email, emailVerified: !!user.emailVerified }, 200, corsHeaders(origin));
+  return json({ authenticated: true, email: user.email, emailVerified: !!user.emailVerified, isAdmin: !!user.isAdmin }, 200, corsHeaders(origin));
 }
 
 async function handleRequestPasswordReset(request, env, origin) {
@@ -576,6 +631,123 @@ async function handleStoryContent(request, env, origin, storyId) {
   return json({ storyId, content: row.content }, 200, corsHeaders(origin));
 }
 
+// ---------- admin content manager ----------
+// Everything below is gated by getAdminUser (a real, password-hashed
+// account with is_admin=1 — see cloudflare/migrations/0004_admin_content.sql).
+// Rows written here are drafts/published-but-not-yet-synced; the actual
+// live site never reads this table directly (no per-request DB query on
+// page views) — script/sync-admin-stories.js turns 'published' rows into
+// real story-post/<id>.md files on a schedule, same pattern as the
+// story-translation pipeline used earlier in this project.
+
+function adminStoryRowToJson(row) {
+  if (!row) return null;
+  let tags = [];
+  try { tags = JSON.parse(row.tags || '[]'); } catch { tags = []; }
+  return {
+    id: row.id, title: row.title, excerpt: row.excerpt, content: row.content,
+    category: row.category, tags, series: row.series || null,
+    episode: row.episode || null, language: row.language,
+    coverUrl: row.cover_url || null, videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
+    exclusive: !!row.exclusive, status: row.status,
+    createdAt: row.created_at, updatedAt: row.updated_at, syncedAt: row.synced_at || null,
+  };
+}
+
+async function handleAdminListStories(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const result = await env.REVIEWS_DB.prepare(
+    'SELECT * FROM admin_stories ORDER BY updated_at DESC LIMIT 200'
+  ).all();
+  return json({ stories: (result.results || []).map(adminStoryRowToJson) }, 200, corsHeaders(origin));
+}
+
+function validateAdminStoryBody(body) {
+  const id = typeof body?.id === 'string' ? body.id.trim() : '';
+  if (!validStoryId(id)) return 'A story id is required (letters, numbers, - and _ only, max 160 chars)';
+  if (!validAdminTitle(body?.title)) return 'Title is required (2-300 characters)';
+  if (!validAdminExcerpt(body?.excerpt)) return 'Excerpt is required (2-600 characters)';
+  if (!validAdminContent(body?.content)) return 'Story text is required (at least 20 characters, max 200,000)';
+  if (!validAdminCategory(body?.category)) return 'Category is required (max 60 characters)';
+  if (body?.tags !== undefined && !validAdminTags(body.tags)) return 'Tags must be an array of up to 15 short strings';
+  if (!validAdminMediaRef(body?.coverUrl)) return 'Cover image reference is invalid';
+  if (!validAdminMediaRef(body?.videoUrl)) return 'Video reference is invalid';
+  if (!validAdminMediaRef(body?.audioUrl)) return 'Audio reference is invalid';
+  if (body?.series !== undefined && body.series !== null && (typeof body.series !== 'string' || body.series.length > 120)) return 'Series name is too long';
+  if (body?.episode !== undefined && body.episode !== null && !(Number.isInteger(body.episode) && body.episode > 0 && body.episode < 10000)) return 'Episode must be a positive whole number';
+  return null;
+}
+
+async function handleAdminCreateStory(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const body = await readJson(request);
+  const error = validateAdminStoryBody(body);
+  if (error) return json({ error }, 400, corsHeaders(origin));
+
+  const existing = await env.REVIEWS_DB.prepare('SELECT id FROM admin_stories WHERE id = ?').bind(body.id).first();
+  if (existing) return json({ error: 'A story with this id already exists — use the update endpoint instead' }, 409, corsHeaders(origin));
+
+  await env.REVIEWS_DB.prepare(
+    `INSERT INTO admin_stories (id, title, excerpt, content, category, tags, series, episode, cover_url, video_url, audio_url, exclusive, status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
+  ).bind(
+    body.id, body.title.trim(), body.excerpt.trim(), body.content,
+    body.category.trim(), JSON.stringify(body.tags || []), body.series || null, body.episode || null,
+    body.coverUrl || null, body.videoUrl || null, body.audioUrl || null, body.exclusive ? 1 : 0, admin.userId
+  ).run();
+  return json({ ok: true, id: body.id }, 201, corsHeaders(origin));
+}
+
+async function handleAdminUpdateStory(request, env, origin, storyId) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  if (!validStoryId(storyId)) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+
+  const row = await env.REVIEWS_DB.prepare('SELECT id, synced_at FROM admin_stories WHERE id = ?').bind(storyId).first();
+  if (!row) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+
+  const body = await readJson(request);
+  const error = validateAdminStoryBody({ ...body, id: storyId });
+  if (error) return json({ error }, 400, corsHeaders(origin));
+
+  await env.REVIEWS_DB.prepare(
+    `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, tags = ?, series = ?, episode = ?,
+     cover_url = ?, video_url = ?, audio_url = ?, exclusive = ?, updated_at = datetime('now')
+     WHERE id = ?`
+  ).bind(
+    body.title.trim(), body.excerpt.trim(), body.content, body.category.trim(), JSON.stringify(body.tags || []),
+    body.series || null, body.episode || null, body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
+    body.exclusive ? 1 : 0, storyId
+  ).run();
+  return json({ ok: true, alreadySynced: !!row.synced_at }, 200, corsHeaders(origin));
+}
+
+async function handleAdminPublishStory(request, env, origin, storyId) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  if (!validStoryId(storyId)) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+  const result = await env.REVIEWS_DB.prepare(
+    "UPDATE admin_stories SET status = 'published', updated_at = datetime('now') WHERE id = ?"
+  ).bind(storyId).run();
+  if (!result.meta || !result.meta.changes) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+  return json({ ok: true, status: 'published' }, 200, corsHeaders(origin));
+}
+
+async function handleAdminDeleteStory(request, env, origin, storyId) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  if (!validStoryId(storyId)) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+  const row = await env.REVIEWS_DB.prepare('SELECT synced_at FROM admin_stories WHERE id = ?').bind(storyId).first();
+  if (!row) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+  if (row.synced_at) {
+    return json({ error: 'This story is already published to the live site — remove or edit story-post/' + storyId + '.md in the repo instead of deleting it here' }, 409, corsHeaders(origin));
+  }
+  await env.REVIEWS_DB.prepare('DELETE FROM admin_stories WHERE id = ?').bind(storyId).run();
+  return json({ ok: true }, 200, corsHeaders(origin));
+}
+
 export default {
   async fetch(request, env) {
     const origin = allowedOrigin(request, env);
@@ -618,6 +790,22 @@ export default {
 
     // ----- contact form -----
     if (pathname === '/api/contact' && request.method === 'POST') return handleContact(request, env, origin);
+
+    // ----- admin content manager (see getAdminUser — gated by is_admin) -----
+    // Defense in depth on top of the auth check: also require a
+    // recognized Origin, same as the ratings/reviews write path.
+    if (pathname.startsWith('/api/admin/') && !origin && request.headers.get('Origin')) {
+      return json({ error: 'Origin not allowed' }, 403);
+    }
+    if (pathname === '/api/admin/stories' && request.method === 'GET') return handleAdminListStories(request, env, origin);
+    if (pathname === '/api/admin/stories' && request.method === 'POST') return handleAdminCreateStory(request, env, origin);
+    const adminAction = routeAdminStoryAction(pathname);
+    if (adminAction && request.method === 'POST') {
+      if (!validStoryId(adminAction.storyId)) return json({ error: 'Not found' }, 404, corsHeaders(origin));
+      if (adminAction.action === 'update') return handleAdminUpdateStory(request, env, origin, adminAction.storyId);
+      if (adminAction.action === 'publish') return handleAdminPublishStory(request, env, origin, adminAction.storyId);
+      if (adminAction.action === 'delete') return handleAdminDeleteStory(request, env, origin, adminAction.storyId);
+    }
 
     // ----- exclusive content -----
     const contentStoryId = routeStoryContent(pathname);

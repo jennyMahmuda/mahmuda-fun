@@ -34,7 +34,7 @@
 
   function itemsHtml(prefix) {
     return CATEGORIES.map(function (c) {
-      return '<a class="category-ticker-item" href="' + prefix + 'category/?cat=' + encodeURIComponent(c.slug) + '">' +
+      return '<a class="category-ticker-item" href="' + prefix + 'category/' + encodeURIComponent(c.slug) + '/">' +
         (c.emoji ? '<span aria-hidden="true">' + c.emoji + '</span> ' : '') + escapeHtml(c.label) + '</a>';
     }).join('');
   }
@@ -42,7 +42,11 @@
   function init() {
     var slot = document.getElementById('categoryTicker');
     if (!slot) return;
-    var prefix = /\/(category|series|gellery|video|account)\/?$/.test(window.location.pathname) ? '../' : '';
+    // category/<slug>/ pages are two directories deep — check that before
+    // the one-deep case (see the same fix in site-components.js).
+    var path = window.location.pathname;
+    var prefix = /\/category\/[^/]+\/?$/.test(path) ? '../../'
+      : /\/(category|series|gellery|video|account)\/?$/.test(path) ? '../' : '';
     // Rendered twice back-to-back; the CSS animation scrolls exactly -50%
     // of the track width, so the loop point is visually seamless.
     var html = itemsHtml(prefix);

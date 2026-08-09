@@ -186,17 +186,16 @@
   }
 
   // Home page "Categories" section ships as static cards with data-cat
-  // attributes — wires each to the real category page filter (or straight
-  // to /series/ for the "Series" card). .category-card is this site's
-  // usual class; .sc-category-card is the new home page redesign's — its
-  // cards shipped with href="category/<slug>/" (a page that doesn't
-  // exist, a dead link) instead of the real ?cat= filter, so this rewrite
-  // is required there, not just a nicety.
+  // attributes — wires each to its real static category/<slug>/ page
+  // (script/blog-builder.js's writeCategoryPages(), one per canonical
+  // category in script/categories-data.js), or straight to /series/ for
+  // the "Series" card. .category-card is this site's usual class;
+  // .sc-category-card is the new home page redesign's.
   function bindCategoryCards() {
     document.querySelectorAll('.category-card[data-cat], .sc-category-card[data-cat]').forEach(function (card) {
       var cat = card.getAttribute('data-cat');
       if (!cat) return;
-      card.href = cat === 'series' ? 'series/' : 'category/?cat=' + encodeURIComponent(cat);
+      card.href = cat === 'series' ? 'series/' : 'category/' + encodeURIComponent(cat) + '/';
     });
   }
 
