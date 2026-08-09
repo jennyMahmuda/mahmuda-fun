@@ -502,6 +502,7 @@ function writeCategoryPages(stories) {
       '<script src="../../assets/js/category-ticker.js" defer></script>\n' +
       '<script src="../../assets/js/navigation.js" defer></script>\n' +
       '<script src="../../assets/js/site-components.js" defer></script>\n' +
+      '<script src="../../assets/js/story-promo.js" defer></script>\n' +
       '<script src="../../assets/js/rating-review.js" defer></script>\n' +
       '<script src="../../assets/js/ads.js" defer></script>\n' +
       '</body>\n</html>\n';
