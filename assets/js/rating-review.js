@@ -68,6 +68,7 @@
     var avg = state.ratingSummary ? state.ratingSummary.average : 0;
     var count = state.ratingSummary ? state.ratingSummary.count : 0;
     var myRating = state.myRating || 0;
+    var reactionCount = state.reactionSummary ? state.reactionSummary.count : 0;
 
     var reviewsMarkup = '';
     if (state.reviewsLoading) {
@@ -96,6 +97,15 @@
         '<span class="rr-count">' + (count ? count + (count === 1 ? ' rating' : ' ratings') : 'No ratings yet') + '</span>' +
       '</div>' +
 
+      '<div class="rr-reaction-block">' +
+        '<button type="button" class="rr-reaction-btn' + (state.myReaction ? ' rr-reaction-active' : '') + '" data-role="reaction-btn"' + (state.reacting ? ' disabled' : '') + '>' +
+          '<span aria-hidden="true">' + (state.myReaction ? '❤️' : '🤍') + '</span> ' +
+          (state.myReaction ? 'Recommended' : 'Recommend this story') +
+        '</button>' +
+        '<span class="rr-reaction-count">' + (reactionCount ? 'Recommended by ' + reactionCount + (reactionCount === 1 ? ' reader' : ' readers') : 'Be the first to recommend this') + '</span>' +
+        (state.reactStatus ? '<p class="rr-hint' + (state.reactStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.reactStatus.message) + '</p>' : '') +
+      '</div>' +
+
       '<div class="rr-rate-block">' +
         '<p class="rr-label">' + (myRating ? 'Your rating' : 'Tap to rate') + '</p>' +
         '<div class="rr-stars rr-stars-interactive" data-role="my-stars">' + starsMarkup(myRating, true) + '</div>' +
@@ -118,6 +128,14 @@
       '</form>' +
 
       '<div class="rr-reviews">' + reviewsMarkup + '</div>';
+
+    // Wire the recommend/reaction button
+    var reactionBtn = shell.querySelector('[data-role="reaction-btn"]');
+    if (reactionBtn) {
+      reactionBtn.addEventListener('click', function () {
+        submitReaction(shell, state);
+      });
+    }
 
     // Wire star buttons
     var starsWrap = shell.querySelector('[data-role="my-stars"]');
@@ -153,6 +171,42 @@
       })
       .catch(function () {
         state.ratingSummary = { count: 0, average: 0 };
+        render(shell, state);
+      });
+  }
+
+  function loadReactionSummary(shell, state) {
+    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/reactions')
+      .then(function (data) {
+        state.reactionSummary = data;
+        render(shell, state);
+      })
+      .catch(function () {
+        state.reactionSummary = { count: 0 };
+        render(shell, state);
+      });
+  }
+
+  function submitReaction(shell, state) {
+    if (state.reacting) return;
+    state.reacting = true;
+    state.reactStatus = null;
+    render(shell, state);
+    apiFetch('/api/stories/' + encodeURIComponent(state.storyId) + '/reactions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-anonymous-key': state.anonymousKey },
+      body: JSON.stringify({ anonymousKey: state.anonymousKey }),
+    })
+      .then(function (data) {
+        state.reacting = false;
+        state.myReaction = !!(data && data.reacted);
+        state.reactionSummary = { count: (data && data.count) || 0 };
+        state.reactStatus = { message: state.myReaction ? 'Thanks for recommending!' : 'Removed.', error: false };
+        render(shell, state);
+      })
+      .catch(function (err) {
+        state.reacting = false;
+        state.reactStatus = { message: err.message || 'Could not save that. Try again.', error: true };
         render(shell, state);
       });
   }
@@ -266,6 +320,10 @@
       ratingSummary: null,
       myRating: 0,
       rateStatus: null,
+      reactionSummary: null,
+      myReaction: false,
+      reacting: false,
+      reactStatus: null,
       reviews: [],
       reviewsLoading: true,
       reviewsError: false,
@@ -275,12 +333,43 @@
 
     render(shell, state);
     loadSummary(shell, state);
+    loadReactionSummary(shell, state);
     loadReviews(shell, state);
+  }
+
+  var reactionSummaryMapPromise = null;
+
+  // Same one-request-for-everything pattern as getSummaryMap(), for a
+  // "❤ 12" style badge on listing cards.
+  function getReactionSummaryMap() {
+    if (reactionSummaryMapPromise) return reactionSummaryMapPromise;
+    reactionSummaryMapPromise = apiFetch('/api/reactions/summary')
+      .then(function (data) {
+        var map = {};
+        ((data && data.reactions) || []).forEach(function (row) {
+          map[row.storyId] = { count: Number(row.count) || 0 };
+        });
+        return map;
+      })
+      .catch(function () {
+        return {};
+      });
+    return reactionSummaryMapPromise;
+  }
+
+  // Small inline "❤ 12" badge for a listing card. Returns '' when nobody
+  // has recommended the story yet so untouched cards stay clean.
+  function reactionBadgeHtml(summary) {
+    if (!summary || !summary.count) return '';
+    return '<span class="rr-inline-badge rr-inline-reaction" title="Recommended by ' + summary.count + (summary.count === 1 ? ' reader' : ' readers') + '">' +
+      '<span aria-hidden="true">❤️</span> ' + summary.count + '</span>';
   }
 
   window.NightsRatingReview = {
     mount: mount,
     getSummaryMap: getSummaryMap,
     badgeHtml: badgeHtml,
+    getReactionSummaryMap: getReactionSummaryMap,
+    reactionBadgeHtml: reactionBadgeHtml,
   };
 })();

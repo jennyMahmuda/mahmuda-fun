@@ -28,6 +28,18 @@
     .admin-row-actions a:hover, .admin-row-actions button:hover { color: var(--accent); border-color: var(--accent); }
     .admin-empty { color: var(--text-muted); text-align: center; padding: 40px 0; }
     .admin-gate { max-width: 420px; margin: 0 auto; padding: 100px 16px 60px; text-align: center; }
+    .admin-guide { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; }
+    .admin-guide summary { cursor: pointer; padding: 16px 18px; font-weight: 600; color: var(--text-primary); list-style: none; display: flex; align-items: center; justify-content: space-between; }
+    .admin-guide summary::-webkit-details-marker { display: none; }
+    .admin-guide summary::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+    .admin-guide[open] summary::after { content: '−'; }
+    .admin-guide-body { padding: 0 18px 18px; color: var(--text-secondary); font-size: .92rem; line-height: 1.75; }
+    .admin-guide-body h3 { color: var(--text-primary); font-family: var(--font-display); font-size: 1.05rem; margin: 20px 0 8px; }
+    .admin-guide-body h3:first-child { margin-top: 0; }
+    .admin-guide-body ol, .admin-guide-body ul { margin: 0 0 10px 20px; }
+    .admin-guide-body li { margin-bottom: 6px; }
+    .admin-guide-body code { background: var(--bg-elevated); padding: 1px 6px; border-radius: 4px; font-size: .85em; }
+    .admin-guide-body .admin-guide-note { background: var(--accent-soft); border-radius: var(--radius-sm); padding: 10px 14px; margin: 10px 0; font-size: .88rem; }
   </style>
 </head>
 <body>
@@ -72,6 +84,56 @@
         '</div>';
     }
 
+    // Full A-to-Z walkthrough, right here on the page instead of only in
+    // a repo doc — closed by default so it doesn't crowd the story list,
+    // but always one click away.
+    function adminGuideHtml() {
+      return '<details class="admin-guide">' +
+        '<summary>📖 কিভাবে নতুন Story লিখবেন / Image, Video যোগ করবেন — সম্পূর্ণ গাইড (A to Z)</summary>' +
+        '<div class="admin-guide-body">' +
+
+          '<h3>১. নতুন Story শুরু করা</h3>' +
+          '<ol>' +
+            '<li>উপরে <strong>"+ New story"</strong>-এ ক্লিক করুন।</li>' +
+            '<li><strong>Story ID</strong> — এটাই গল্পের ঠিকানার (URL) অংশ হবে, তাই শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা, আর <code>-</code>/<code>_</code> ব্যবহার করুন (যেমন: <code>rainy-night-part1</code>)। একবার Save করার পর এটা আর বদলানো যাবে না, তাই ভেবেচিন্তে দিন।</li>' +
+            '<li><strong>Title</strong> — গল্পের আসল শিরোনাম, যা reader-রা দেখবে (যেমন: <code>বৃষ্টির রাতে – পর্ব ১</code>)।</li>' +
+            '<li><strong>Excerpt</strong> — ২-৩ লাইনের ছোট preview, যেটা card/feed-এ দেখা যায়। পুরো গল্প বলে দেবেন না, curiosity রাখুন।</li>' +
+            '<li><strong>Category</strong> — একটা শব্দ/phrase (যেমন: <code>Forbidden</code>)। <strong>Tags</strong> — কমা (,) দিয়ে আলাদা করে একাধিক ট্যাগ দিন (যেমন: <code>Romance, Bhabi, Neighbor</code>)।</li>' +
+            '<li><strong>Series</strong> ও <strong>Episode</strong> — এটা যদি কোনো সিরিজের একটা পর্ব হয়, তাহলে সিরিজের নাম আর পর্ব নাম্বার দিন (না হলে খালি রাখুন)।</li>' +
+          '</ol>' +
+
+          '<h3>২. গল্পের লেখা (Story text)</h3>' +
+          '<p>নিচের বড় বক্সে সরাসরি বাংলা/ইংরেজিতে গল্প লিখুন। কিছু সাধারণ নিয়ম:</p>' +
+          '<ul>' +
+            '<li>দুইটা প্যারাগ্রাফের মাঝে একটা <strong>ফাঁকা লাইন (blank line)</strong> রাখুন — এটাই নতুন প্যারাগ্রাফ বোঝায়।</li>' +
+            '<li>heading/উপশিরোনাম দিতে চাইলে লাইনের শুরুতে <code># </code> বা <code>## </code> লিখুন।</li>' +
+            '<li>গল্পের মাঝে অতিরিক্ত ছবি বসাতে চাইলে (cover ছাড়াও) লিখুন: <code>![বিবরণ](ছবির-লিংক)</code></li>' +
+          '</ul>' +
+
+          '<h3>৩. Image (ছবি) কিভাবে যোগ করবেন</h3>' +
+          '<p>এখন সরাসরি এই পেজ থেকে ছবি আপলোড করার সুবিধা নেই — ছবি আগে GitHub repository-তে রাখতে হবে, তারপর সেই ছবির path/link এখানে <strong>Cover image URL</strong> field-এ বসাতে হবে:</p>' +
+          '<ol>' +
+            '<li>GitHub-এ repository খুলুন → <code>assets/images/</code> folder-এ যান (অথবা সেখানে নতুন কোনো folder বানান, যেমন <code>assets/images/story-covers/</code>)।</li>' +
+            '<li><strong>Add file → Upload files</strong> ক্লিক করে আপনার ছবি upload করুন এবং commit করুন।</li>' +
+            '<li>Upload হয়ে যাওয়ার পর ছবির উপর ক্লিক করে ঠিকানা (path) দেখুন — যেমন <code>assets/images/story-covers/my-photo.jpg</code>।</li>' +
+            '<li>ঠিক এই path-টা কপি করে এই ফর্মের <strong>Cover image URL</strong> field-এ বসান।</li>' +
+          '</ol>' +
+          '<div class="admin-guide-note">আপনি আগেও ঠিক এইভাবেই কিছু ছবি (hero, category background) সরাসরি GitHub-এ upload করেছেন — একই পদ্ধতি, শুধু path-টা এখন এই form-এ বসাতে হবে।</div>' +
+
+          '<h3>৪. Video / Audio কিভাবে যোগ করবেন</h3>' +
+          '<p>একইভাবে — video/audio file আগে GitHub-এ (অথবা যেকোনো hosting-এ, যেমন YouTube/Cloudflare Stream) upload করে তার সরাসরি link নিয়ে <strong>Video URL</strong> বা <strong>Audio URL</strong> field-এ বসান। <code>.mp4</code>/<code>.webm</code> (video) এবং <code>.mp3</code>/<code>.m4a</code> (audio) ফাইল সরাসরি কাজ করবে।</p>' +
+
+          '<h3>৫. Save এবং Publish</h3>' +
+          '<ul>' +
+            '<li><strong>Save draft</strong> — শুধু draft হিসেবে জমা থাকবে, live হবে না। পরে এসে edit করা যাবে।</li>' +
+            '<li><strong>Save &amp; publish</strong> — draft save হওয়ার সাথে সাথে publish-ও হয়ে যাবে। এরপর প্রায় ২০ মিনিটের মধ্যে (অথবা GitHub Actions থেকে "Sync admin-submitted stories" workflow manually চালালে সাথে সাথেই) গল্পটা আসল website-এ live হয়ে যাবে।</li>' +
+            '<li>একবার live হয়ে যাওয়ার পর এই panel থেকে edit করলে শুধু draft record বদলাবে, আসল live page বদলাতে <code>story-post/&lt;id&gt;.md</code> ফাইল সরাসরি GitHub-এ edit করতে হবে — ইচ্ছাকৃতভাবে এমন রাখা হয়েছে, যাতে হাতে ঠিক করা কোনো লেখা ভুলবশত মুছে না যায়।</li>' +
+          '</ul>' +
+
+        '</div>' +
+      '</details>';
+    }
+
     function statusBadge(story) {
       if (story.status === 'draft') return '<span class="admin-badge draft">Draft</span>';
       if (story.syncedAt) return '<span class="admin-badge live">Live</span>';
@@ -101,6 +163,7 @@
             '<h1>Content Manager</h1>' +
             '<a class="rr-submit" style="text-decoration:none;" href="story.html">+ New story</a>' +
           '</div>' +
+          adminGuideHtml() +
           '<p class="rr-hint" style="margin-bottom:18px;">Stories you publish here are written as real story-post files and go live automatically within about 20 minutes (or trigger the "Sync admin-submitted stories" GitHub Action manually for right away). Editing a story after it has gone live needs to be done in the repo directly — this panel writes the file once, it does not keep overwriting it.</p>' +
           '<div class="admin-list">' + rowsHtml + '</div>' +
         '</div>';
