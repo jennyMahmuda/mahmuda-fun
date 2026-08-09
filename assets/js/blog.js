@@ -791,7 +791,10 @@
       if (story) {
         expandedId = null;
         renderFeed();
-        openReader(id, { silent: true });
+        // initialLoad: true — this is the page the browser actually
+        // requested, so gtag's own automatic page_view already covers
+        // it; sending a second one here would double-count the view.
+        openReader(id, { silent: true, initialLoad: true });
       }
     }
   }
@@ -804,6 +807,22 @@
     var story = allStories.find(function (s) { return s.id === id; });
     if (!story) return;
     currentStoryId = id;
+    // gtag's automatic page_view only ever fires for whatever URL the
+    // browser actually loaded — a story opened from the home feed via
+    // this SPA's history.pushState(), or reached via back/forward
+    // (popstate), is otherwise invisible to GA4, which starves the
+    // server-side "Trending" section (GET /api/analytics/top-content) of
+    // the very data it's supposed to read. Skipped only for the initial
+    // deep-link open (?story=… on first page load), since gtag's own
+    // automatic page_view already covers that exact URL — sending a
+    // second one here would double-count the view.
+    if (!options.initialLoad && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_location: window.location.href,
+        page_path: window.location.pathname + window.location.search,
+        page_title: story.title,
+      });
+    }
     var content = await ensureContent(id);
     updateSeoForStory(story);
     updateStoryStructuredData(story);
