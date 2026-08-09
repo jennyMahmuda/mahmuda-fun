@@ -16,6 +16,12 @@
     .admin-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
     .admin-head h1 { font-family: var(--font-display); font-size: 1.6rem; margin: 0; }
     .admin-list { display: flex; flex-direction: column; gap: 10px; }
+    .admin-search {
+      display: block; width: 100%; box-sizing: border-box; font: inherit; font-size: .9rem;
+      padding: 10px 14px; margin: 16px 0 18px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text-primary);
+    }
+    .admin-search:focus { outline: none; border-color: var(--accent); }
     .admin-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; align-items: center; gap: 14px; justify-content: space-between; }
     .admin-row-title { font-weight: 600; color: var(--text-primary); }
     .admin-row-meta { font-size: .8rem; color: var(--text-muted); margin-top: 3px; }
@@ -150,7 +156,8 @@
           '<div class="admin-guide-note">আপনি আগেও ঠিক এইভাবেই কিছু ছবি (hero, category background) সরাসরি GitHub-এ upload করেছেন — একই পদ্ধতি, শুধু path-টা এখন এই form-এ বসাতে হবে।</div>' +
 
           '<h3>৪. Video / Audio কিভাবে যোগ করবেন</h3>' +
-          '<p>একইভাবে — video/audio file আগে GitHub-এ (অথবা যেকোনো hosting-এ, যেমন YouTube/Cloudflare Stream) upload করে তার সরাসরি link নিয়ে <strong>Video URL</strong> বা <strong>Audio URL</strong> field-এ বসান। <code>.mp4</code>/<code>.webm</code> (video) এবং <code>.mp3</code>/<code>.m4a</code> (audio) ফাইল সরাসরি কাজ করবে।</p>' +
+          '<p>একইভাবে — video/audio file আগে GitHub-এ (অথবা যেকোনো hosting-এ, যেমন YouTube/Cloudflare Stream) upload করে তার সরাসরি link নিয়ে <strong>Video URL</strong> বা <strong>Audio URL</strong> field-এ বসান। <code>.mp4</code>/<code>.webm</code> (video) এবং <code>.mp3</code>/<code>.m4a</code> (audio) ফাইল সরাসরি কাজ করবে — YouTube/Facebook-এর মতো embed/page link কাজ করবে না, ফাইলের সরাসরি link লাগবে।</p>' +
+          '<div class="admin-guide-note">এটা এই Video URL/Cover image URL-এর চেয়েও জরুরি: গল্পের ওপরে <strong>Content type</strong> dropdown-টাও ঠিকমতো বসান (Video / Image gallery)। <code>/video/</code> আর <code>/gellery/</code> page দুটো ঠিক এই field অনুযায়ী গল্প দেখায় — শুধু Video URL/Cover URL বসিয়ে Content type "Story (text)"-ই রেখে দিলে গল্পটা ঐ page-এ দেখা যাবে না।</div>' +
 
           '<h3>৫. Save এবং Publish</h3>' +
           '<ul>' +
@@ -169,22 +176,46 @@
       return '<span class="admin-badge published">Publishing…</span>';
     }
 
+    function storyRowHtml(s) {
+      return '<div class="admin-row">' +
+        '<div>' +
+          '<div class="admin-row-title">' + escapeHtml(s.title) + ' ' + statusBadge(s) + '</div>' +
+          '<div class="admin-row-meta">' + escapeHtml(s.id) + ' · ' + escapeHtml(s.category) +
+            (s.updatedAt ? ' · updated ' + escapeHtml(s.updatedAt) : '') +
+            (s.status === 'published' && !s.syncedAt ? ' · syncs to the live site automatically within ~20 min' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="admin-row-actions">' +
+          '<a href="story.html?id=' + encodeURIComponent(s.id) + '">Edit</a>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function filterStories(stories, query) {
+      var q = query.trim().toLowerCase();
+      if (!q) return stories;
+      return stories.filter(function (s) {
+        return (s.title || '').toLowerCase().indexOf(q) !== -1 ||
+          (s.id || '').toLowerCase().indexOf(q) !== -1 ||
+          (s.category || '').toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    function renderStoryRows(stories, query) {
+      var list = document.getElementById('adminStoriesSection');
+      if (!list) return;
+      var filtered = filterStories(stories, query || '');
+      if (!stories.length) {
+        list.innerHTML = '<p class="admin-empty">No stories yet. Create your first one.</p>';
+      } else if (!filtered.length) {
+        list.innerHTML = '<p class="admin-empty">No stories match "' + escapeHtml(query) + '".</p>';
+      } else {
+        list.innerHTML = filtered.map(storyRowHtml).join('');
+      }
+    }
+
     function renderList(stories) {
       var main = document.getElementById('adminMain');
-      var rowsHtml = stories.length ? stories.map(function (s) {
-        return '<div class="admin-row">' +
-          '<div>' +
-            '<div class="admin-row-title">' + escapeHtml(s.title) + ' ' + statusBadge(s) + '</div>' +
-            '<div class="admin-row-meta">' + escapeHtml(s.id) + ' · ' + escapeHtml(s.category) +
-              (s.updatedAt ? ' · updated ' + escapeHtml(s.updatedAt) : '') +
-              (s.status === 'published' && !s.syncedAt ? ' · syncs to the live site automatically within ~20 min' : '') +
-            '</div>' +
-          '</div>' +
-          '<div class="admin-row-actions">' +
-            '<a href="story.html?id=' + encodeURIComponent(s.id) + '">Edit</a>' +
-          '</div>' +
-        '</div>';
-      }).join('') : '<p class="admin-empty">No stories yet. Create your first one.</p>';
 
       main.innerHTML =
         '<div class="admin-wrap">' +
@@ -198,13 +229,21 @@
             '<a href="#adminNewsletterSection">✉️ Subscribers</a>' +
             '<a href="#adminAnalyticsSection">📊 Analytics</a>' +
           '</nav>' +
+          '<input type="search" id="storySearch" class="admin-search" placeholder="Search stories by title, id, or category…" aria-label="Search stories" />' +
           adminGuideHtml() +
           '<p class="rr-hint" style="margin-bottom:18px;">Stories you publish here are written as real story-post files and go live automatically within about 20 minutes (or trigger the "Sync admin-submitted stories" GitHub Action manually for right away). Editing a story after it has gone live needs to be done in the repo directly — this panel writes the file once, it does not keep overwriting it.</p>' +
-          '<div id="adminStoriesSection" class="admin-list">' + rowsHtml + '</div>' +
+          '<div id="adminStoriesSection" class="admin-list"></div>' +
           '<div id="adminReviewsSection"></div>' +
           '<div id="adminNewsletterSection"></div>' +
           '<div id="adminAnalyticsSection"></div>' +
         '</div>';
+      renderStoryRows(stories, '');
+      var searchInput = document.getElementById('storySearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          renderStoryRows(stories, searchInput.value);
+        });
+      }
       loadReviews();
       loadNewsletter();
       loadAnalytics();
@@ -343,14 +382,42 @@
       }).join('');
 
       section.innerHTML =
-        '<div class="admin-section-head"><h2>Story performance</h2><span class="admin-row-meta">' + rows.length + ' stories</span></div>' +
+        '<div class="admin-section-head">' +
+          '<h2>Story performance</h2>' +
+          '<div class="admin-section-actions">' +
+            '<span class="admin-row-meta">' + rows.length + ' stories</span>' +
+            '<button type="button" id="checkGa4Btn">Check GA4 connection</button>' +
+          '</div>' +
+        '</div>' +
         (ga4Available ? '' : '<p class="rr-hint" style="margin-bottom:10px;">Views (28d) needs Google Analytics credentials configured on the Worker — see cloudflare/README.md. Ratings and recommends below are live either way.</p>') +
+        '<p class="rr-hint" id="ga4StatusMsg" style="margin-bottom:10px;"></p>' +
         (rows.length
           ? '<div class="admin-table-wrap"><table class="admin-table">' +
               '<thead><tr><th>Story</th><th>Rating</th><th>Recommends</th><th>Views (28d)</th></tr></thead>' +
               '<tbody>' + rowsHtml + '</tbody>' +
             '</table></div>'
           : '<p class="admin-empty">No published stories yet.</p>');
+
+      var checkBtn = document.getElementById('checkGa4Btn');
+      var statusMsg = document.getElementById('ga4StatusMsg');
+      if (checkBtn) {
+        checkBtn.addEventListener('click', function () {
+          checkBtn.disabled = true;
+          checkBtn.textContent = 'Checking…';
+          statusMsg.className = 'rr-hint';
+          statusMsg.textContent = 'Calling Google Analytics live (bypassing every cache) — this can take a few seconds…';
+          window.NightsAuth.adminGa4Status().then(function (data) {
+            statusMsg.className = 'rr-hint ' + (data.ok ? 'rr-success' : 'rr-error');
+            statusMsg.textContent = (data.ok ? '✅ ' : '❌ [' + data.stage + '] ') + data.message;
+          }).catch(function (err) {
+            statusMsg.className = 'rr-hint rr-error';
+            statusMsg.textContent = 'Could not run the check: ' + (err.message || 'unknown error');
+          }).finally(function () {
+            checkBtn.disabled = false;
+            checkBtn.textContent = 'Check GA4 connection';
+          });
+        });
+      }
     }
 
     function loadAnalytics() {

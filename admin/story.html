@@ -91,8 +91,15 @@
               '<label class="rr-field"><span>Tags (comma separated)</span><input type="text" name="tags" value="' + escapeHtml(existing && existing.tags ? existing.tags.join(', ') : '') + '"></label>' +
               '<label class="rr-field"><span>Series (optional)</span><input type="text" name="series" maxlength="120" value="' + escapeHtml(existing && existing.series ? existing.series : '') + '"></label>' +
               '<label class="rr-field"><span>Episode number (optional)</span><input type="number" name="episode" min="1" value="' + (existing && existing.episode ? existing.episode : '') + '"></label>' +
+              '<label class="rr-field"><span>Content type</span><select name="contentType">' +
+                '<option value="text"' + (!existing || existing.contentType === 'text' ? ' selected' : '') + '>Story (text)</option>' +
+                '<option value="video"' + (existing && existing.contentType === 'video' ? ' selected' : '') + '>Video</option>' +
+                '<option value="image"' + (existing && existing.contentType === 'image' ? ' selected' : '') + '>Image gallery</option>' +
+              '</select>' +
+              '<span class="rr-hint" style="margin-top:4px;">Video → shows on /video/. Image gallery → shows on /gellery/. This is what those pages actually filter by — filling in a Video/Cover URL below without setting this here will not make it appear there.</span>' +
+              '</label>' +
               '<label class="rr-field"><span>Cover image URL (optional)</span><input type="text" name="coverUrl" value="' + escapeHtml(existing && existing.coverUrl ? existing.coverUrl : '') + '"></label>' +
-              '<label class="rr-field"><span>Video URL (optional)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"></label>' +
+              '<label class="rr-field"><span>Video URL (optional — required if Content type is Video; must be a direct file link, e.g. ending .mp4/.webm, not a YouTube page)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"></label>' +
               '<label class="rr-field"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
               '<label class="rr-checkbox"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
               '<label class="rr-field full"><span>Story text — plain paragraphs (blank line = new paragraph). # / ## for headings, ![alt](url) for images.</span>' +
@@ -121,6 +128,15 @@
           status.innerHTML = '<p class="rr-hint rr-error">Story ID must be letters, numbers, - or _ only.</p>';
           return;
         }
+        var contentTypeVal = String(fd.get('contentType') || 'text');
+        if (contentTypeVal === 'video' && !String(fd.get('videoUrl') || '').trim()) {
+          status.innerHTML = '<p class="rr-hint rr-error">Content type is "Video" but the Video URL field is empty — fill it in, or switch Content type back to "Story (text)".</p>';
+          return;
+        }
+        if (contentTypeVal === 'image' && !String(fd.get('coverUrl') || '').trim()) {
+          status.innerHTML = '<p class="rr-hint rr-error">Content type is "Image gallery" but the Cover image URL field is empty — fill it in, or switch Content type back to "Story (text)".</p>';
+          return;
+        }
         var payload = {
           id: id,
           title: String(fd.get('title') || '').trim(),
@@ -130,6 +146,7 @@
           tags: String(fd.get('tags') || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean),
           series: String(fd.get('series') || '').trim() || null,
           episode: fd.get('episode') ? Number(fd.get('episode')) : null,
+          contentType: String(fd.get('contentType') || 'text'),
           coverUrl: String(fd.get('coverUrl') || '').trim() || null,
           videoUrl: String(fd.get('videoUrl') || '').trim() || null,
           audioUrl: String(fd.get('audioUrl') || '').trim() || null,

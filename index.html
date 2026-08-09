@@ -1444,6 +1444,36 @@
       </div>
 
 
+      <div class="sc-footer-review">
+
+        <h4>Rate your experience</h4>
+        <p class="sc-footer-review-sub">Tell other readers what you think of SecretChapters — it shows above, in "What readers are saying".</p>
+
+        <form class="footer-review-form" id="siteReviewForm">
+
+          <div class="rr-stars rr-stars-interactive" data-role="site-review-stars">
+            <button type="button" class="rr-star" data-star="1" aria-label="Rate 1 out of 5"><span aria-hidden="true">☆</span></button>
+            <button type="button" class="rr-star" data-star="2" aria-label="Rate 2 out of 5"><span aria-hidden="true">☆</span></button>
+            <button type="button" class="rr-star" data-star="3" aria-label="Rate 3 out of 5"><span aria-hidden="true">☆</span></button>
+            <button type="button" class="rr-star" data-star="4" aria-label="Rate 4 out of 5"><span aria-hidden="true">☆</span></button>
+            <button type="button" class="rr-star" data-star="5" aria-label="Rate 5 out of 5"><span aria-hidden="true">☆</span></button>
+          </div>
+
+          <div class="footer-review-row">
+            <input type="text" name="name" placeholder="Name (optional)" maxlength="80" autocomplete="name" aria-label="Name" />
+            <input type="email" name="email" placeholder="Email (optional)" maxlength="254" autocomplete="email" aria-label="Email" />
+          </div>
+
+          <textarea name="experience" rows="2" maxlength="1000" minlength="2" placeholder="Your reader experience…" required aria-label="Your reader experience"></textarea>
+
+          <button type="submit">Submit review</button>
+          <p class="rr-hint" id="siteReviewStatus"></p>
+
+        </form>
+
+      </div>
+
+
       <div class="sc-footer-bottom">
 
         <span>
@@ -1530,6 +1560,10 @@
   ></script>
   <script
     src="assets/js/site-reviews-marquee.js"
+    defer
+  ></script>
+  <script
+    src="assets/js/site-review-footer.js"
     defer
   ></script>
 

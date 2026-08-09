@@ -593,6 +593,112 @@ async function getTopContent(env) {
   return fresh;
 }
 
+// ---------- admin: GA4 connection diagnostic ----------
+// getGoogleAccessToken()/fetchTopContentFromGa4() above deliberately
+// swallow every failure into null/[] — that's the right behavior for a
+// page render (fail quiet, show nothing), but it means "Trending is
+// empty" is genuinely ambiguous from the outside: no credentials? a bad
+// private key? a Google API error? a real zero (no story pageviews in
+// GA4 yet)? Those are four different fixes. This repeats the same two
+// live calls (bypassing every cache, unlike the real path) and reports
+// exactly which stage it got to, so that question has a real answer
+// instead of a guess — without ever returning the private key or token.
+async function diagnoseGa4(env) {
+  if (!env.GOOGLE_CLIENT_EMAIL || !env.GOOGLE_PRIVATE_KEY) {
+    return { ok: false, stage: 'credentials', message: 'GOOGLE_CLIENT_EMAIL and/or GOOGLE_PRIVATE_KEY are not set on the Worker — add them as repo secrets and re-run "Deploy Cloudflare Worker".' };
+  }
+  if (!env.GA_PROPERTY_ID) {
+    return { ok: false, stage: 'credentials', message: 'GA_PROPERTY_ID is not set on the Worker — add it as a repo secret (GA4 Admin → Property Settings → Property ID, a plain number) and re-run "Deploy Cloudflare Worker".' };
+  }
+
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const claims = {
+    iss: env.GOOGLE_CLIENT_EMAIL,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now + 3600,
+    iat: now,
+  };
+  const signingInput = base64UrlEncodeString(JSON.stringify(header)) + '.' + base64UrlEncodeString(JSON.stringify(claims));
+
+  let accessToken;
+  try {
+    const keyBuf = pemToArrayBuffer(env.GOOGLE_PRIVATE_KEY);
+    const cryptoKey = await crypto.subtle.importKey('pkcs8', keyBuf, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+    const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, new TextEncoder().encode(signingInput));
+    const jwt = signingInput + '.' + base64UrlEncodeBytes(signature);
+
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=' + encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer') + '&assertion=' + encodeURIComponent(jwt),
+    });
+    if (!tokenRes.ok) {
+      const bodyText = await tokenRes.text().catch(() => '');
+      let reason = bodyText;
+      try { reason = JSON.parse(bodyText).error_description || JSON.parse(bodyText).error || bodyText; } catch {}
+      return {
+        ok: false, stage: 'token',
+        message: 'Google rejected the service-account credentials (HTTP ' + tokenRes.status + '): ' + String(reason).slice(0, 300) +
+          '. Usually means GOOGLE_PRIVATE_KEY is malformed/truncated, or GOOGLE_CLIENT_EMAIL does not match the key.',
+      };
+    }
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      return { ok: false, stage: 'token', message: 'Google returned no access_token for these credentials.' };
+    }
+    accessToken = tokenData.access_token;
+  } catch (err) {
+    return { ok: false, stage: 'token', message: 'Could not sign/exchange the service-account JWT: ' + (err && err.message ? err.message : 'unknown error') + '. Usually means GOOGLE_PRIVATE_KEY is not a valid PKCS8 PEM key.' };
+  }
+
+  const propertyId = String(env.GA_PROPERTY_ID).replace(/^properties\//, '');
+  try {
+    const res = await fetch('https://analyticsdata.googleapis.com/v1beta/properties/' + propertyId + ':runReport', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + accessToken, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: '28daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'pagePath' }],
+        metrics: [{ name: 'screenPageViews' }],
+        orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+        limit: 25,
+      }),
+    });
+    if (!res.ok) {
+      const bodyText = await res.text().catch(() => '');
+      let reason = bodyText;
+      try { reason = JSON.parse(bodyText).error?.message || bodyText; } catch {}
+      return {
+        ok: false, stage: 'api', message: 'Token exchange succeeded, but the GA4 Data API call failed (HTTP ' + res.status + '): ' + String(reason).slice(0, 300) +
+          '. Usually means GA_PROPERTY_ID is wrong, or the service account (' + env.GOOGLE_CLIENT_EMAIL + ') was never added as a Viewer on that GA4 property.',
+      };
+    }
+    const data = await res.json();
+    const rows = data.rows || [];
+    const storyRows = rows.filter((row) => row.dimensionValues && row.dimensionValues[0] && /[?&]story=/.test(row.dimensionValues[0].value || ''));
+    if (!storyRows.length) {
+      return {
+        ok: true, stage: 'data', rows: 0,
+        message: rows.length
+          ? 'Connected — GA4 returned ' + rows.length + ' page(s) with views, but none were story reader URLs (?story=...) in the last 28 days yet.'
+          : 'Connected — GA4 returned no pageview data at all for the last 28 days yet (a brand-new property, or the cookie-consent banner is being rejected by most visitors, both suppress this).',
+      };
+    }
+    return { ok: true, stage: 'data', rows: storyRows.length, message: 'Connected — ' + storyRows.length + ' story page(s) with real GA4 pageviews in the last 28 days.' };
+  } catch (err) {
+    return { ok: false, stage: 'api', message: 'Token exchange succeeded, but the GA4 Data API request itself failed: ' + (err && err.message ? err.message : 'unknown error') };
+  }
+}
+
+async function handleGa4Status(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const result = await diagnoseGa4(env);
+  return json(result, 200, corsHeaders(origin));
+}
+
 async function handleTopContent(request, env, origin) {
   if (!origin && request.headers.get('Origin')) return json({ error: 'Origin not allowed' }, 403);
   const topContent = await getTopContent(env);
@@ -726,10 +832,15 @@ function adminStoryRowToJson(row) {
     id: row.id, title: row.title, excerpt: row.excerpt, content: row.content,
     category: row.category, tags, series: row.series || null,
     episode: row.episode || null, language: row.language,
+    contentType: row.content_type || 'text',
     coverUrl: row.cover_url || null, videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
     exclusive: !!row.exclusive, status: row.status,
     createdAt: row.created_at, updatedAt: row.updated_at, syncedAt: row.synced_at || null,
   };
+}
+
+function validContentType(value) {
+  return value === 'text' || value === 'video' || value === 'image';
 }
 
 async function handleAdminListStories(request, env, origin) {
@@ -752,6 +863,7 @@ function validateAdminStoryBody(body) {
   if (!validAdminMediaRef(body?.coverUrl)) return 'Cover image reference is invalid';
   if (!validAdminMediaRef(body?.videoUrl)) return 'Video reference is invalid';
   if (!validAdminMediaRef(body?.audioUrl)) return 'Audio reference is invalid';
+  if (body?.contentType !== undefined && !validContentType(body.contentType)) return 'Content type must be text, video, or image';
   if (body?.series !== undefined && body.series !== null && (typeof body.series !== 'string' || body.series.length > 120)) return 'Series name is too long';
   if (body?.episode !== undefined && body.episode !== null && !(Number.isInteger(body.episode) && body.episode > 0 && body.episode < 10000)) return 'Episode must be a positive whole number';
   return null;
@@ -768,12 +880,12 @@ async function handleAdminCreateStory(request, env, origin) {
   if (existing) return json({ error: 'A story with this id already exists — use the update endpoint instead' }, 409, corsHeaders(origin));
 
   await env.REVIEWS_DB.prepare(
-    `INSERT INTO admin_stories (id, title, excerpt, content, category, tags, series, episode, cover_url, video_url, audio_url, exclusive, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
+    `INSERT INTO admin_stories (id, title, excerpt, content, category, tags, series, episode, content_type, cover_url, video_url, audio_url, exclusive, status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
   ).bind(
     body.id, body.title.trim(), body.excerpt.trim(), body.content,
     body.category.trim(), JSON.stringify(body.tags || []), body.series || null, body.episode || null,
-    body.coverUrl || null, body.videoUrl || null, body.audioUrl || null, body.exclusive ? 1 : 0, admin.userId
+    body.contentType || 'text', body.coverUrl || null, body.videoUrl || null, body.audioUrl || null, body.exclusive ? 1 : 0, admin.userId
   ).run();
   return json({ ok: true, id: body.id }, 201, corsHeaders(origin));
 }
@@ -792,11 +904,11 @@ async function handleAdminUpdateStory(request, env, origin, storyId) {
 
   await env.REVIEWS_DB.prepare(
     `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, tags = ?, series = ?, episode = ?,
-     cover_url = ?, video_url = ?, audio_url = ?, exclusive = ?, updated_at = datetime('now')
+     content_type = ?, cover_url = ?, video_url = ?, audio_url = ?, exclusive = ?, updated_at = datetime('now')
      WHERE id = ?`
   ).bind(
     body.title.trim(), body.excerpt.trim(), body.content, body.category.trim(), JSON.stringify(body.tags || []),
-    body.series || null, body.episode || null, body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
+    body.series || null, body.episode || null, body.contentType || 'text', body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
     body.exclusive ? 1 : 0, storyId
   ).run();
   return json({ ok: true, alreadySynced: !!row.synced_at }, 200, corsHeaders(origin));
@@ -904,6 +1016,7 @@ export default {
       return handleAdminModerateReview(request, env, origin, adminReviewAction.reviewId, adminReviewAction.action);
     }
     if (pathname === '/api/admin/newsletter' && request.method === 'GET') return handleAdminListNewsletter(request, env, origin);
+    if (pathname === '/api/admin/ga4-status' && request.method === 'GET') return handleGa4Status(request, env, origin);
 
     // ----- exclusive content -----
     const contentStoryId = routeStoryContent(pathname);

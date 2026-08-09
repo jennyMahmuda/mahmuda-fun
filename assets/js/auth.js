@@ -177,6 +177,15 @@
     return apiFetch('/api/admin/newsletter');
   }
 
+  // ---- Admin GA4 connection diagnostic ----
+  // A live (uncached) check of the Trending/Analytics Google Analytics
+  // pipeline — reports exactly which stage failed (credentials/token
+  // exchange/API call) instead of the silent-empty result every reader
+  // sees when it isn't wired up yet.
+  function adminGa4Status() {
+    return apiFetch('/api/admin/ga4-status');
+  }
+
   // Updates the shared #navAccountLink / #navAccountLabel present on every
   // page's nav (points at /account/ either way — that page itself shows a
   // login form or an account summary depending on session state).
@@ -212,5 +221,6 @@
     adminListReviews: adminListReviews,
     adminModerateReview: adminModerateReview,
     adminListNewsletter: adminListNewsletter,
+    adminGa4Status: adminGa4Status,
   };
 })();
