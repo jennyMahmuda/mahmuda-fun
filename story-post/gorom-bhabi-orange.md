@@ -9,12 +9,12 @@ date: 2026-08-08
 language: bn
 readTime: 25 min
 author: Mahmudajenny69
-cover: https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg
-images: ["https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg"]
+cover: assets/images/categories/Bhabi-saree.jpg
+images: ["assets/images/categories/Bhabi-saree.jpg"]
 excerpt: জামাই ঢাকার বাইরে। পাশের বাসার ছেলে বাইশ। ভাবি তেত্রিশ। কমলা শাড়ি, গভীর নেকলাইন—এক রাতের টেনশন যেটা আর থামে না।
 ---
 
-![গরম ভাবি](https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg)
+![গরম ভাবি](assets/images/categories/Bhabi-saree.jpg)
 
 জামাই চলে গেছে সকালে।
 

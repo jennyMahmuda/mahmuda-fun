@@ -9,12 +9,12 @@ date: 2026-08-08
 language: bn
 readTime: 40 min
 author: Mahmudajenny69
-cover: https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg
-images: ["https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg"]
+cover: assets/images/categories/Bhabi-saree.jpg
+images: ["assets/images/categories/Bhabi-saree.jpg"]
 excerpt: জামাই কাল সকালে ফিরবে। আজ শেষ রাত। রেহানা দরজা খুলে রেখেছেন—আর অয়নকে বলেছেন, আজকে থামবে না কেউ।
 ---
 
-![গরম ভাবি](https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg)
+![গরম ভাবি](assets/images/categories/Bhabi-saree.jpg)
 
 মেসেজ এসেছিল দুপুরে।
 

@@ -9,12 +9,12 @@ date: 2026-08-08
 language: bn
 readTime: 35 min
 author: Mahmudajenny69
-cover: https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg
-images: ["https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg"]
+cover: assets/images/categories/Bhabi-saree.jpg
+images: ["assets/images/categories/Bhabi-saree.jpg"]
 excerpt: সোফায় ভাবির কোল। কমলা শাড়ি সরে যাচ্ছে। অয়নের হাত কাঁপছে—ভাবি শেখাচ্ছেন কীভাবে ছুঁতে হয়। রাত এখনও শুরুই হয়েছে।
 ---
 
-![গরম ভাবি](https://mahmuda.fun/assets/images/gallery/bhabi-orange-saree.jpg)
+![গরম ভাবি](assets/images/categories/Bhabi-saree.jpg)
 
 সোফায় ভাবির ওজন অয়নের উপর।
 
