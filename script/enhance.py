@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Nights – Image SEO & Enhancement Script
+Hushed Chapters – Image SEO & Enhancement Script
 ---------------------------------------
 • Crops / resizes images to optimal story-card & OpenGraph sizes
 • Compresses for web
@@ -107,7 +107,7 @@ def process_one(src: Path, out_dir: Path, size_key: str = "card", enhance_img: b
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Nights Image SEO & Crop Tool")
+    parser = argparse.ArgumentParser(description="Hushed Chapters Image SEO & Crop Tool")
     parser.add_argument("input", help="Image file or folder")
     parser.add_argument("--out", default="assets/images", help="Output directory")
     parser.add_argument("--size", choices=list(SIZES.keys()), default="card",
@@ -123,7 +123,7 @@ def main():
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\n🖼  Nights Image Enhancer")
+    print(f"\n🖼  Hushed Chapters Image Enhancer")
     print(f"   Output → {out_dir.resolve()}\n")
 
     sizes_to_run = list(SIZES.keys()) if args.all_sizes else [args.size]

@@ -247,6 +247,56 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .series-card-title, .category-card h3 { font-family: var(--font-display); font-size: 1.25rem; color: var(--text-primary); margin-bottom: 8px; }
 
 /* =========================================
+   CATEGORY TICKER (left-to-right auto-scroll strip, below the navbar —
+   never part of <nav class="nav-links">)
+   ========================================= */
+.category-ticker {
+  overflow: hidden; white-space: nowrap; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border); padding: 9px 0;
+  position: sticky; top: var(--nav-h, 70px); z-index: 90;
+}
+.category-ticker-track { display: inline-flex; gap: 10px; animation: category-ticker-scroll 55s linear infinite; }
+.category-ticker:hover .category-ticker-track { animation-play-state: paused; }
+.category-ticker-item {
+  flex-shrink: 0; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary);
+  text-decoration: none; padding: 5px 14px; border-radius: 999px;
+  border: 1px solid var(--border); white-space: nowrap; transition: color var(--transition), border-color var(--transition);
+}
+.category-ticker-item:hover { color: var(--accent); border-color: var(--accent); }
+@keyframes category-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .category-ticker-track { animation: none; padding-left: 0; overflow-x: auto; }
+}
+@media (max-width: 768px) {
+  .category-ticker { top: var(--nav-h, 62px); }
+}
+
+/* =========================================
+   CATEGORY INTRO + THEMED SECTION BACKGROUNDS
+   Deliberately gradient/color-mood based, not photographic — no licensed
+   image source for "category photos", and this site's own DMCA/Content
+   Removal pages commit to not using real people's images without rights.
+   Scoped to .section-header only (via body.cat-theme-*), never the whole
+   page, so story cards below stay on the normal readable background.
+   ========================================= */
+.cat-intro { margin: -8px 0 28px; max-width: 760px; }
+.cat-intro h2 { font-family: var(--font-display); font-size: 1.3rem; color: var(--text-primary); margin-bottom: 8px; }
+.cat-intro p { color: var(--text-secondary); line-height: 1.7; }
+
+.section-header { transition: background var(--transition); border-radius: var(--radius); }
+body.cat-theme-danger .section-header { background: radial-gradient(circle at 20% 0%, rgba(224,122,122,0.18), transparent 65%); }
+body.cat-theme-luxury .section-header { background: radial-gradient(circle at 20% 0%, var(--accent-glow), transparent 65%); }
+body.cat-theme-mystic .section-header { background: radial-gradient(circle at 20% 0%, rgba(155,120,224,0.18), transparent 65%); }
+body.cat-theme-rose .section-header { background: radial-gradient(circle at 20% 0%, rgba(224,122,170,0.18), transparent 65%); }
+body.cat-theme-earthy .section-header { background: radial-gradient(circle at 20% 0%, rgba(196,148,90,0.18), transparent 65%); }
+body.cat-theme-warm .section-header { background: radial-gradient(circle at 20% 0%, rgba(224,180,110,0.16), transparent 65%); }
+body.cat-theme-accent .section-header { background: radial-gradient(circle at 20% 0%, var(--accent-soft), transparent 65%); }
+[class*="cat-theme-"] .section-header { padding: 20px 20px 4px; margin: -20px -20px 0; }
+
+/* =========================================
    FOOTER
    ========================================= */
 .footer { border-top: 1px solid var(--border); padding: 60px 0 40px; background: var(--bg-secondary); }

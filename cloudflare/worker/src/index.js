@@ -82,6 +82,30 @@ async function readJson(request) {
 
 // ---------- crypto helpers ----------
 
+function base64UrlEncodeString(str) {
+  return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64UrlEncodeBytes(bytes) {
+  let binary = '';
+  const arr = new Uint8Array(bytes);
+  for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i]);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// Accepts a PEM private key either with real newlines or with literal
+// "\n" escape sequences (common when pasting a multi-line PEM into a
+// single-line secret store), strips the PEM header/footer, and returns
+// the raw PKCS8 key bytes for crypto.subtle.importKey.
+function pemToArrayBuffer(pem) {
+  const normalized = String(pem || '').replace(/\\n/g, '\n');
+  const b64 = normalized.replace(/-----BEGIN [^-]+-----/, '').replace(/-----END [^-]+-----/, '').replace(/\s+/g, '');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
 function bufToHex(buf) {
   return Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
@@ -392,6 +416,129 @@ async function handleResetPassword(request, env, origin) {
   return json({ ok: true }, 200, corsHeaders(origin));
 }
 
+// ---------- generic D1 cache (Google OAuth token, GA4 top-content result) ----------
+
+async function cacheGet(env, key) {
+  const row = await env.REVIEWS_DB.prepare(
+    "SELECT value_json AS v FROM analytics_cache WHERE cache_key = ? AND expires_at > datetime('now')"
+  ).bind(key).first();
+  if (!row) return null;
+  try { return JSON.parse(row.v); } catch { return null; }
+}
+
+async function cacheSet(env, key, value, ttlSeconds) {
+  await env.REVIEWS_DB.prepare(
+    `INSERT INTO analytics_cache (cache_key, value_json, expires_at, updated_at)
+     VALUES (?, ?, datetime('now', '+' || ? || ' seconds'), datetime('now'))
+     ON CONFLICT(cache_key) DO UPDATE SET value_json = excluded.value_json, expires_at = excluded.expires_at, updated_at = excluded.updated_at`
+  ).bind(key, JSON.stringify(value), ttlSeconds).run();
+}
+
+// ---------- Google Analytics Data API (GA4) — "Trending" content ----------
+// Server-side only: uses a Google service account (GOOGLE_CLIENT_EMAIL +
+// GOOGLE_PRIVATE_KEY, both Worker secrets — never referenced from any
+// frontend file) to sign a JWT, exchange it for an OAuth access token,
+// then call the GA4 Data API for the most-viewed story pages. Both the
+// access token and the report result are cached in D1 so a page view
+// never triggers a live Google call — only a cache read, refreshed at
+// most once an hour.
+
+async function getGoogleAccessToken(env) {
+  if (!env.GOOGLE_CLIENT_EMAIL || !env.GOOGLE_PRIVATE_KEY) return null;
+  const cached = await cacheGet(env, 'google_access_token');
+  if (cached && cached.token) return cached.token;
+
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const claims = {
+    iss: env.GOOGLE_CLIENT_EMAIL,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now + 3600,
+    iat: now,
+  };
+  const signingInput = base64UrlEncodeString(JSON.stringify(header)) + '.' + base64UrlEncodeString(JSON.stringify(claims));
+
+  let accessToken = null;
+  try {
+    const keyBuf = pemToArrayBuffer(env.GOOGLE_PRIVATE_KEY);
+    const cryptoKey = await crypto.subtle.importKey('pkcs8', keyBuf, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+    const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, new TextEncoder().encode(signingInput));
+    const jwt = signingInput + '.' + base64UrlEncodeBytes(signature);
+
+    const res = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=' + encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer') + '&assertion=' + encodeURIComponent(jwt),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.access_token) {
+        accessToken = data.access_token;
+        // Refresh a minute before actual expiry, never past it.
+        await cacheSet(env, 'google_access_token', { token: accessToken }, Math.max(60, (data.expires_in || 3600) - 60));
+      }
+    }
+  } catch {
+    return null;
+  }
+  return accessToken;
+}
+
+async function fetchTopContentFromGa4(env) {
+  const accessToken = await getGoogleAccessToken(env);
+  if (!accessToken || !env.GA_PROPERTY_ID) return [];
+  const propertyId = String(env.GA_PROPERTY_ID).replace(/^properties\//, '');
+
+  try {
+    const res = await fetch('https://analyticsdata.googleapis.com/v1beta/properties/' + propertyId + ':runReport', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + accessToken, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: '28daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'pagePath' }],
+        metrics: [{ name: 'screenPageViews' }],
+        orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+        limit: 25,
+      }),
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const rows = data.rows || [];
+    const seen = {};
+    const out = [];
+    for (const row of rows) {
+      const path = row.dimensionValues && row.dimensionValues[0] && row.dimensionValues[0].value;
+      const views = row.metricValues && row.metricValues[0] ? Number(row.metricValues[0].value) : 0;
+      if (!path) continue;
+      const m = path.match(/[?&]story=([^&]+)/);
+      if (!m) continue;
+      const storyId = decodeURIComponent(m[1]);
+      if (seen[storyId] || !validStoryId(storyId)) continue;
+      seen[storyId] = true;
+      out.push({ storyId, views });
+      if (out.length >= 10) break;
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+async function getTopContent(env) {
+  const cached = await cacheGet(env, 'top_content');
+  if (cached) return cached;
+  const fresh = await fetchTopContentFromGa4(env);
+  await cacheSet(env, 'top_content', fresh, 3600);
+  return fresh;
+}
+
+async function handleTopContent(request, env, origin) {
+  if (!origin && request.headers.get('Origin')) return json({ error: 'Origin not allowed' }, 403);
+  const topContent = await getTopContent(env);
+  return json({ topContent }, 200, corsHeaders(origin));
+}
+
 // ---------- contact form (Become a Creator, Advertising, etc.) ----------
 
 async function handleContact(request, env, origin) {
@@ -457,6 +604,8 @@ export default {
       ).all();
       return json({ ratings: result.results || [] }, 200, corsHeaders(origin));
     }
+
+    if (pathname === '/api/analytics/top-content' && request.method === 'GET') return handleTopContent(request, env, origin);
 
     // ----- auth -----
     if (pathname === '/api/auth/signup' && request.method === 'POST') return handleSignup(request, env, origin);
