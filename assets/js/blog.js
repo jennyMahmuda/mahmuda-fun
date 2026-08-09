@@ -287,6 +287,7 @@
             '<p class="cat-row-excerpt">' + escapeHtml(s.excerpt || '') + '</p>' +
             '<span class="cat-row-readmore">Read more →</span>' +
             '<span data-rating-slot="' + escapeHtml(s.id) + '"></span>' +
+            '<span data-reaction-slot="' + escapeHtml(s.id) + '"></span>' +
           '</div>' +
         '</a>';
       }).join('');
@@ -297,6 +298,7 @@
     }).join('');
 
     applyRatingBadges(wrap);
+    applyReactionBadges(wrap);
     wireMediaButtons(wrap);
   }
 
@@ -516,6 +518,22 @@
     });
   }
 
+  // Same idea as applyRatingBadges() below, for the "❤ 12 recommended"
+  // reaction badge — a separate placeholder/map so a card can show both
+  // independently.
+  function applyReactionBadges(container) {
+    if (!container || !window.NightsRatingReview || typeof window.NightsRatingReview.getReactionSummaryMap !== 'function') return;
+    window.NightsRatingReview.getReactionSummaryMap().then(function (map) {
+      container.querySelectorAll('[data-reaction-slot]').forEach(function (slot) {
+        var id = slot.getAttribute('data-reaction-slot');
+        var summary = map[id];
+        if (summary && summary.count) {
+          slot.outerHTML = window.NightsRatingReview.reactionBadgeHtml(summary);
+        }
+      });
+    });
+  }
+
   // Fills in the [data-rating-slot] placeholders left in each feed card
   // with a "★ 4.5 (12)" badge, once ratings are available. Non-blocking —
   // cards render immediately and badges pop in when the API responds.
@@ -567,6 +585,7 @@
                 '<div class="feed-time">' + escapeHtml(heroStory.date || '') + ' · ' + escapeHtml(heroStory.readTime || '') + '</div>' +
               '</div>' + heroBadge +
               '<span data-rating-slot="' + escapeHtml(heroStory.id) + '"></span>' +
+              '<span data-reaction-slot="' + escapeHtml(heroStory.id) + '"></span>' +
             '</div>';
     html += '<h1 class="feed-title hero-title">' + escapeHtml(heroStory.title) + '</h1>';
     html += '<div class="feed-full-content" id="content-' + heroStory.id + '"><p class="loading-text">ফুল স্টোরি লোড হচ্ছে...</p></div>';
@@ -622,6 +641,7 @@
                 '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
               '</div>' + badge +
               '<span data-rating-slot="' + escapeHtml(story.id) + '"></span>' +
+              '<span data-reaction-slot="' + escapeHtml(story.id) + '"></span>' +
             '</div>' +
             '<h2 class="feed-title">' + escapeHtml(story.title) + '</h2>' +
             (isExpanded ? '' : '<p class="feed-excerpt">' + escapeHtml(story.excerpt || '') + '</p>') +
@@ -640,6 +660,7 @@
     feedEl.innerHTML = html;
     if (feedEnd) feedEnd.hidden = false;
     applyRatingBadges(feedEl);
+    applyReactionBadges(feedEl);
     mountRatingReviews(feedEl);
 
     ensureContent(heroStory.id).then(function (content) {

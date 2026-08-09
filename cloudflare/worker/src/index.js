@@ -30,7 +30,7 @@ function corsHeaders(origin) {
 }
 
 function routeStoryId(pathname) {
-  const match = pathname.match(/^\/api\/stories\/([^/]+)\/(ratings|reviews)$/);
+  const match = pathname.match(/^\/api\/stories\/([^/]+)\/(ratings|reviews|reactions)$/);
   return match ? { storyId: decodeURIComponent(match[1]), resource: match[2] } : null;
 }
 
@@ -777,6 +777,14 @@ export default {
       return json({ ratings: result.results || [] }, 200, corsHeaders(origin));
     }
 
+    if (pathname === '/api/reactions/summary' && request.method === 'GET') {
+      if (!origin && request.headers.get('Origin')) return json({ error: 'Origin not allowed' }, 403);
+      const result = await env.REVIEWS_DB.prepare(
+        'SELECT story_id AS storyId, COUNT(*) AS count FROM story_reactions GROUP BY story_id ORDER BY count DESC LIMIT 200'
+      ).all();
+      return json({ reactions: result.results || [] }, 200, corsHeaders(origin));
+    }
+
     if (pathname === '/api/analytics/top-content' && request.method === 'GET') return handleTopContent(request, env, origin);
 
     // ----- auth -----
@@ -838,6 +846,13 @@ export default {
       return json({ storyId: route.storyId, reviews: result.results || [] }, 200, corsHeaders(origin));
     }
 
+    if (request.method === 'GET' && route.resource === 'reactions') {
+      const result = await env.REVIEWS_DB.prepare(
+        'SELECT COUNT(*) AS count FROM story_reactions WHERE story_id = ?'
+      ).bind(route.storyId).first();
+      return json({ storyId: route.storyId, count: Number(result?.count || 0) }, 200, corsHeaders(origin));
+    }
+
     const body = await readJson(request);
     const anonymousKey = request.headers.get('X-Anonymous-Key') || body?.anonymousKey;
     if (!validAnonymousKey(anonymousKey)) {
@@ -854,6 +869,31 @@ export default {
          ON CONFLICT(story_id, anonymous_key) DO UPDATE SET rating = excluded.rating, updated_at = datetime('now')`
       ).bind(route.storyId, rating, anonymousKey).run();
       return json({ ok: true, status: 'saved' }, 201, corsHeaders(origin));
+    }
+
+    // Toggle: reacting again removes the reaction (this is the write path
+    // for the "recommend" button — see the GET branch above for the
+    // read-only count used everywhere else).
+    if (route.resource === 'reactions') {
+      const existing = await env.REVIEWS_DB.prepare(
+        'SELECT 1 FROM story_reactions WHERE story_id = ? AND anonymous_key = ?'
+      ).bind(route.storyId, anonymousKey).first();
+      let reacted;
+      if (existing) {
+        await env.REVIEWS_DB.prepare(
+          'DELETE FROM story_reactions WHERE story_id = ? AND anonymous_key = ?'
+        ).bind(route.storyId, anonymousKey).run();
+        reacted = false;
+      } else {
+        await env.REVIEWS_DB.prepare(
+          'INSERT INTO story_reactions (story_id, anonymous_key) VALUES (?, ?)'
+        ).bind(route.storyId, anonymousKey).run();
+        reacted = true;
+      }
+      const countRow = await env.REVIEWS_DB.prepare(
+        'SELECT COUNT(*) AS count FROM story_reactions WHERE story_id = ?'
+      ).bind(route.storyId).first();
+      return json({ ok: true, reacted, count: Number(countRow?.count || 0) }, 200, corsHeaders(origin));
     }
 
     const reviewText = typeof body?.reviewText === 'string' ? body.reviewText.trim() : '';
