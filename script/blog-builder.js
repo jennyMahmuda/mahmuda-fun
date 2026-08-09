@@ -308,13 +308,49 @@ function writeSitemap(stories) {
 function normCategoryText(value) {
   return String(value || '').toLowerCase().replace(/[-\s]+/g, ' ').trim();
 }
-function storyMatchesCategory(story, slug) {
+const CATEGORY_MATCH_STOPWORDS = ['romance', 'and', 'the', 'a', 'to', 'of', '&'];
+
+function storyMatchesCategory(story, slug, label) {
   const needle = normCategoryText(slug);
   const haystack = [story.type || 'text', story.category || '']
     .concat(story.tags || [])
     .concat(story.series ? [story.series] : [])
     .map(normCategoryText);
-  return haystack.indexOf(needle) !== -1 || haystack.join(' ').indexOf(needle) !== -1;
+  if (haystack.indexOf(needle) !== -1 || haystack.join(' ').indexOf(needle) !== -1) return true;
+  // Compound category names ("Bhabi Romance", "Affair & Cheating Romance")
+  // won't substring-match a story tagged with just one plain word ("Bhabi",
+  // "Cheating") — fall back to matching on the label's own significant
+  // words, so the category page finds content that's clearly meant for it
+  // instead of showing "no stories yet" over a naming technicality.
+  if (label) {
+    const words = normCategoryText(label).split(' ').filter((w) => w.length > 2 && CATEGORY_MATCH_STOPWORDS.indexOf(w) === -1);
+    for (const word of words) {
+      if (haystack.indexOf(word) !== -1) return true;
+    }
+  }
+  return false;
+}
+
+// Resolves what art a category page's hero uses, so every category page
+// always has *something* behind its title — never a blank/plain header.
+// Resolution order: (1) a real uploaded photo on disk at
+// assets/images/categories/<slug>.{webp,jpg,jpeg,png} — the file
+// convention used when the site owner uploads a photo for that specific
+// category; (2) an explicit `image` override in categories-data.js, for
+// uploads that don't follow the <slug> naming convention (e.g.
+// bhabi-romance's Bhabi-saree.jpg); (3) a non-photographic mood-art SVG
+// (assets/images/categories/theme-<theme>.svg, one per palette) generated
+// once and committed like any other static asset. `photo: true` tells the
+// caller to lay a darker gradient overlay under the title text — a real
+// photo needs more contrast help than the already-dark SVG art does.
+const CATEGORY_IMAGE_EXTS = ['webp', 'jpg', 'jpeg', 'png'];
+function resolveCategoryBackground(cat) {
+  for (const ext of CATEGORY_IMAGE_EXTS) {
+    const rel = 'assets/images/categories/' + cat.slug + '.' + ext;
+    if (fs.existsSync(path.join(ROOT, rel))) return { path: rel, photo: true };
+  }
+  if (cat.image && fs.existsSync(path.join(ROOT, cat.image))) return { path: cat.image, photo: true };
+  return { path: 'assets/images/categories/theme-' + cat.theme + '.svg', photo: false };
 }
 
 function categoryCardData(story) {
@@ -337,7 +373,15 @@ function writeCategoryPages(stories) {
   const publicStories = stories.map(publicStoryJson);
   let written = 0;
   CATEGORIES.forEach(function (cat) {
-    const matches = publicStories.filter(function (s) { return storyMatchesCategory(s, cat.slug); });
+    const matches = publicStories.filter(function (s) { return storyMatchesCategory(s, cat.slug, cat.label); });
+    const bg = resolveCategoryBackground(cat);
+    // A real photo needs a darker overlay to keep the title/rating text
+    // readable than the already-dark, low-contrast mood-art SVGs do.
+    const heroOverlay = bg.photo
+      ? 'linear-gradient(180deg, rgba(5,5,5,0.45), rgba(5,5,5,0.88))'
+      : 'linear-gradient(180deg, rgba(5,5,5,0.25), rgba(5,5,5,0.7))';
+    const heroStyle = 'background-image:' + heroOverlay + ', url(\'../../' + escapeAttr(bg.path) + '\');' +
+      'background-size:cover;background-position:center;';
     // JSON.stringify does not escape "<" — a title/excerpt containing the
     // literal text "</script>" (increasingly plausible now that the
     // admin content manager lets those fields through with only a length
@@ -385,7 +429,7 @@ function writeCategoryPages(stories) {
       '<div class="ad-leaderboard-wrap"><div data-ad="leaderboard" class="ad-slot"></div></div>\n' +
       '<div class="ad-mobile-wrap"><div data-ad="mobile-banner" class="ad-slot"></div></div>\n' +
       '<main class="section" style="padding-top: 80px;"><div class="container">' +
-      '<div class="section-header"><h1 class="section-title">' + (cat.emoji ? escapeXml(cat.emoji) + ' ' : '') + escapeXml(cat.label) + '</h1>' +
+      '<div class="section-header cat-hero" style="' + heroStyle + '"><h1 class="section-title">' + (cat.emoji ? escapeXml(cat.emoji) + ' ' : '') + escapeXml(cat.label) + '</h1>' +
       '<p class="section-desc">' + matches.length + ' ' + (matches.length === 1 ? 'story' : 'stories') + '</p></div>' +
       '<div class="cat-intro"><p>' + escapeXml(cat.intro) + '</p></div>' +
       '<p style="margin:0 0 24px;"><a href="../" style="color:var(--accent);text-decoration:none;">← Browse all categories</a></p>' +
@@ -405,7 +449,7 @@ function writeCategoryPages(stories) {
       '    var badge=s.exclusive?"🔒 Members":(s.series?esc(s.series):esc(s.category||s.type||"Story"));\n' +
       '    return "<a class=\\"feed-card\\" href=\\"../../index.html?story="+encodeURIComponent(s.id)+"\\" style=\\"text-decoration:none\\">"+\n' +
       '      "<div class=\\"feed-card-media\\"><img src=\\""+esc(img)+"\\" alt=\\""+esc(s.title)+"\\" loading=\\"lazy\\" decoding=\\"async\\" onerror=\\"this.style.display=\'none\'\\"></div>"+\n' +
-      '      "<div class=\\"feed-card-header\\"><div class=\\"feed-avatar\\">N</div><div class=\\"feed-meta\\"><div class=\\"feed-author\\">Hushed Chapters</div><div class=\\"feed-time\\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+\n' +
+      '      "<div class=\\"feed-card-header\\"><div class=\\"feed-avatar\\">N</div><div class=\\"feed-meta\\"><div class=\\"feed-author\\">SecretChapters</div><div class=\\"feed-time\\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+\n' +
       '      "<span class=\\"feed-type-badge\\">"+badge+"</span><span data-rating-slot=\\""+esc(s.id)+"\\"></span></div>"+\n' +
       '      "<h2 class=\\"feed-title\\">"+esc(s.title)+"</h2><p class=\\"feed-excerpt\\">"+esc(s.excerpt||"")+"</p></a>";\n' +
       '  }).join("");}\n' +
@@ -432,6 +476,22 @@ function writeCategoryPages(stories) {
     written++;
   });
   console.log('✓ ' + written + ' category/<slug>/index.html pages (' + CATEGORIES.length + ' categories)');
+}
+
+// Same resolution the per-category pages use, exported as a small static
+// JSON manifest so client-side card grids (homepage "Popular Categories",
+// the category/ hub page) can show the identical background per slug
+// without duplicating the disk-existence-check logic in the browser.
+function writeCategoryBackgroundsManifest() {
+  const manifest = {};
+  CATEGORIES.forEach(function (cat) {
+    const bg = resolveCategoryBackground(cat);
+    manifest[cat.slug] = { path: bg.path, photo: bg.photo };
+  });
+  const outDir = path.join(ROOT, 'assets', 'data');
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(path.join(outDir, 'category-backgrounds.json'), JSON.stringify(manifest, null, 2), 'utf8');
+  console.log('✓ assets/data/category-backgrounds.json');
 }
 
 function writeCategoryFooterHtml() {
@@ -486,7 +546,7 @@ function buildStory(filePath) {
     date: meta.date || getFileDate(filePath),
     readTime: meta.readTime || estimateReadTime(body),
     language: meta.language || 'en',
-    author: meta.author || 'Hushed Chapters',
+    author: meta.author || 'SecretChapters',
     content: injectAdMarkers(htmlContent),
     // Members-only story: full text is stripped from the public JSON (see
     // writeStoryJson/publicStoryJson below) and instead synced into the D1
@@ -595,6 +655,7 @@ function build() {
 
   console.log('\n✓ stories/index.json (' + stories.length + ' stories)');
   writeCategoryPages(stories);
+  writeCategoryBackgroundsManifest();
   writeSitemap(stories);
   console.log('Done.\n');
 }

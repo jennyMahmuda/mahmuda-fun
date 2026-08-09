@@ -39,7 +39,7 @@ video: ""
 audio: ""
 date: 2026-08-08
 language: bn
-author: Hushed Chapters
+author: SecretChapters
 exclusive: false
 ---
 
@@ -78,7 +78,7 @@ cover: story-post/image/university-madam-classroom-01.webp
 images: [story-post/image/university-madam-classroom-01.webp]
 date: 2026-08-08
 language: en
-author: Hushed Chapters
+author: SecretChapters
 ---
 
 ![University Madam classroom scene](story-post/image/university-madam-classroom-01.webp)
@@ -106,7 +106,7 @@ cover: story-post/image/rain-night-video-01.webp
 video: story-post/video/rain-night-video-01.mp4
 date: 2026-08-08
 language: bn
-author: Hushed Chapters
+author: SecretChapters
 ---
 
 ভিডিওটির সংক্ষিপ্ত description এখানে লিখুন।

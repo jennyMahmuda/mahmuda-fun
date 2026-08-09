@@ -1,5 +1,5 @@
 /**
- * Hushed Chapters – Blog Feed v3 (mahmuda.fun)
+ * SecretChapters – Blog Feed v3 (mahmuda.fun)
  * - First story = HERO POST (cover with fetchpriority=high)
  * - Other stories = card grid (lazy images)
  */
@@ -581,7 +581,7 @@
     html += '<div class="feed-card-header">' +
               '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author">Hushed Chapters (Featured)</div>' +
+                '<div class="feed-author">SecretChapters (Featured)</div>' +
                 '<div class="feed-time">' + escapeHtml(heroStory.date || '') + ' · ' + escapeHtml(heroStory.readTime || '') + '</div>' +
               '</div>' + heroBadge +
               '<span data-rating-slot="' + escapeHtml(heroStory.id) + '"></span>' +
@@ -637,7 +637,7 @@
             '<div class="feed-card-header">' +
               '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author">Hushed Chapters</div>' +
+                '<div class="feed-author">SecretChapters</div>' +
                 '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
               '</div>' + badge +
               '<span data-rating-slot="' + escapeHtml(story.id) + '"></span>' +
