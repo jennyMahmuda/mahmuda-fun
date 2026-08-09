@@ -280,14 +280,26 @@
    navbar has the higher stacking position, so it wins hit-testing for
    that whole overlapping region). Now it stays fixed/visible above the
    reader at all times; only the content below it scrolls. */
+/* No backdrop-filter here on purpose. This element is both
+   position:fixed *and* its own scroll container (overflow-y: auto for
+   the whole reading experience) — on iOS Safari that specific
+   combination is a known WebKit compositing bug: it has to keep
+   recomputing the blurred backdrop as content scrolls *inside* the
+   blurred element itself, and during momentum/rubber-band scrolling it
+   can smear or ghost, making the (fully opaque) .reader-panel's own
+   text look hazy/low-contrast on top of it.
+   background is solid (not semi-transparent) rather than a "frosted
+   glass" partial-opacity look: without blur, a see-through backdrop
+   just shows the page underneath at reduced opacity with sharp edges
+   instead of a soft blur — legible enough to read as ghosted/doubled
+   text behind the reader's own, which is its own readability problem.
+   Solid removes that risk entirely. */
 .reader-modal {
   position: fixed; top: var(--nav-h, 96px); right: 0; bottom: 0; left: 0; z-index: 900;
   display: flex; justify-content: center;
   visibility: hidden; opacity: 0;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: var(--bg-secondary);
   overflow-y: auto;
 }
 .reader-modal.open { visibility: visible; opacity: 1; }
