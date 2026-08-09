@@ -349,6 +349,8 @@ body.cat-theme-accent .section-header { background: radial-gradient(circle at 20
 .footer { border-top: 1px solid var(--border); padding: 60px 0 40px; background: var(--bg-secondary); }
 .footer-note { font-size: 0.9rem; color: var(--accent); margin-bottom: 16px; text-align: center; }
 .footer-copy { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 32px; line-height: 1.7; }
+/* Plain, static credit line — never colorful or blinking. */
+.footer-credit { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 8px; opacity: .8; }
 
 .footer-inner { display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; text-align: left; }
 .footer-brand { flex: 0 0 220px; }
@@ -360,6 +362,23 @@ body.cat-theme-accent .section-header { background: radial-gradient(circle at 20
   transition: color var(--transition), border-color var(--transition);
 }
 .footer-social a:hover { color: var(--accent); border-color: var(--accent); }
+
+.footer-newsletter { margin-top: 18px; max-width: 260px; }
+.footer-newsletter h4 { font-size: 0.82rem; color: var(--text-primary); margin: 0 0 8px; }
+.footer-newsletter-form { display: flex; gap: 8px; }
+.footer-newsletter-form input {
+  flex: 1; min-width: 0; font: inherit; font-size: 0.82rem; padding: 8px 10px;
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--bg-elevated); color: var(--text-primary);
+}
+.footer-newsletter-form input:focus { outline: none; border-color: var(--accent); }
+.footer-newsletter-form button {
+  font: inherit; font-size: 0.8rem; font-weight: 600; padding: 8px 14px; white-space: nowrap;
+  border-radius: var(--radius-sm); border: none; background: var(--accent); color: var(--bg-primary); cursor: pointer;
+}
+.footer-newsletter-form button:hover { opacity: .9; }
+.footer-newsletter-form button:disabled { opacity: .6; cursor: default; }
+.footer-newsletter-hint { font-size: 0.76rem; color: var(--text-muted); margin: 6px 0 0; min-height: 1em; }
 
 .footer-cats { margin-top: 20px; }
 .footer-cats-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; }

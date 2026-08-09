@@ -159,10 +159,14 @@
     container.appendChild(script);
   }
 
+  // Deliberately never falls back to <footer> — the footer is reserved for
+  // site credit/links/newsletter, not a sponsored-link unit. Only renders
+  // next to feed "next episode" actions or inside the reader nav, where an
+  // ad placement is expected.
   function addSmartLinkNotice(root) {
     root = root || document;
     if (root.querySelector('.ad-smartlink')) return;
-    const target = root.querySelector('.feed-actions, .reader-nav, footer');
+    const target = root.querySelector('.feed-actions, .reader-nav');
     if (!target) return;
     const wrap = document.createElement('div');
     wrap.className = 'ad-smartlink';

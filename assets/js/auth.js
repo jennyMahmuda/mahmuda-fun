@@ -159,6 +159,17 @@
     return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/delete', { method: 'POST' });
   }
 
+  // ---- Admin review moderation ----
+  // Reviews always insert as 'pending' and the public reviews endpoint
+  // only ever returns 'approved' ones — these two calls are the only way
+  // a submitted review can ever become visible on the site.
+  function adminListReviews() {
+    return apiFetch('/api/admin/reviews');
+  }
+  function adminModerateReview(id, action) {
+    return apiFetch('/api/admin/reviews/' + encodeURIComponent(id) + '/' + action, { method: 'POST' });
+  }
+
   // Updates the shared #navAccountLink / #navAccountLabel present on every
   // page's nav (points at /account/ either way — that page itself shows a
   // login form or an account summary depending on session state).
@@ -191,5 +202,7 @@
     adminUpdateStory: adminUpdateStory,
     adminPublishStory: adminPublishStory,
     adminDeleteStory: adminDeleteStory,
+    adminListReviews: adminListReviews,
+    adminModerateReview: adminModerateReview,
   };
 })();

@@ -40,6 +40,18 @@
     .admin-guide-body li { margin-bottom: 6px; }
     .admin-guide-body code { background: var(--bg-elevated); padding: 1px 6px; border-radius: 4px; font-size: .85em; }
     .admin-guide-body .admin-guide-note { background: var(--accent-soft); border-radius: var(--radius-sm); padding: 10px 14px; margin: 10px 0; font-size: .88rem; }
+    .admin-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 34px 0 14px; }
+    .admin-section-head h2 { font-family: var(--font-display); font-size: 1.2rem; margin: 0; }
+    .admin-review-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; }
+    .admin-review-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .admin-review-name { font-weight: 600; color: var(--text-primary); }
+    .admin-review-meta { font-size: .78rem; color: var(--text-muted); }
+    .admin-review-text { margin: 8px 0 10px; color: var(--text-secondary); font-size: .92rem; line-height: 1.6; }
+    .admin-review-actions { display: flex; gap: 8px; }
+    .admin-review-actions button { font-size: .82rem; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: none; cursor: pointer; color: var(--text-secondary); }
+    .admin-review-actions button.approve:hover { color: #78c882; border-color: #78c882; }
+    .admin-review-actions button.reject:hover { color: #e0687a; border-color: #e0687a; }
+    .admin-review-actions button:disabled { opacity: .5; cursor: default; }
   </style>
 </head>
 <body>
@@ -67,6 +79,7 @@
   <script src="../assets/js/navigation.js" defer></script>
   <script src="../assets/js/site-components.js" defer></script>
   <script src="../assets/js/story-promo.js" defer></script>
+  <script src="../assets/js/newsletter-footer.js" defer></script>
   <script>
   (function () {
     'use strict';
@@ -167,7 +180,67 @@
           adminGuideHtml() +
           '<p class="rr-hint" style="margin-bottom:18px;">Stories you publish here are written as real story-post files and go live automatically within about 20 minutes (or trigger the "Sync admin-submitted stories" GitHub Action manually for right away). Editing a story after it has gone live needs to be done in the repo directly — this panel writes the file once, it does not keep overwriting it.</p>' +
           '<div class="admin-list">' + rowsHtml + '</div>' +
+          '<div id="adminReviewsSection"></div>' +
         '</div>';
+      loadReviews();
+    }
+
+    function reviewRowHtml(r) {
+      return '<div class="admin-review-row" data-review-id="' + escapeHtml(r.id) + '">' +
+        '<div class="admin-review-head">' +
+          '<span class="admin-review-name">' + escapeHtml(r.displayName || 'Anonymous') + '</span>' +
+          '<span class="admin-review-meta">on ' + escapeHtml(r.storyId) +
+            (r.email ? ' · ' + escapeHtml(r.email) : '') +
+            (r.createdAt ? ' · ' + escapeHtml(r.createdAt) : '') +
+          '</span>' +
+        '</div>' +
+        '<p class="admin-review-text">' + escapeHtml(r.reviewText) + '</p>' +
+        '<div class="admin-review-actions">' +
+          '<button type="button" class="approve" data-action="approve">Approve</button>' +
+          '<button type="button" class="reject" data-action="reject">Reject</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderReviews(reviews) {
+      var section = document.getElementById('adminReviewsSection');
+      if (!section) return;
+      section.innerHTML =
+        '<div class="admin-section-head"><h2>Pending reviews</h2><span class="admin-row-meta">' + reviews.length + ' waiting</span></div>' +
+        (reviews.length
+          ? '<div class="admin-list">' + reviews.map(reviewRowHtml).join('') + '</div>'
+          : '<p class="admin-empty">No reviews waiting for moderation.</p>');
+
+      section.querySelectorAll('.admin-review-actions button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var row = btn.closest('.admin-review-row');
+          var id = row.getAttribute('data-review-id');
+          var action = btn.getAttribute('data-action');
+          row.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+          window.NightsAuth.adminModerateReview(id, action).then(function () {
+            row.remove();
+            var head = section.querySelector('.admin-section-head .admin-row-meta');
+            var remaining = section.querySelectorAll('.admin-review-row').length;
+            if (head) head.textContent = remaining + ' waiting';
+            if (!remaining) {
+              section.querySelector('.admin-list').outerHTML = '<p class="admin-empty">No reviews waiting for moderation.</p>';
+            }
+          }).catch(function () {
+            row.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
+          });
+        });
+      });
+    }
+
+    function loadReviews() {
+      var section = document.getElementById('adminReviewsSection');
+      if (!section) return;
+      section.innerHTML = '<div class="admin-section-head"><h2>Pending reviews</h2></div><p class="admin-empty">Loading…</p>';
+      window.NightsAuth.adminListReviews().then(function (data) {
+        renderReviews(data.reviews || []);
+      }).catch(function () {
+        section.innerHTML = '<div class="admin-section-head"><h2>Pending reviews</h2></div><p class="rr-hint">Could not load reviews right now.</p>';
+      });
     }
 
     function init() {

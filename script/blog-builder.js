@@ -503,6 +503,7 @@ function writeCategoryPages(stories) {
       '<script src="../../assets/js/navigation.js" defer></script>\n' +
       '<script src="../../assets/js/site-components.js" defer></script>\n' +
       '<script src="../../assets/js/story-promo.js" defer></script>\n' +
+      '<script src="../../assets/js/newsletter-footer.js" defer></script>\n' +
       '<script src="../../assets/js/rating-review.js" defer></script>\n' +
       '<script src="../../assets/js/ads.js" defer></script>\n' +
       '</body>\n</html>\n';
@@ -539,13 +540,23 @@ function writeCategoryFooterHtml() {
     '<a href="https://www.facebook.com/share/1HCyEtHHvN/?mibextid=wwXIfr" rel="noopener noreferrer" target="_blank" aria-label="Facebook">Facebook</a>' +
     '<a href="https://x.com/jennydufun" rel="noopener noreferrer" target="_blank" aria-label="X (Twitter)">X / Twitter</a>' +
     '<a href="https://xhamster.com/users/profiles/safejenny69" rel="noopener noreferrer" target="_blank" aria-label="xHamster">xHamster</a>' +
-    '</div></div>' +
+    '</div>' +
+    '<div class="footer-newsletter">' +
+    '<h4>Get new stories first</h4>' +
+    '<form class="footer-newsletter-form" id="footerNewsletterForm">' +
+    '<input type="email" name="email" placeholder="you@example.com" required aria-label="Email address" />' +
+    '<button type="submit">Subscribe</button>' +
+    '</form>' +
+    '<p class="footer-newsletter-hint" id="footerNewsletterHint"></p>' +
+    '</div>' +
+    '</div>' +
     '<nav class="footer-links" aria-label="Footer">' +
     '<div class="footer-col"><h4>Explore</h4><a href="../../index.html">Feed</a><a href="../../category/">Categories</a><a href="../../series/">Series</a><a href="../../gellery/">Gallery</a><a href="../../video/">Video</a><a href="../../premium.html">Premium</a><a href="../../become-creator.html">Become a Creator</a></div>' +
     '<div class="footer-col"><h4>Support</h4><a href="../../faq.html">FAQ</a><a href="mailto:support@mahmuda.fun">Help</a><a href="mailto:support@mahmuda.fun">Contact us</a><a href="../../advertising.html">Advertising</a><a href="../../content-removal.html">Content Removal</a></div>' +
     '<div class="footer-col"><h4>Legal</h4><a href="../../terms.html">Terms of Use</a><a href="../../privacy-policy.html">Privacy Policy</a><a href="../../cookies.html">Cookies Policy</a><a href="../../dmca.html">DMCA / Copyright</a><a href="../../dmca.html#2257">18 U.S.C. 2257</a><a href="../../parental-controls.html">Parental Controls</a><a href="../../eu-dsa.html">EU DSA</a><a href="../../trust-safety.html">Trust &amp; Safety</a><a href="../../sitemap.xml">Sitemap</a></div>' +
     '</nav></div>' +
     '<p class="footer-copy">Premium Adult Fiction • Audio • Video • Series • 18+ Only • mahmuda.fun<br>© <span class="footer-year">2026</span> mahmuda.fun. All rights reserved.</p>' +
+    '<p class="footer-credit">Credit : Secret Chapter | Jenny | Night Adult Stories</p>' +
     '</div></footer>\n';
 }
 
