@@ -139,12 +139,7 @@
     "name": "SecretChapters",
     "url": "https://mahmuda.fun",
     "description": "Adult romance stories, mature fiction and serialized romantic storytelling.",
-    "inLanguage": ["en", "bn"],
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://mahmuda.fun/search/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+    "inLanguage": ["en", "bn"]
   }
   </script>
 </head>
@@ -427,6 +422,46 @@
 
     </section>
 
+    <!-- =======================================================
+         CONTINUE READING
+         Local reading-history only (no cross-device sync yet — that
+         needs a logged-in server-side record, not built this round).
+         Hidden entirely until assets/js/blog.js's renderContinueReading()
+         finds at least one in-progress story in this browser, so a first
+         visit never shows an empty "Continue reading" section.
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-continue-section"
+      id="continueReadingSection"
+      hidden
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+            <span class="sc-section-eyebrow">
+              Pick up where you left off
+            </span>
+
+            <h2>
+              Continue reading
+            </h2>
+          </div>
+
+        </div>
+
+        <div
+          class="sc-continue-grid"
+          id="continueReadingGrid"
+        ></div>
+
+      </div>
+
+    </section>
+
 
     <!-- =======================================================
          TRENDING — EXISTING JS INJECTION POINT
@@ -466,67 +501,6 @@
       </div>
 
     </section>
-
-
-    <!-- =======================================================
-         TOP RATED — GA4 + RATING DATA TARGET
-         ======================================================= -->
-
-    <section
-      class="sc-section sc-top-rated"
-      id="topStoriesSection"
-      hidden
-    >
-
-      <div class="sc-container">
-
-        <div class="sc-top-rated-head">
-
-          <div>
-
-            <span class="sc-section-eyebrow">
-              Reader intelligence
-            </span>
-
-            <h2>
-              Readers' favorites
-            </h2>
-
-            <p>
-              Stories ranked from reader ratings,
-              engagement and recent activity.
-            </p>
-
-          </div>
-
-          <div class="sc-score-legend">
-
-            <span>
-              ★ Rating
-            </span>
-
-            <span>
-              ◉ Engagement
-            </span>
-
-            <span>
-              ↗ Growth
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="sc-ranked-grid top-rated-grid"
-          id="topStoriesGrid"
-        ></div>
-
-      </div>
-
-    </section>
-
 
     <!-- =======================================================
          FEATURED EDITORIAL
@@ -583,136 +557,67 @@
 
     </section>
 
-
     <!-- =======================================================
-         CATEGORY-SECTIONED FEED
-         One horizontally-scrolling row per category with stories —
-         assets/js/blog.js's renderCategorySections(). Hidden (empty)
-         until there's at least one categorized story.
+         BROWSE BY MOOD
+         A discovery layer separate from Categories — feeling-first
+         instead of genre-first. Every tile links to a real category
+         page (verified against category/<slug>/ at build time).
          ======================================================= -->
 
-    <div id="categoryFeedSections"></div>
-
-
-    <!-- =======================================================
-         FEED
-         Existing #storyFeed preserved
-         ======================================================= -->
-
-    <section
-      class="sc-section sc-feed-section"
-      id="feed"
-    >
+    <section class="sc-section sc-mood-section">
 
       <div class="sc-container">
 
         <div class="sc-section-heading">
 
           <div>
-
             <span class="sc-section-eyebrow">
-              Fresh chapters
+              Not sure where to start?
             </span>
 
             <h2>
-              The story feed
+              Browse by mood
             </h2>
 
-          </div>
-
-          <div
-            class="feed-filters sc-feed-filters"
-            id="feedFilters"
-          >
-
-            <button
-              class="filter-btn active"
-              data-filter="all"
-            >
-              All
-            </button>
-
-            <button
-              class="filter-btn"
-              data-filter="text"
-            >
-              Stories
-            </button>
-
-            <button
-              class="filter-btn"
-              data-filter="audio"
-            >
-              Audio
-            </button>
-
-            <button
-              class="filter-btn"
-              data-filter="video"
-            >
-              Video
-            </button>
-
-            <button
-              class="filter-btn"
-              data-filter="series"
-            >
-              Series
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="feed sc-feed"
-          id="storyFeed"
-        >
-
-          <div class="loading-state sc-loading">
-
-            <div class="spinner"></div>
-
             <p>
-              Loading stories…
+              Skip the genre labels — pick the feeling
+              you're chasing tonight.
             </p>
-
           </div>
 
         </div>
 
+        <div class="sc-mood-grid">
 
-        <div
-          class="feed-end"
-          id="feedEnd"
-          hidden
-        >
+          <a class="sc-mood-card sc-mood-danger" href="category/dark-romance/">
+            <span>Dark &amp; Dangerous</span>
+          </a>
 
-          <p>
-            You've reached the end.
-          </p>
+          <a class="sc-mood-card sc-mood-accent" href="category/forbidden-romance/">
+            <span>Forbidden &amp; Secret</span>
+          </a>
+
+          <a class="sc-mood-card sc-mood-rose" href="category/slow-burn/">
+            <span>Slow &amp; Emotional</span>
+          </a>
+
+          <a class="sc-mood-card sc-mood-luxury" href="category/billionaire-romance/">
+            <span>Powerful &amp; Luxurious</span>
+          </a>
+
+          <a class="sc-mood-card sc-mood-mystic" href="category/paranormal-fantasy-romance/">
+            <span>Supernatural</span>
+          </a>
+
+          <a class="sc-mood-card sc-mood-warm" href="category/clean-wholesome/">
+            <span>Sweet &amp; Romantic</span>
+          </a>
 
         </div>
 
       </div>
 
     </section>
-
-
-    <!-- =======================================================
-         MID AD — PRESERVED
-         ======================================================= -->
-
-    <div class="ad-between-sections sc-ad-shell">
-
-      <div
-        data-ad="mid"
-        class="ad-slot"
-        id="adMidSection"
-      ></div>
-
-    </div>
 
 
     <!-- =======================================================
@@ -919,7 +824,6 @@
 
     </section>
 
-
     <!-- =======================================================
          NEW RELEASES
          ======================================================= -->
@@ -961,48 +865,64 @@
 
     </section>
 
-
     <!-- =======================================================
-         RECENTLY UPDATED
+         TOP RATED — GA4 + RATING DATA TARGET
          ======================================================= -->
 
-    <section class="sc-section sc-updated-section">
+    <section
+      class="sc-section sc-top-rated"
+      id="topStoriesSection"
+      hidden
+    >
 
       <div class="sc-container">
 
-        <div class="sc-section-heading">
+        <div class="sc-top-rated-head">
 
           <div>
 
             <span class="sc-section-eyebrow">
-              Continue the journey
+              Reader intelligence
             </span>
 
             <h2>
-              Recently updated
+              Readers' favorites
             </h2>
+
+            <p>
+              Stories ranked from reader ratings,
+              engagement and recent activity.
+            </p>
 
           </div>
 
-          <a
-            href="series/"
-            class="sc-view-all"
-          >
-            View series →
-          </a>
+          <div class="sc-score-legend">
+
+            <span>
+              ★ Rating
+            </span>
+
+            <span>
+              ◉ Engagement
+            </span>
+
+            <span>
+              ↗ Growth
+            </span>
+
+          </div>
 
         </div>
 
 
         <div
-          class="sc-updated-list"
-          id="recentlyUpdatedGrid"
+          class="sc-ranked-grid top-rated-grid"
+          id="topStoriesGrid"
         ></div>
 
       </div>
 
     </section>
-
 
     <!-- =======================================================
          SERIES
@@ -1042,6 +962,188 @@
           class="series-grid sc-series-grid"
           id="seriesGrid"
         ></div>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         CATEGORY-SECTIONED FEED
+         One horizontally-scrolling row per category with stories —
+         assets/js/blog.js's renderCategorySections(). Hidden (empty)
+         until there's at least one categorized story.
+         ======================================================= -->
+
+    <div id="categoryFeedSections"></div>
+
+    <!-- =======================================================
+         FEED
+         Existing #storyFeed preserved
+         ======================================================= -->
+
+    <section
+      class="sc-section sc-feed-section"
+      id="feed"
+    >
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+
+            <span class="sc-section-eyebrow">
+              Fresh chapters
+            </span>
+
+            <h2>
+              The story feed
+            </h2>
+
+          </div>
+
+          <div
+            class="feed-filters sc-feed-filters"
+            id="feedFilters"
+          >
+
+            <button
+              class="filter-btn active"
+              data-filter="all"
+            >
+              All
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="text"
+            >
+              Stories
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="audio"
+            >
+              Audio
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="video"
+            >
+              Video
+            </button>
+
+            <button
+              class="filter-btn"
+              data-filter="series"
+            >
+              Series
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="feed sc-feed"
+          id="storyFeed"
+        >
+
+          <div class="loading-state sc-loading">
+
+            <div class="spinner"></div>
+
+            <p>
+              Loading stories…
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="feed-end"
+          id="feedEnd"
+          hidden
+        >
+
+          <p>
+            You've reached the end.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         MID AD — PRESERVED
+         ======================================================= -->
+
+    <div class="ad-between-sections sc-ad-shell">
+
+      <div
+        data-ad="mid"
+        class="ad-slot"
+        id="adMidSection"
+      ></div>
+
+    </div>
+
+    <!-- =======================================================
+         WHY SECRETCHAPTERS
+         ======================================================= -->
+
+    <section class="sc-section sc-why-section">
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+            <span class="sc-section-eyebrow">
+              Why readers stay
+            </span>
+
+            <h2>
+              Why SecretChapters
+            </h2>
+          </div>
+
+        </div>
+
+        <div class="sc-why-grid">
+
+          <div class="sc-why-card">
+            <span class="sc-why-icon">◈</span>
+            <h3>22 real categories</h3>
+            <p>Every category is a real, indexed page with matching stories — never a dead filter or a placeholder.</p>
+          </div>
+
+          <div class="sc-why-card">
+            <span class="sc-why-icon">★</span>
+            <h3>Reader-driven ratings</h3>
+            <p>Star ratings, reviews and "recommended by readers" badges come from real readers, not editorial guesswork.</p>
+          </div>
+
+          <div class="sc-why-card">
+            <span class="sc-why-icon">↻</span>
+            <h3>New chapters regularly</h3>
+            <p>Ongoing series get new episodes on a schedule, so a story you follow doesn't go quiet on you.</p>
+          </div>
+
+          <div class="sc-why-card">
+            <span class="sc-why-icon">18+</span>
+            <h3>Mature fiction, clearly labeled</h3>
+            <p>Every story is written for adult readers and clearly marked — no surprises, no filler.</p>
+          </div>
+
+        </div>
 
       </div>
 
@@ -1105,6 +1207,96 @@
       </div>
 
     </section>
+
+    <!-- =======================================================
+         FAQ (home page teaser — full list lives at faq.html)
+         ======================================================= -->
+
+    <section class="sc-section sc-faq-section">
+
+      <div class="sc-container">
+
+        <div class="sc-section-heading">
+
+          <div>
+            <span class="sc-section-eyebrow">
+              Quick answers
+            </span>
+
+            <h2>
+              Frequently asked questions
+            </h2>
+          </div>
+
+          <a href="faq.html" class="sc-view-all">
+            All FAQs →
+          </a>
+
+        </div>
+
+        <div class="sc-faq-list">
+
+          <details class="sc-faq-item">
+            <summary>Is SecretChapters free to read?</summary>
+            <p>Yes — every story on the site is free to read. A Premium tier for early chapters and exclusive stories is on the way.</p>
+          </details>
+
+          <details class="sc-faq-item">
+            <summary>Do I need an account?</summary>
+            <p>No account is required to read. Creating a free account lets you rate stories and leave reviews.</p>
+          </details>
+
+          <details class="sc-faq-item">
+            <summary>Is this content for adults only?</summary>
+            <p>Yes. Every story on SecretChapters is 18+ mature fiction, and all characters depicted are adults.</p>
+          </details>
+
+          <details class="sc-faq-item">
+            <summary>How often are new chapters published?</summary>
+            <p>New chapters and stories are added regularly — check New Releases and Trending above for what's fresh.</p>
+          </details>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         FINAL CTA
+         ======================================================= -->
+
+    <section class="sc-section sc-cta-section">
+
+      <div class="sc-container sc-cta-inner">
+
+        <h2>
+          Your next story is one click away.
+        </h2>
+
+        <p>
+          Thousands of chapters, twenty-two categories,
+          and a new favorite waiting to be found.
+        </p>
+
+        <div class="sc-cta-actions">
+
+          <a href="category/" class="sc-btn sc-btn-primary">
+            Explore Stories
+            <span>→</span>
+          </a>
+
+          <a href="account/" class="sc-btn sc-btn-secondary">
+            Create Free Account
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
 
   </main>
 
