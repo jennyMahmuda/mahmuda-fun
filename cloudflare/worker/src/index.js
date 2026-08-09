@@ -682,6 +682,21 @@ async function handleAdminModerateReview(request, env, origin, reviewId, action)
   return json({ ok: true, status }, 200, corsHeaders(origin));
 }
 
+// ---------- admin: newsletter subscriber list ----------
+// Emails are PII, so unlike the ratings/reactions/top-content summaries
+// (public, aggregate-only) this is admin-gated — it's the only place the
+// actual subscriber list is ever readable anywhere.
+
+async function handleAdminListNewsletter(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const result = await env.REVIEWS_DB.prepare(
+    'SELECT id, email, source, created_at AS createdAt FROM newsletter_subscribers ORDER BY created_at DESC LIMIT 2000'
+  ).all();
+  const subscribers = result.results || [];
+  return json({ subscribers, count: subscribers.length }, 200, corsHeaders(origin));
+}
+
 // ---------- exclusive story content ----------
 
 async function handleStoryContent(request, env, origin, storyId) {
@@ -888,6 +903,7 @@ export default {
     if (adminReviewAction && request.method === 'POST') {
       return handleAdminModerateReview(request, env, origin, adminReviewAction.reviewId, adminReviewAction.action);
     }
+    if (pathname === '/api/admin/newsletter' && request.method === 'GET') return handleAdminListNewsletter(request, env, origin);
 
     // ----- exclusive content -----
     const contentStoryId = routeStoryContent(pathname);

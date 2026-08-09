@@ -204,6 +204,9 @@
           '<h1>Signed in</h1>' +
           '<p class="sub">' + escapeHtml(data.email) + (data.emailVerified ? '' : ' — <span class="rr-error">email not verified</span>') + '</p>' +
           '<p class="rr-hint">You can now read member-only stories marked 🔒 across the site.</p>' +
+          (data.isAdmin
+            ? '<a class="rr-submit" style="text-decoration:none;display:block;box-sizing:border-box;" href="../admin/">📊 Go to Admin Dashboard</a>'
+            : '') +
           '<button type="button" class="rr-submit" id="logoutBtn">Log out</button>' +
         '</div>';
       document.getElementById('logoutBtn').addEventListener('click', function () {

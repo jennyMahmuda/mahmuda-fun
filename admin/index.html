@@ -52,6 +52,20 @@
     .admin-review-actions button.approve:hover { color: #78c882; border-color: #78c882; }
     .admin-review-actions button.reject:hover { color: #e0687a; border-color: #e0687a; }
     .admin-review-actions button:disabled { opacity: .5; cursor: default; }
+    .admin-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+    .admin-tabs a { font-size: .82rem; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); text-decoration: none; }
+    .admin-tabs a:hover { color: var(--accent); border-color: var(--accent); }
+    .admin-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+    .admin-table th, .admin-table td { padding: 10px 14px; text-align: left; white-space: nowrap; }
+    .admin-table thead th { background: var(--bg-elevated); color: var(--text-muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+    .admin-table tbody tr { border-top: 1px solid var(--border); }
+    .admin-table tbody tr:hover { background: var(--bg-elevated); }
+    .admin-table td.admin-cell-title { white-space: normal; max-width: 320px; color: var(--text-primary); font-weight: 600; }
+    .admin-table td.admin-cell-muted { color: var(--text-muted); }
+    .admin-section-actions { display: flex; gap: 8px; align-items: center; }
+    .admin-section-actions button { font-size: .8rem; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--text-secondary); cursor: pointer; }
+    .admin-section-actions button:hover { color: var(--accent); border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -80,6 +94,7 @@
   <script src="../assets/js/site-components.js" defer></script>
   <script src="../assets/js/story-promo.js" defer></script>
   <script src="../assets/js/newsletter-footer.js" defer></script>
+  <script src="../assets/js/rating-review.js" defer></script>
   <script>
   (function () {
     'use strict';
@@ -177,12 +192,22 @@
             '<h1>Content Manager</h1>' +
             '<a class="rr-submit" style="text-decoration:none;" href="story.html">+ New story</a>' +
           '</div>' +
+          '<nav class="admin-tabs" aria-label="Dashboard sections">' +
+            '<a href="#adminStoriesSection">📝 Stories</a>' +
+            '<a href="#adminReviewsSection">💬 Pending reviews</a>' +
+            '<a href="#adminNewsletterSection">✉️ Subscribers</a>' +
+            '<a href="#adminAnalyticsSection">📊 Analytics</a>' +
+          '</nav>' +
           adminGuideHtml() +
           '<p class="rr-hint" style="margin-bottom:18px;">Stories you publish here are written as real story-post files and go live automatically within about 20 minutes (or trigger the "Sync admin-submitted stories" GitHub Action manually for right away). Editing a story after it has gone live needs to be done in the repo directly — this panel writes the file once, it does not keep overwriting it.</p>' +
-          '<div class="admin-list">' + rowsHtml + '</div>' +
+          '<div id="adminStoriesSection" class="admin-list">' + rowsHtml + '</div>' +
           '<div id="adminReviewsSection"></div>' +
+          '<div id="adminNewsletterSection"></div>' +
+          '<div id="adminAnalyticsSection"></div>' +
         '</div>';
       loadReviews();
+      loadNewsletter();
+      loadAnalytics();
     }
 
     function reviewRowHtml(r) {
@@ -240,6 +265,135 @@
         renderReviews(data.reviews || []);
       }).catch(function () {
         section.innerHTML = '<div class="admin-section-head"><h2>Pending reviews</h2></div><p class="rr-hint">Could not load reviews right now.</p>';
+      });
+    }
+
+    // ---- Newsletter subscribers ----
+    // The only place the actual subscriber list/emails are ever readable —
+    // export as a copy-to-clipboard list of addresses for use with
+    // whatever mailer eventually sends the "new stories first" campaign
+    // (this site itself has no send pipeline, see README.md §5).
+    function renderNewsletter(subscribers) {
+      var section = document.getElementById('adminNewsletterSection');
+      if (!section) return;
+      var rowsHtml = subscribers.length ? subscribers.map(function (s) {
+        return '<tr><td class="admin-cell-title">' + escapeHtml(s.email) + '</td>' +
+          '<td class="admin-cell-muted">' + escapeHtml(s.source || 'unknown') + '</td>' +
+          '<td class="admin-cell-muted">' + escapeHtml(s.createdAt || '') + '</td></tr>';
+      }).join('') : '';
+
+      section.innerHTML =
+        '<div class="admin-section-head">' +
+          '<h2>Newsletter subscribers</h2>' +
+          '<div class="admin-section-actions">' +
+            '<span class="admin-row-meta">' + subscribers.length + ' subscribed</span>' +
+            (subscribers.length ? '<button type="button" id="copyEmailsBtn">Copy all emails</button>' : '') +
+          '</div>' +
+        '</div>' +
+        (subscribers.length
+          ? '<div class="admin-table-wrap"><table class="admin-table">' +
+              '<thead><tr><th>Email</th><th>Source</th><th>Subscribed</th></tr></thead>' +
+              '<tbody>' + rowsHtml + '</tbody>' +
+            '</table></div>'
+          : '<p class="admin-empty">No subscribers yet — footer/review-form signups will show up here.</p>');
+
+      var copyBtn = document.getElementById('copyEmailsBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+          var emails = subscribers.map(function (s) { return s.email; }).join('\n');
+          var done = function () { copyBtn.textContent = 'Copied!'; setTimeout(function () { copyBtn.textContent = 'Copy all emails'; }, 1500); };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(emails).then(done).catch(function () { copyBtn.textContent = 'Could not copy'; });
+          } else {
+            copyBtn.textContent = 'Copy not supported here';
+          }
+        });
+      }
+    }
+
+    function loadNewsletter() {
+      var section = document.getElementById('adminNewsletterSection');
+      if (!section) return;
+      section.innerHTML = '<div class="admin-section-head"><h2>Newsletter subscribers</h2></div><p class="admin-empty">Loading…</p>';
+      window.NightsAuth.adminListNewsletter().then(function (data) {
+        renderNewsletter(data.subscribers || []);
+      }).catch(function () {
+        section.innerHTML = '<div class="admin-section-head"><h2>Newsletter subscribers</h2></div><p class="rr-hint">Could not load subscribers right now.</p>';
+      });
+    }
+
+    // ---- Story performance / analytics ----
+    // Combines the public stories/index.json (titles) with the public
+    // ratings/reactions summary endpoints and GA4 top-content, all
+    // already used elsewhere on the site — no new tracking added here,
+    // just the existing numbers brought into one place. Sorted by rating
+    // average (then count) so the best- and worst-received stories are
+    // easy to spot at a glance.
+    var ANALYTICS_API_BASE = 'https://mahmuda-fun-api.mahmudajenny6.workers.dev';
+
+    function renderAnalytics(rows, ga4Available) {
+      var section = document.getElementById('adminAnalyticsSection');
+      if (!section) return;
+      var rowsHtml = rows.map(function (r) {
+        return '<tr><td class="admin-cell-title">' + escapeHtml(r.title) + '<div class="admin-row-meta">' + escapeHtml(r.category || '') + '</div></td>' +
+          '<td>' + (r.ratingCount ? '★ ' + r.ratingAvg.toFixed(1) + ' <span class="admin-cell-muted">(' + r.ratingCount + ')</span>' : '<span class="admin-cell-muted">No ratings yet</span>') + '</td>' +
+          '<td>' + (r.recommends ? '❤️ ' + r.recommends : '<span class="admin-cell-muted">—</span>') + '</td>' +
+          '<td>' + (r.views != null ? '👁 ' + r.views : '<span class="admin-cell-muted">—</span>') + '</td>' +
+        '</tr>';
+      }).join('');
+
+      section.innerHTML =
+        '<div class="admin-section-head"><h2>Story performance</h2><span class="admin-row-meta">' + rows.length + ' stories</span></div>' +
+        (ga4Available ? '' : '<p class="rr-hint" style="margin-bottom:10px;">Views (28d) needs Google Analytics credentials configured on the Worker — see cloudflare/README.md. Ratings and recommends below are live either way.</p>') +
+        (rows.length
+          ? '<div class="admin-table-wrap"><table class="admin-table">' +
+              '<thead><tr><th>Story</th><th>Rating</th><th>Recommends</th><th>Views (28d)</th></tr></thead>' +
+              '<tbody>' + rowsHtml + '</tbody>' +
+            '</table></div>'
+          : '<p class="admin-empty">No published stories yet.</p>');
+    }
+
+    function loadAnalytics() {
+      var section = document.getElementById('adminAnalyticsSection');
+      if (!section) return;
+      section.innerHTML = '<div class="admin-section-head"><h2>Story performance</h2></div><p class="admin-empty">Loading…</p>';
+
+      Promise.all([
+        fetch('../stories/index.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).catch(function () { return []; }),
+        window.NightsRatingReview ? window.NightsRatingReview.getSummaryMap() : Promise.resolve({}),
+        window.NightsRatingReview ? window.NightsRatingReview.getReactionSummaryMap() : Promise.resolve({}),
+        fetch(ANALYTICS_API_BASE + '/api/analytics/top-content').then(function (r) { return r.json(); }).catch(function () { return null; }),
+      ]).then(function (results) {
+        var stories = Array.isArray(results[0]) ? results[0] : (results[0].stories || []);
+        var ratingMap = results[1] || {};
+        var reactionMap = results[2] || {};
+        var topContent = results[3] && Array.isArray(results[3].topContent) ? results[3].topContent : null;
+        var viewsMap = {};
+        if (topContent) topContent.forEach(function (row) { viewsMap[row.storyId] = row.views; });
+
+        var rows = stories.map(function (s) {
+          var rating = ratingMap[s.id] || { count: 0, average: 0 };
+          var reaction = reactionMap[s.id] || { count: 0 };
+          return {
+            id: s.id,
+            title: s.title,
+            category: s.category,
+            ratingAvg: rating.average,
+            ratingCount: rating.count,
+            recommends: reaction.count,
+            // GA4's top-content list only ever holds ~10 rows, so a story
+            // missing from it means "not in the top 10", not "confirmed
+            // zero views" — null (→ "—") is the honest value there, not 0.
+            views: topContent && Object.prototype.hasOwnProperty.call(viewsMap, s.id) ? viewsMap[s.id] : null,
+          };
+        }).sort(function (a, b) {
+          if (b.ratingAvg !== a.ratingAvg) return b.ratingAvg - a.ratingAvg;
+          return b.ratingCount - a.ratingCount;
+        });
+
+        renderAnalytics(rows, !!topContent);
+      }).catch(function () {
+        section.innerHTML = '<div class="admin-section-head"><h2>Story performance</h2></div><p class="rr-hint">Could not load analytics right now.</p>';
       });
     }
 
