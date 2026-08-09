@@ -121,6 +121,7 @@
     renderTopStories();
     renderTrending();
     renderHeroStats();
+    renderCategorySections();
     openDeepLink();
   }
 
@@ -227,6 +228,76 @@
   function renderHeroStats() {
     var el = document.getElementById('heroStoryCount');
     if (el) el.textContent = allStories.length;
+  }
+
+  // Picks a real link for a category row's "View all" — a genuine
+  // category/<slug>/ page (script/blog-builder.js's writeCategoryPages)
+  // when the story's own category text matches one of the canonical
+  // categories (assets/js/category-ticker.js carries that same list
+  // client-side), otherwise the always-safe hub-page filter fallback so
+  // this never links to a page that doesn't exist.
+  function resolveCategoryUrl(rawCategory) {
+    var norm = normalizeCategory(rawCategory).replace(/[-\s]+/g, ' ');
+    var list = window.NightsCategoryTicker && window.NightsCategoryTicker.CATEGORIES;
+    if (list) {
+      var match = list.find(function (c) {
+        var slugNorm = c.slug.toLowerCase().replace(/[-\s]+/g, ' ');
+        var labelNorm = c.label.toLowerCase().replace(/[-\s]+/g, ' ');
+        return slugNorm === norm || labelNorm === norm || slugNorm.indexOf(norm) !== -1 || norm.indexOf(slugNorm) !== -1;
+      });
+      if (match) return 'category/' + match.slug + '/';
+    }
+    return 'category/?cat=' + encodeURIComponent(rawCategory);
+  }
+
+  // Home-page dynamic feed, grouped by category — one horizontally
+  // scrolling row per category that actually has stories (busiest
+  // categories first, capped so the home page stays scannable as the
+  // admin panel adds more). Each card opens the same full reader modal
+  // as every other card on the site (rating widget, related stories,
+  // next/prev episode — all of it), it's just a lighter-weight card for
+  // a horizontal row.
+  function renderCategorySections() {
+    var wrap = document.getElementById('categoryFeedSections');
+    if (!wrap) return;
+    var groups = {};
+    var order = [];
+    allStories.forEach(function (s) {
+      var key = String(s.category || '').trim();
+      if (!key || normalizeCategory(key) === 'story') return;
+      if (!groups[key]) { groups[key] = []; order.push(key); }
+      groups[key].push(s);
+    });
+    order.sort(function (a, b) { return groups[b].length - groups[a].length; });
+    var sections = order.slice(0, 6);
+    if (!sections.length) { wrap.innerHTML = ''; return; }
+
+    wrap.innerHTML = sections.map(function (key) {
+      var stories = groups[key].slice(0, 10);
+      var url = resolveCategoryUrl(key);
+      var cardsHtml = stories.map(function (s) {
+        var img = resolveImage(s);
+        return '<a class="cat-row-card" href="' + storyUrl(s.id) + '" data-story-link="' + escapeHtml(s.id) + '">' +
+          '<div class="cat-row-media">' +
+            (img ? '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(s.title) + '" loading="lazy" decoding="async" onerror="this.parentElement.style.display=\'none\'">' : '') +
+            (s.exclusive ? '<span class="cat-row-badge">🔒 Members</span>' : '') +
+          '</div>' +
+          '<div class="cat-row-body">' +
+            '<h3 class="cat-row-title">' + escapeHtml(s.title) + '</h3>' +
+            '<p class="cat-row-excerpt">' + escapeHtml(s.excerpt || '') + '</p>' +
+            '<span class="cat-row-readmore">Read more →</span>' +
+            '<span data-rating-slot="' + escapeHtml(s.id) + '"></span>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+      return '<div class="cat-row-section">' +
+        '<div class="cat-row-head"><h2>' + escapeHtml(key) + '</h2><a class="cat-row-viewall" href="' + escapeHtml(url) + '">View all →</a></div>' +
+        '<div class="cat-row-track">' + cardsHtml + '</div>' +
+      '</div>';
+    }).join('');
+
+    applyRatingBadges(wrap);
+    wireMediaButtons(wrap);
   }
 
   // Footer "Popular tags" — same aggregation the category page's filter

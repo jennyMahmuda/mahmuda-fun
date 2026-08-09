@@ -112,6 +112,8 @@ UPDATE users SET is_admin = 1 WHERE email = 'you@example.com';
 
 **Flow:** `/admin/` → নতুন story লিখুন (title, excerpt, category, tags, cover/video/audio URL, plain-text body) → "Save draft" অথবা "Save & publish" → publish করলে সেটা D1-এর `admin_stories` table-এ যায় → `.github/workflows/sync-admin-stories.yml` (প্রতি ২০ মিনিটে চলে, চাইলে GitHub Actions থেকে manually run করা যায়) সেটাকে real `story-post/<id>.md` file বানিয়ে commit করে → normal Pages deploy সেটা live করে। একবার sync হয়ে গেলে সেই story আর যেকোনো hand-authored story-র মতোই — `/admin/`-এ পরে edit করলে সেটা শুধু D1-এর draft record বদলায়, live file বদলাতে চাইলে `story-post/<id>.md` সরাসরি repo-তে edit করতে হবে (ইচ্ছাকৃতভাবে — কেউ hand-edit করার পর panel সেটা silently overwrite করে না)।
 
+**সম্পূর্ণ ধাপে-ধাপে গাইড** (story লেখা, image/video যোগ করা সহ) `/admin/` পেজেই আছে — "📖 কিভাবে নতুন Story লিখবেন..." অংশে ক্লিক করলে খুলবে। আলাদা করে এখানে duplicate করা হলো না, যাতে এক জায়গায় update রাখা যায়।
+
 ## Security rules
 
 API token কখনো `wrangler.toml`, `.env`, Markdown, commit message বা frontend JavaScript-এ রাখবেন না। GitHub Actions secret-এই token রাখবেন। Token-এর permission প্রয়োজনের চেয়ে বেশি দেবেন না এবং সন্দেহ হলে Cloudflare Dashboard থেকে token rotate করবেন।
