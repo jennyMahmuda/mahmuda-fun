@@ -6,6 +6,17 @@
   var API_BASE = 'https://mahmuda-fun-api.mahmudajenny6.workers.dev';
   var ANON_KEY_STORAGE = 'nights_anonymous_key';
 
+  // This widget currently only ever mounts from blog.js (index.html's
+  // reader), so this is always '' in practice — computed instead of
+  // hardcoded so the cookies/privacy links in the consent line below
+  // still resolve correctly if this widget is ever mounted from a
+  // page in a subfolder.
+  function rootPath() {
+    var segments = window.location.pathname.split('/').filter(Boolean);
+    if (segments.length && /\.[a-z0-9]+$/i.test(segments[segments.length - 1])) segments.pop();
+    return segments.map(function () { return '../'; }).join('');
+  }
+
   function getAnonymousKey() {
     try {
       var existing = window.localStorage.getItem(ANON_KEY_STORAGE);
@@ -78,15 +89,23 @@
     } else if (!state.reviews || state.reviews.length === 0) {
       reviewsMarkup = '<p class="rr-hint">No reviews yet. Be the first to share your thoughts.</p>';
     } else {
-      reviewsMarkup = '<ul class="rr-list">' + state.reviews.map(function (r) {
-        return '<li class="rr-item">' +
+      var cardsHtml = state.reviews.map(function (r) {
+        return '<div class="rr-item">' +
           '<div class="rr-item-head">' +
             '<span class="rr-item-name">' + escapeHtml(r.displayName || 'Anonymous') + '</span>' +
             '<span class="rr-item-date">' + escapeHtml(formatDate(r.createdAt)) + '</span>' +
           '</div>' +
           '<p class="rr-item-text">' + escapeHtml(r.reviewText) + '</p>' +
-        '</li>';
-      }).join('') + '</ul>';
+        '</div>';
+      }).join('');
+      // Auto-scrolling marquee (paused on hover/focus, and always
+      // natively scrollable too — same pattern as the homepage category
+      // ticker). Only duplicate the track when there's enough content
+      // that the loop doesn't feel like an obvious instant repeat.
+      var loop = state.reviews.length >= 3;
+      reviewsMarkup = '<div class="rr-marquee' + (loop ? '' : ' rr-marquee-static') + '" data-role="rr-marquee">' +
+        '<div class="rr-marquee-track">' + cardsHtml + (loop ? cardsHtml : '') + '</div>' +
+      '</div>';
     }
 
     shell.innerHTML =
@@ -112,22 +131,40 @@
         (state.rateStatus ? '<p class="rr-hint' + (state.rateStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.rateStatus.message) + '</p>' : '') +
       '</div>' +
 
-      '<form class="rr-form" data-role="review-form">' +
-        '<label class="rr-field">' +
-          '<span>Name (optional)</span>' +
-          '<input type="text" name="displayName" maxlength="80" placeholder="Anonymous" autocomplete="off">' +
+      '<div class="rr-reviews">' +
+        '<p class="rr-reviews-label">What readers are saying</p>' +
+        reviewsMarkup +
+      '</div>' +
+
+      '<form class="rr-form rr-reply-form" data-role="review-form">' +
+        '<h4>Leave a Reply</h4>' +
+        '<textarea name="reviewText" rows="3" maxlength="2000" minlength="2" placeholder="Share what you thought of this story…" required></textarea>' +
+        '<div class="rr-field-row">' +
+          '<label class="rr-field">' +
+            '<span>Name</span>' +
+            '<input type="text" name="displayName" maxlength="80" placeholder="Anonymous" autocomplete="name">' +
+          '</label>' +
+          '<label class="rr-field">' +
+            '<span>Email</span>' +
+            '<input type="email" name="email" maxlength="254" placeholder="you@example.com" autocomplete="email">' +
+          '</label>' +
+          '<label class="rr-field">' +
+            '<span>Website (optional)</span>' +
+            '<input type="text" name="website" maxlength="300" placeholder="https://" autocomplete="url">' +
+          '</label>' +
+        '</div>' +
+        '<label class="rr-checkbox-line">' +
+          '<input type="checkbox" name="notifyFollowUp"> Notify me of follow-up comments by email.' +
         '</label>' +
-        '<label class="rr-field">' +
-          '<span>Your review</span>' +
-          '<textarea name="reviewText" rows="3" maxlength="2000" minlength="2" placeholder="Share what you thought of this story…" required></textarea>' +
+        '<label class="rr-checkbox-line">' +
+          '<input type="checkbox" name="notifyNewPosts"> Notify me of new posts by email.' +
         '</label>' +
+        '<p class="rr-consent">By submitting, you agree this site’s <a href="' + rootPath() + 'cookies.html" target="_blank" rel="noopener">Cookies</a> and <a href="' + rootPath() + 'privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a> apply to your comment.</p>' +
         '<button type="submit" class="rr-submit"' + (state.submitting ? ' disabled' : '') + '>' +
           (state.submitting ? 'Submitting…' : 'Submit review') +
         '</button>' +
         (state.reviewStatus ? '<p class="rr-hint' + (state.reviewStatus.error ? ' rr-error' : ' rr-success') + '">' + escapeHtml(state.reviewStatus.message) + '</p>' : '') +
-      '</form>' +
-
-      '<div class="rr-reviews">' + reviewsMarkup + '</div>';
+      '</form>';
 
     // Wire the recommend/reaction button
     var reactionBtn = shell.querySelector('[data-role="reaction-btn"]');
@@ -158,6 +195,10 @@
         submitReview(shell, state, {
           displayName: (formData.get('displayName') || '').toString().trim(),
           reviewText: (formData.get('reviewText') || '').toString().trim(),
+          email: (formData.get('email') || '').toString().trim(),
+          website: (formData.get('website') || '').toString().trim(),
+          notifyFollowUp: formData.get('notifyFollowUp') === 'on',
+          notifyNewPosts: formData.get('notifyNewPosts') === 'on',
         });
       });
     }
@@ -261,12 +302,21 @@
       body: JSON.stringify({
         displayName: payload.displayName || undefined,
         reviewText: payload.reviewText,
+        email: payload.email || undefined,
+        website: payload.website || undefined,
+        notifyFollowUp: !!payload.notifyFollowUp,
+        notifyNewPosts: !!payload.notifyNewPosts,
         anonymousKey: state.anonymousKey,
       }),
     })
       .then(function () {
         state.submitting = false;
-        state.reviewStatus = { message: 'Thanks! Your review was submitted and will appear after a quick moderation check.', error: false };
+        state.reviewStatus = {
+          message: payload.notifyNewPosts && payload.email
+            ? 'Thanks! Your review was submitted and will appear after a quick moderation check. You’re subscribed for new-story emails.'
+            : 'Thanks! Your review was submitted and will appear after a quick moderation check.',
+          error: false,
+        };
         render(shell, state);
       })
       .catch(function (err) {
