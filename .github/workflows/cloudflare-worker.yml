@@ -69,16 +69,21 @@ jobs:
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           GA_API_SECRET: ${{ secrets.GA_API_SECRET }}
+          GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+          GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          GA_PROPERTY_ID: ${{ secrets.GA_PROPERTY_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           # Account signup/login works without any of these being set, but
           # verification/reset emails silently won't send, IP-hash rate
-          # limiting falls back to an unpepper-ed hash, and server-side
-          # sign_up/login analytics events won't send, until they're added
-          # as repo secrets. See cloudflare/README.md. Each block below
-          # fails the job (not just logs a warning) if the value WAS
-          # provided but `wrangler secret put` itself failed.
+          # limiting falls back to an unpepper-ed hash, server-side
+          # sign_up/login analytics events won't send, and the "Trending"
+          # GA4 top-content section stays empty, until they're added as
+          # repo secrets. See cloudflare/README.md. Each block below fails
+          # the job (not just logs a warning) if the value WAS provided
+          # but `wrangler secret put` itself failed.
           set -e
           if [ -n "$RESEND_API_KEY" ]; then
             printf '%s' "$RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY
@@ -99,4 +104,24 @@ jobs:
             printf '%s' "$GA_API_SECRET" | npx wrangler secret put GA_API_SECRET
           else
             echo "GA_API_SECRET not set — skipping (server-side sign_up/login GA4 events won't send until it is)"
+          fi
+          if [ -n "$GOOGLE_PROJECT_ID" ]; then
+            printf '%s' "$GOOGLE_PROJECT_ID" | npx wrangler secret put GOOGLE_PROJECT_ID
+          else
+            echo "GOOGLE_PROJECT_ID not set — skipping (not currently read by any Worker code, kept for future use)"
+          fi
+          if [ -n "$GOOGLE_CLIENT_EMAIL" ]; then
+            printf '%s' "$GOOGLE_CLIENT_EMAIL" | npx wrangler secret put GOOGLE_CLIENT_EMAIL
+          else
+            echo "GOOGLE_CLIENT_EMAIL not set — skipping (required for the GA4 'Trending' top-content section)"
+          fi
+          if [ -n "$GOOGLE_PRIVATE_KEY" ]; then
+            printf '%s' "$GOOGLE_PRIVATE_KEY" | npx wrangler secret put GOOGLE_PRIVATE_KEY
+          else
+            echo "GOOGLE_PRIVATE_KEY not set — skipping (required for the GA4 'Trending' top-content section)"
+          fi
+          if [ -n "$GA_PROPERTY_ID" ]; then
+            printf '%s' "$GA_PROPERTY_ID" | npx wrangler secret put GA_PROPERTY_ID
+          else
+            echo "GA_PROPERTY_ID not set — skipping (required for the GA4 'Trending' top-content section; find it in GA4 Admin -> Property Settings -> Property ID, a plain number)"
           fi

@@ -325,7 +325,7 @@ function buildStory(filePath) {
     date: meta.date || getFileDate(filePath),
     readTime: meta.readTime || estimateReadTime(body),
     language: meta.language || 'en',
-    author: meta.author || 'Nights',
+    author: meta.author || 'Hushed Chapters',
     content: injectAdMarkers(htmlContent),
     // Members-only story: full text is stripped from the public JSON (see
     // writeStoryJson/publicStoryJson below) and instead synced into the D1

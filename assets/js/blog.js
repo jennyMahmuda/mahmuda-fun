@@ -1,5 +1,5 @@
 /**
- * Nights – Blog Feed v3 (mahmuda.fun)
+ * Hushed Chapters – Blog Feed v3 (mahmuda.fun)
  * - First story = HERO POST (cover with fetchpriority=high)
  * - Other stories = card grid (lazy images)
  */
@@ -119,7 +119,40 @@
     renderFooterCats();
     bindCategoryCards();
     renderTopStories();
+    renderTrending();
     openDeepLink();
+  }
+
+  var ANALYTICS_API_BASE = 'https://mahmuda-fun-api.mahmudajenny6.workers.dev';
+
+  // Home-page "🔥 Trending Now" — driven by real GA4 pageview data (not
+  // ratings, unlike "★ Top Stories" below), via the Worker's
+  // GET /api/analytics/top-content. Renders nothing if the Worker isn't
+  // configured with Google credentials yet (returns an empty list, not
+  // an error) or nobody has viewed enough pages for GA4 to report on.
+  function renderTrending() {
+    var section = document.getElementById('trendingSection');
+    var grid = document.getElementById('trendingGrid');
+    if (!section || !grid) return;
+    fetch(ANALYTICS_API_BASE + '/api/analytics/top-content')
+      .then(function (res) { return res.ok ? res.json() : { topContent: [] }; })
+      .then(function (data) {
+        var byId = {};
+        allStories.forEach(function (s) { byId[s.id] = s; });
+        var list = (data.topContent || []).filter(function (row) { return byId[row.storyId]; }).slice(0, 6);
+        if (!list.length) { section.hidden = true; return; }
+        grid.innerHTML = list.map(function (row) {
+          var s = byId[row.storyId];
+          var img = resolveImage(s);
+          return '<a class="top-rated-card" href="' + storyUrl(row.storyId) + '" data-story-link="' + escapeHtml(row.storyId) + '">' +
+            (img ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:8px;" onerror="this.remove()">' : '') +
+            '<div class="top-rated-name">' + escapeHtml(s.title) + '</div>' +
+            '</a>';
+        }).join('');
+        section.hidden = false;
+        wireMediaButtons(grid);
+      })
+      .catch(function () { section.hidden = true; });
   }
 
   // Home-page "★ Top Stories" — same ranking approach as the category page:
@@ -446,7 +479,7 @@
     html += '<div class="feed-card-header">' +
               '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author">Nights (Featured)</div>' +
+                '<div class="feed-author">Hushed Chapters (Featured)</div>' +
                 '<div class="feed-time">' + escapeHtml(heroStory.date || '') + ' · ' + escapeHtml(heroStory.readTime || '') + '</div>' +
               '</div>' + heroBadge +
               '<span data-rating-slot="' + escapeHtml(heroStory.id) + '"></span>' +
@@ -501,7 +534,7 @@
             '<div class="feed-card-header">' +
               '<div class="feed-avatar">N</div>' +
               '<div class="feed-meta">' +
-                '<div class="feed-author">Nights</div>' +
+                '<div class="feed-author">Hushed Chapters</div>' +
                 '<div class="feed-time">' + escapeHtml(story.date || '') + ' · ' + escapeHtml(story.readTime || '') + '</div>' +
               '</div>' + badge +
               '<span data-rating-slot="' + escapeHtml(story.id) + '"></span>' +

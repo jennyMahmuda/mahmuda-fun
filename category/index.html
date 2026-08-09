@@ -43,6 +43,7 @@
       </div>
     </div>
   </header>
+  <div class="category-ticker" id="categoryTicker" aria-label="Browse categories"></div>
 
   <div class="ad-leaderboard-wrap"><div data-ad="leaderboard" class="ad-slot"></div></div>
   <div class="ad-mobile-wrap"><div data-ad="mobile-banner" class="ad-slot"></div></div>
@@ -53,6 +54,7 @@
         <h1 class="section-title">Categories</h1>
         <p class="section-desc" id="catSub">Browse stories by desire</p>
       </div>
+      <div class="cat-intro" id="catIntro" hidden></div>
       <section class="top-rated-section" id="topRatedSection" hidden>
         <h2 class="top-rated-title">★ Top Rated Stories</h2>
         <div class="top-rated-grid" id="topRatedGrid"></div>
@@ -177,7 +179,7 @@
         var badge = s.series ? esc(s.series) : esc(s.category || s.type || 'Story');
         return '<a class="feed-card" href="../index.html?story=' + encodeURIComponent(s.id) + '" style="text-decoration:none">' +
           (img ? '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>' : '') +
-          '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">Nights</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
+          '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">Hushed Chapters</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
           '<span class="feed-type-badge">' + badge + '</span>' +
           '<span data-rating-slot="' + esc(s.id) + '"></span>' +
           '</div>' +
@@ -254,7 +256,10 @@
     document.addEventListener('DOMContentLoaded', init);
   })();
   </script>
-  <script src="../assets/js/auth.js" defer></script><script src="../assets/js/navigation.js" defer></script>
+  <script src="../assets/js/auth.js" defer></script>
+  <script src="../assets/js/category-ticker.js" defer></script>
+  <script src="../assets/js/category-seo.js" defer></script>
+  <script src="../assets/js/navigation.js" defer></script>
   <script src="../assets/js/site-components.js" defer></script>
   <script src="../assets/js/rating-review.js" defer></script>
   <script src="../assets/js/ads.js" defer></script>

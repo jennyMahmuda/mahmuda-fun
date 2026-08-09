@@ -81,6 +81,23 @@ Frontend pages: `/account/` (login + signup), `/account/verify.html`, `/account/
 
 `RESEND_API_KEY` এবং `RESEND_FROM_EMAIL` ছাড়া deploy fail হবে না (`cloudflare-worker.yml`-এর secret-configuration step সেগুলো না থাকলে শুধু skip করে) — কিন্তু ততক্ষণ পর্যন্ত signup করা account-গুলো কখনো verify হবে না। Resend account বানানো এবং domain verify করা এই session থেকে সম্ভব না — এটা manual step, নিজে করতে হবে।
 
+### 🔥 Trending Now (GA4 Data API top-content section)
+
+আপনি ইতিমধ্যে `GOOGLE_PROJECT_ID`, `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY` — একটি Google service account-এর credentials — GitHub এবং Cloudflare উভয় জায়গায় secret হিসেবে যোগ করেছেন। Worker এখন এগুলো দিয়ে সরাসরি GA4 Data API থেকে সবচেয়ে বেশি-দেখা story pages পড়ে এবং home page-এর "🔥 Trending Now" section-এ দেখায় (`GET /api/analytics/top-content`)।
+
+| Name | ব্যবহার হচ্ছে কি | Value কোথায় পাবেন |
+|---|---|---|
+| `GOOGLE_CLIENT_EMAIL` | হ্যাঁ — JWT sign করতে | Service account JSON key file-এর `client_email` field |
+| `GOOGLE_PRIVATE_KEY` | হ্যাঁ — JWT sign করতে | Service account JSON key file-এর `private_key` field (পুরো PEM string, `-----BEGIN PRIVATE KEY-----` সহ) |
+| `GOOGLE_PROJECT_ID` | **না** — এই feature-এ প্রয়োজন হয় না, শুধু ভবিষ্যতের জন্য secret হিসেবে রাখা আছে | — |
+| `GA_PROPERTY_ID` | **হ্যাঁ, কিন্তু এখনো দেওয়া হয়নি** — এটা ছাড়া "Trending Now" section কখনো data দেখাবে না | GA4 Admin → Property Settings → **Property ID** (একটা plain number, যেমন `398765432` — measurement ID `G-XXXXXXX`-এর মতো নয়) |
+
+আরও দুইটা জিনিস verify করে নেবেন:
+1. **Service account-কে GA4 property access দেওয়া হয়েছে কিনা।** GA4 Admin → Property Access Management → Add users → `GOOGLE_CLIENT_EMAIL`-এর ঠিকানা (যেমন `xxx@yyy.iam.gserviceaccount.com`) → role: **Viewer**। এটা না করলে API call authenticate হলেও 403 error দেবে।
+2. **`GA_PROPERTY_ID`** GitHub repository secret হিসেবে যোগ করুন (উপরের অন্য secret-গুলোর মতোই jagah থেকে)।
+
+Result cache হয় D1-এ (১ ঘণ্টা পর্যন্ত) — তাই প্রতিটা visitor সরাসরি Google API hit করে না, শুধু cache পড়ে।
+
 ## Security rules
 
 API token কখনো `wrangler.toml`, `.env`, Markdown, commit message বা frontend JavaScript-এ রাখবেন না। GitHub Actions secret-এই token রাখবেন। Token-এর permission প্রয়োজনের চেয়ে বেশি দেবেন না এবং সন্দেহ হলে Cloudflare Dashboard থেকে token rotate করবেন।
