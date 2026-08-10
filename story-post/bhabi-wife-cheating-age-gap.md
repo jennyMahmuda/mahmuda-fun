@@ -23,6 +23,7 @@ cover: https://mahmuda.fun/gallery-post/bhabi-wife-cheating-story.jpg
 images:
   - https://mahmuda.fun/gallery-post/bhabi-wife-cheating-story.jpg
   - https://mahmuda.fun/gallery-post/wife-secret-relationship-bangla-story.jpg
+  - https://mahmuda.fun/gallery-post/husband-friend-secret-hotel-meeting.jpg
 excerpt: জামাই অফিসে। ভাবি ৩৩, আমি ২২। দরজায় নক—এসি নষ্টের অজুহাত। ভিতরে ঢুকেই শাড়ি খুললেন। পড়তে পড়তে থামবে না।
 ---
 
@@ -107,3 +108,14 @@ https://mahmuda.fun/?story=bhabi-wife-cheating-age-gap
 **SEO Keywords:** bangla bhabi story, age gap romance, wife cheating bangla, ভাবির গোপন সম্পর্ক, জামাই বাইরে, অসন্তুষ্ট স্ত্রী, secret relationship bangla, 22x33
 
 পরের পর্ব (মুখ + পেছন একসাথে) চাইলে বলো।
+
+---
+
+<div class="next-ep-cta" style="margin:2rem 0;text-align:center;">
+
+<a href="https://www.effectivecpmnetwork.com/kg1dg8q0c2?key=43cfb175f776514c54c4c87294d1718d" rel="nofollow sponsored noopener" target="_blank" style="text-decoration:none;color:inherit;">
+<img src="https://mahmuda.fun/gallery-post/husband-friend-secret-hotel-meeting.jpg" alt="পরের পর্ব পড়ুন" loading="lazy" style="width:100%;max-width:420px;border-radius:10px;border:2px solid #e8a87c;">
+<p style="margin-top:0.75rem;font-size:1.15rem;font-weight:700;color:#e8a87c;">পরের পর্ব পড়ুন →</p>
+</a>
+
+</div>
