@@ -20,17 +20,11 @@ language: bn
 readTime: 55 min
 author: Mahmudajenny69
 cover: https://mahmuda.fun/gallery-post/bhabi-wife-cheating-story.jpg
-images:
-  - https://mahmuda.fun/gallery-post/bhabi-wife-cheating-story.jpg
-  - https://mahmuda.fun/gallery-post/wife-secret-relationship-bangla-story.jpg
-  - https://mahmuda.fun/gallery-post/husband-friend-secret-hotel-meeting.jpg
 excerpt: জামাই অফিসে। ভাবি ৩৩, আমি ২২। দরজায় নক—এসি নষ্টের অজুহাত। ভিতরে ঢুকেই শাড়ি খুললেন। পড়তে পড়তে থামবে না।
 ---
 
 ![ভাবির গোপন সম্পর্ক](https://mahmuda.fun/gallery-post/bhabi-wife-cheating-story.jpg)
 
-**স্পষ্ট লিংক (কপি করো):**  
-`https://mahmuda.fun/?story=bhabi-wife-cheating-age-gap`
 
 ---
 
@@ -100,16 +94,7 @@ excerpt: জামাই অফিসে। ভাবি ৩৩, আমি ২�
 
 ---
 
-**গল্প শেষ · Age-Gap Romance**
-
-**পড়ার লিংক (স্পষ্ট):**  
-https://mahmuda.fun/?story=bhabi-wife-cheating-age-gap
-
-**SEO Keywords:** bangla bhabi story, age gap romance, wife cheating bangla, ভাবির গোপন সম্পর্ক, জামাই বাইরে, অসন্তুষ্ট স্ত্রী, secret relationship bangla, 22x33
-
-পরের পর্ব (মুখ + পেছন একসাথে) চাইলে বলো।
-
----
+ ** Age-Gap Romance **
 
 <div class="next-ep-cta" style="margin:2rem 0;text-align:center;">
 
@@ -119,3 +104,4 @@ https://mahmuda.fun/?story=bhabi-wife-cheating-age-gap
 </a>
 
 </div>
+
