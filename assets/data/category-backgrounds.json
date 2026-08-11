@@ -1,35 +1,35 @@
 {
   "dark-romance": {
-    "path": "assets/images/categories/theme-danger.svg",
-    "photo": false
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": true
   },
   "mafia-romance": {
     "path": "assets/images/categories/theme-danger.svg",
-    "photo": false
+    "photo": true
   },
   "paranormal-fantasy-romance": {
     "path": "assets/images/categories/theme-mystic.svg",
-    "photo": false
+    "photo": true
   },
   "billionaire-romance": {
     "path": "assets/images/categories/theme-luxury.svg",
-    "photo": false
+    "photo": true
   },
   "alpha-males": {
     "path": "assets/images/categories/theme-luxury.svg",
-    "photo": false
+    "photo": true
   },
   "high-school-romance": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": false
+    "photo": true
   },
   "spicy-romance": {
     "path": "assets/images/categories/theme-rose.svg",
-    "photo": false
+    "photo": true
   },
   "age-gap-romance": {
     "path": "assets/images/categories/theme-rose.svg",
-    "photo": false
+    "photo": true
   },
   "vampire-romance": {
     "path": "assets/images/categories/vampire-romance.webp",
@@ -37,54 +37,54 @@
   },
   "cowboy-romance": {
     "path": "assets/images/categories/theme-earthy.svg",
-    "photo": false
+    "photo": true
   },
   "forbidden-romance": {
     "path": "assets/images/categories/theme-accent.svg",
-    "photo": false
+    "photo": true
   },
   "second-chance-romance": {
     "path": "assets/images/categories/theme-accent.svg",
-    "photo": false
+    "photo": true
   },
   "clean-wholesome": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": false
+    "photo": true
   },
   "fated-mates": {
     "path": "assets/images/categories/theme-mystic.svg",
-    "photo": false
+    "photo": true
   },
   "comedy": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": false
+    "photo": true
   },
   "bad-boys": {
     "path": "assets/images/categories/theme-danger.svg",
-    "photo": false
+    "photo": true
   },
   "slow-burn": {
     "path": "assets/images/categories/theme-accent.svg",
-    "photo": false
+    "photo": true
   },
   "enemies-to-lovers": {
     "path": "assets/images/categories/theme-danger.svg",
-    "photo": false
+    "photo": true
   },
   "sports": {
     "path": "assets/images/categories/theme-earthy.svg",
-    "photo": false
+    "photo": true
   },
   "college": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": false
+    "photo": true
   },
   "bhabi-romance": {
     "path": "assets/images/categories/Bhabi-saree.jpg",
     "photo": true
   },
   "affair-romance": {
-    "path": "assets/images/categories/theme-rose.svg",
-    "photo": false
+    "path": "assets/images/gallery/wife-secret-relationship-story.mp4",
+    "photo": true
   }
 }
