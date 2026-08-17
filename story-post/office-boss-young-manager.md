@@ -87,4 +87,4 @@ seo:
 
 **পড়ার লিংক:** https://mahmuda.fun/?story=office-boss-young-manager
 
-পরের পর্ব (মিটিংয়ের পর কেবিন) চাইলে বলো।
+**[পর্ব ২ পড়ুন →](?story=office-boss-young-manager-2)**
