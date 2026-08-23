@@ -79,7 +79,7 @@
     function renderForm(existing) {
       var isNew = !existing;
       var editorMode = qs('mode');
-      var modeLabel = editorMode === 'video' ? 'Video post' : (editorMode === 'image' ? 'Image post' : 'Story post');
+      var modeLabel = editorMode === 'video' ? 'Video post' : (editorMode === 'image' ? 'Image post' : (editorMode === 'premium' ? 'Premium content' : 'Story post'));
       var main = document.getElementById('adminMain');
       main.innerHTML =
         '<div class="admin-wrap">' +
@@ -123,6 +123,7 @@
 
       var form = document.getElementById('storyForm');
       if (isNew && (editorMode === 'video' || editorMode === 'image')) form.elements.contentType.value = editorMode;
+      if (isNew && editorMode === 'premium') form.elements.exclusive.checked = true;
       if (qs('panel') === 'seo') window.setTimeout(function () { var seo = document.querySelector('.admin-seo-health'); if (seo) seo.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
       var submitAction = 'draft';
       form.querySelectorAll('[data-action]').forEach(function (btn) {
