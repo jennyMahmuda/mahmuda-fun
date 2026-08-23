@@ -612,9 +612,9 @@ function buildStory(filePath) {
     exclusive: meta.exclusive === true || meta.exclusive === 'true',
     nextEpisodeId: null,
     seo: {
-      title: (title + ' | mahmuda.fun – Premium Adult Stories').slice(0, 60),
-      description: buildDescription({ title: title, excerpt: meta.excerpt, category: meta.category, language: meta.language }),
-      keywords: buildKeywords({ category: meta.category, tags: tags, language: meta.language }),
+      title: String(meta.seoTitle || (title + ' | mahmuda.fun – Premium Adult Stories')).slice(0, 65),
+      description: String(meta.metaDescription || buildDescription({ title: title, excerpt: meta.excerpt, category: meta.category, language: meta.language })).slice(0, 158),
+      keywords: Array.isArray(meta.seoKeywords) ? meta.seoKeywords : (typeof meta.seoKeywords === 'string' ? meta.seoKeywords.split(',').map(function (k) { return k.trim(); }).filter(Boolean) : buildKeywords({ category: meta.category, tags: tags, language: meta.language })),
       ogImage: images[0] || cover ? resolveMediaUrl(images[0] || cover) : null,
       canonical: SITE_URL + '/?story=' + encodeURIComponent(id)
     },

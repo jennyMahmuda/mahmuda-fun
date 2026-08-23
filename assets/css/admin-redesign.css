@@ -62,7 +62,26 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 #pipelineDestination { color:#fff; font-size:.95rem; }
 #pipelineRoute { color:var(--mrf-soft); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.78rem; }
 .admin-pipeline-panel p { color:var(--mrf-faint); font-size:.78rem; margin:.35rem 0 0; }
-.admin-seo-preview { margin-top:1rem; padding:1rem 1.1rem; border:1px solid var(--mrf-line); border-radius:10px; background:#101217; }
+.admin-seo-health { margin-top:1rem; padding:1rem 1.1rem; border:1px solid var(--mrf-line); border-radius:12px; background:var(--mrf-panel); }
+.seo-health-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.seo-health-header strong { color:#fff; font-size:.95rem; }
+.seo-score { min-width:42px; padding:.35rem .55rem; border-radius:999px; background:rgba(225,29,46,.18); color:var(--mrf-bright); font-size:.75rem; font-weight:800; text-align:center; }
+.seo-checklist { display:grid; gap:.45rem; margin-top:.8rem; }
+.seo-check { display:flex; align-items:center; gap:.55rem; min-height:28px; color:var(--mrf-soft); font-size:.78rem; }
+.seo-check-icon { width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-weight:800; }
+.seo-check.is-ok .seo-check-icon { background:rgba(43,190,125,.18); color:#55e6a5; }
+.seo-check.is-missing .seo-check-icon { background:rgba(225,29,46,.18); color:var(--mrf-bright); }
+.seo-check button { margin-left:auto; border:1px solid rgba(225,29,46,.5); border-radius:6px; padding:.2rem .5rem; background:transparent; color:var(--mrf-bright); cursor:pointer; font-size:.7rem; }
+.admin-seo-fields { display:grid; gap:.8rem; grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:.8rem; padding:1rem; border:1px solid var(--mrf-line); border-radius:10px; background:rgba(255,255,255,.02); }
+.admin-field-heading { grid-column:1/-1; color:#fff; font-size:.9rem; font-weight:700; }
+.admin-seo-fields .rr-field:last-child { grid-column:1/-1; }
+.admin-preview-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-top:1rem; }
+.admin-seo-preview, .admin-card-preview { min-width:0; padding:1rem 1.1rem; border:1px solid var(--mrf-line); border-radius:10px; background:#101217; }
+.admin-card-preview { background:linear-gradient(135deg,#181a20,#0e0f12); }
+.card-preview-label { margin-top:.55rem; color:var(--mrf-bright); font-size:.65rem; font-weight:800; letter-spacing:.14em; }
+.card-preview-title { margin-top:.35rem; color:#fff; font-size:1.15rem; font-weight:750; }
+.card-preview-summary { margin-top:.35rem; color:var(--mrf-faint); font-size:.8rem; line-height:1.5; }
+
 .seo-preview-title { margin-top:.45rem; color:#8ab4f8; font:500 1.05rem Arial,sans-serif; }
 .seo-preview-url { margin:.3rem 0; color:#9aa0a6; font:12px Arial,sans-serif; }
 .seo-preview-description { color:#bdc1c6; font:13px/1.45 Arial,sans-serif; max-width:680px; }
@@ -137,4 +156,7 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 }
 .mrf-admin-mobilebar { display:none; align-items:center; gap:.75rem; padding:1rem; background:var(--mrf-side); border-bottom:1px solid var(--mrf-line); color:#fff; }
 .mrf-admin-mobilebar button { padding:.45rem .7rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.05); color:#fff; }
-@media (max-width:700px) { .admin-row { display:grid !important; grid-template-columns:1fr !important; gap:.6rem !important; } .admin-row-actions { justify-content:flex-start !important; } }
+@media (max-width: 720px) {
+  .admin-seo-fields, .admin-preview-grid { grid-template-columns:1fr; }
+  .admin-seo-fields .rr-field:last-child { grid-column:auto; }
+ .admin-row { display:grid !important; grid-template-columns:1fr !important; gap:.6rem !important; } .admin-row-actions { justify-content:flex-start !important; } }

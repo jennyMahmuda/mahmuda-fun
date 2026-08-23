@@ -88,7 +88,7 @@
               '<label class="rr-field full"><span>Story ID (used in the URL, letters/numbers/-/_ only — can\'t change after creating)</span>' +
                 '<input type="text" name="id" id="storyId" pattern="[a-zA-Z0-9_-]{1,160}" required ' + (isNew ? '' : 'readonly') + ' value="' + escapeHtml(existing ? existing.id : '') + '"></label>' +
               '<label class="rr-field full"><span>Title</span><input type="text" name="title" required maxlength="300" value="' + escapeHtml(existing ? existing.title : '') + '"></label>' +
-              '<label class="rr-field full"><span>Excerpt (short teaser shown on cards)</span><textarea name="excerpt" required maxlength="600">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></label>' +
+              '<label class="rr-field full"><span>Excerpt / Summary (short teaser shown on cards)</span><textarea name="excerpt" required maxlength="600">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></label>' +
               '<label class="rr-field"><span>Category</span><input type="text" name="category" required maxlength="60" value="' + escapeHtml(existing ? existing.category : '') + '"></label>' +
               '<label class="rr-field"><span>Tags (comma separated)</span><input type="text" name="tags" value="' + escapeHtml(existing && existing.tags ? existing.tags.join(', ') : '') + '"></label>' +
               '<label class="rr-field"><span>Series (optional)</span><input type="text" name="series" maxlength="120" value="' + escapeHtml(existing && existing.series ? existing.series : '') + '"></label>' +
@@ -101,6 +101,9 @@
               '<span class="rr-hint" style="margin-top:4px;">Video → shows on /video/. Image gallery → shows on /gellery/. This is what those pages actually filter by — filling in a Video/Cover URL below without setting this here will not make it appear there.</span>' +
               '</label>' +
               '<label class="rr-field"><span>Cover image URL (optional)</span><input type="text" name="coverUrl" value="' + escapeHtml(existing && existing.coverUrl ? existing.coverUrl : '') + '"></label>' +
+              '<label class="rr-field full"><span>SEO title <small>(30–65 characters)</small></span><input type="text" name="seoTitle" maxlength="65" value="' + escapeHtml(existing && existing.seoTitle ? existing.seoTitle : '') + '" placeholder="Search title"></label>' +
+              '<label class="rr-field full"><span>Meta description <small>(70–158 characters)</small></span><textarea name="metaDescription" maxlength="158" placeholder="Search description">' + escapeHtml(existing && existing.metaDescription ? existing.metaDescription : '') + '</textarea></label>' +
+              '<label class="rr-field full"><span>SEO keywords <small>(comma separated)</small></span><input type="text" name="seoKeywords" value="' + escapeHtml(existing && existing.seoKeywords ? existing.seoKeywords.join(', ') : '') + '" placeholder="primary keyword, related keyword"></label>' +
               '<label class="rr-field"><span>Video URL (optional — required if Content type is Video; must be a direct file link, e.g. ending .mp4/.webm, not a YouTube page)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"></label>' +
               '<label class="rr-field"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
               '<label class="rr-checkbox"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
@@ -152,6 +155,9 @@
           coverUrl: String(fd.get('coverUrl') || '').trim() || null,
           videoUrl: String(fd.get('videoUrl') || '').trim() || null,
           audioUrl: String(fd.get('audioUrl') || '').trim() || null,
+          seoTitle: String(fd.get('seoTitle') || '').trim() || null,
+          metaDescription: String(fd.get('metaDescription') || '').trim() || null,
+          seoKeywords: String(fd.get('seoKeywords') || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean),
           exclusive: fd.get('exclusive') === 'on',
         };
 

@@ -77,6 +77,11 @@ function buildFrontMatter(row) {
   lines.push('date: ' + new Date().toISOString().slice(0, 10));
   lines.push('language: ' + yamlScalar(row.language || 'bn'));
   lines.push('excerpt: ' + yamlScalar(row.excerpt));
+  if (row.seo_title) lines.push('seoTitle: ' + yamlScalar(row.seo_title));
+  if (row.meta_description) lines.push('metaDescription: ' + yamlScalar(row.meta_description));
+  let seoKeywords = [];
+  try { seoKeywords = JSON.parse(row.seo_keywords || '[]'); } catch { seoKeywords = []; }
+  if (seoKeywords.length) lines.push('seoKeywords: ' + yamlList(seoKeywords));
   if (row.cover_url) lines.push('cover: ' + yamlScalar(row.cover_url));
   if (row.video_url) lines.push('video: ' + yamlScalar(row.video_url));
   if (row.audio_url) lines.push('audio: ' + yamlScalar(row.audio_url));

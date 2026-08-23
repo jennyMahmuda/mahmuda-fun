@@ -1,53 +1,26 @@
-/* Shared admin pipeline helpers for mahmuda.fun. No credentials live here. */
+/* Canonical category and SEO readiness helpers for mahmuda.fun admin. */
 (function () {
   'use strict';
-  var CATEGORIES = [
-    ['dark-romance','Dark Romance'],['mafia-romance','Mafia Romance'],['paranormal-fantasy-romance','Paranormal & Fantasy Romance'],['billionaire-romance','Billionaire Romance'],['alpha-males','Alpha Males'],['high-school-romance','High School Romance'],['spicy-romance','Spicy Romance'],['age-gap-romance','Age Gap Romance'],['vampire-romance','Vampire Romance'],['cowboy-romance','Cowboy Romance'],['forbidden-romance','Forbidden Romance'],['second-chance-romance','Second Chance Romance'],['clean-wholesome','Clean & Wholesome'],['fated-mates','Fated Mates'],['comedy','Comedy'],['bad-boys','Bad Boys'],['slow-burn','Slow Burn'],['enemies-to-lovers','Enemies to Lovers'],['sports','Sports'],['college','College'],['bhabi-romance','Bhabi Romance'],['affair-romance','Affair & Cheating Romance']
-  ];
-  var byLabel = {};
-  CATEGORIES.forEach(function (item) { byLabel[item[1].toLowerCase()] = item; });
+  var CATEGORIES = [['affair-romance','Affair & Cheating Romance'],['age-gap-romance','Age Gap Romance'],['alpha-males','Alpha Males'],['bad-boys','Bad Boys'],['bhabi-romance','Bhabi Romance'],['billionaire-romance','Billionaire Romance'],['clean-wholesome','Clean & Wholesome'],['college','College'],['comedy','Comedy'],['cowboy-romance','Cowboy Romance'],['dark-romance','Dark Romance'],['enemies-to-lovers','Enemies to Lovers'],['fated-mates','Fated Mates'],['forbidden-romance','Forbidden Romance'],['high-school-romance','High School Romance'],['mafia-romance','Mafia Romance'],['paranormal-fantasy-romance','Paranormal & Fantasy Romance'],['second-chance-romance','Second Chance Romance'],['slow-burn','Slow Burn'],['spicy-romance','Spicy Romance'],['sports','Sports'],['vampire-romance','Vampire Romance']];
+  var labels = {}; CATEGORIES.forEach(function (item) { labels[item[1].toLowerCase()] = item; });
   function esc(value) { return String(value || '').replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
-  function canonicalCategory(value) {
-    var raw = String(value || '').trim().toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ');
-    if (byLabel[raw]) return byLabel[raw];
-    for (var i = 0; i < CATEGORIES.length; i++) {
-      var label = CATEGORIES[i][1].toLowerCase();
-      if (label === raw || label.replace(' romance','') === raw || raw.indexOf(label) !== -1 || label.indexOf(raw) !== -1) return CATEGORIES[i];
-    }
-    return null;
-  }
+  function canonicalCategory(value) { var raw = String(value || '').trim().toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' '); if (labels[raw]) return labels[raw]; for (var i=0;i<CATEGORIES.length;i++) { var n=CATEGORIES[i][1].toLowerCase(); if (n===raw || n.replace(' romance','')===raw || n.indexOf(raw)!==-1 || raw.indexOf(n)!==-1) return CATEGORIES[i]; } return null; }
+  function field(form, name) { return form.querySelector('[name="' + name + '"]'); }
   function enhanceEditor() {
-    var form = document.getElementById('storyForm');
-    if (!form || form.dataset.pipelineEnhanced === 'true') return;
-    form.dataset.pipelineEnhanced = 'true';
-    var category = form.querySelector('[name="category"]');
-    if (category && category.tagName === 'INPUT') {
-      var select = document.createElement('select');
-      select.name = 'category'; select.id = category.id || 'storyCategory'; select.required = true;
-      select.innerHTML = '<option value="">Select canonical destination…</option>' + CATEGORIES.map(function (item) { return '<option value="' + esc(item[1]) + '">' + esc(item[1]) + '</option>'; }).join('');
-      var existing = canonicalCategory(category.value); if (existing) select.value = existing[1];
-      category.parentNode.replaceChild(select, category); category = select;
-    }
-    var field = document.createElement('div'); field.className = 'admin-pipeline-panel';
-    field.innerHTML = '<div class="admin-pipeline-kicker">Publishing pipeline</div><strong id="pipelineDestination">Choose a category to see the live destination</strong><span id="pipelineRoute">No route selected</span><p>Saving this story will use the selected canonical category. The live route is shown here to prevent accidental misfiling.</p>';
-    form.insertBefore(field, form.querySelector('.admin-actions'));
-    var seo = document.createElement('aside'); seo.className = 'admin-seo-preview'; seo.innerHTML = '<div class="admin-pipeline-kicker">SEO live preview</div><div class="seo-preview-title" id="seoPreviewTitle">Story title preview</div><div class="seo-preview-url" id="seoPreviewUrl">mahmuda.fun/story.html</div><div class="seo-preview-description" id="seoPreviewDescription">Your excerpt will appear here as the search description.</div>';
-    form.parentNode.insertBefore(seo, form);
-    var title = form.querySelector('[name="title"]'), excerpt = form.querySelector('[name="excerpt"]'), id = form.querySelector('[name="id"]');
-    function update() {
-      var cat = canonicalCategory(category && category.value); var slug = id && id.value.trim();
-      var dest = document.getElementById('pipelineDestination'), route = document.getElementById('pipelineRoute');
-      if (dest) dest.textContent = cat ? 'This story will publish under ' + cat[1] : 'Choose a category to see the live destination';
-      if (route) route.textContent = cat ? '/category/' + cat[0] + '/' : 'No route selected';
-      var pt = document.getElementById('seoPreviewTitle'), pu = document.getElementById('seoPreviewUrl'), pd = document.getElementById('seoPreviewDescription');
-      if (pt) pt.textContent = (title && title.value.trim()) || 'Story title preview';
-      if (pu) pu.textContent = 'mahmuda.fun/' + (slug || 'story.html');
-      if (pd) pd.textContent = (excerpt && excerpt.value.trim()) || 'Your excerpt will appear here as the search description.';
-    }
-    [category, title, excerpt, id].forEach(function (el) { if (el) el.addEventListener('input', update); });
-    update();
+    var form = document.getElementById('storyForm'); if (!form || form.dataset.pipelineEnhanced === 'true') return; form.dataset.pipelineEnhanced = 'true';
+    var category = field(form,'category');
+    if (category && category.tagName === 'INPUT') { var select=document.createElement('select'); select.name='category'; select.required=true; select.innerHTML='<option value="">Select canonical destination…</option>'+CATEGORIES.map(function(i){return '<option value="'+esc(i[1])+'">'+esc(i[1])+'</option>';}).join(''); var existing=canonicalCategory(category.value); if(existing)select.value=existing[1]; category.parentNode.replaceChild(select,category); category=select; }
+    var seoFields=field(form,'seoTitle') ? null : document.createElement('div'); if (seoFields) { seoFields.className='admin-seo-fields full'; seoFields.innerHTML='<div class="admin-field-heading">Search appearance</div><label class="rr-field"><span>SEO title <small>(30–65 characters)</small></span><input name="seoTitle" maxlength="65" placeholder="SEO title for Google"></label><label class="rr-field"><span>Meta description <small>(70–158 characters)</small></span><textarea name="metaDescription" maxlength="158" placeholder="Search description…"></textarea></label><label class="rr-field"><span>SEO keywords <small>(comma separated)</small></span><input name="seoKeywords" placeholder="primary keyword, related keyword"></label>'; var contentNode=field(form,'content'); if(contentNode && contentNode.closest('.rr-field')) contentNode.closest('.rr-field').before(seoFields); }
+    var panel=document.createElement('section'); panel.className='admin-seo-health full'; panel.innerHTML='<div class="seo-health-header"><div><div class="admin-pipeline-kicker">SEO readiness</div><strong id="seoHealthTitle">A few fields still to fill.</strong></div><span id="seoHealthScore" class="seo-score">0/8</span></div><div id="seoChecklist" class="seo-checklist"></div>';
+    var formGrid=form.querySelector('.admin-grid'); if(formGrid) formGrid.insertBefore(panel,formGrid.firstChild);
+    var destination=document.createElement('div'); destination.className='admin-pipeline-panel full'; destination.innerHTML='<div class="admin-pipeline-kicker">Publishing pipeline</div><strong id="pipelineDestination">Choose a category to see the live destination</strong><span id="pipelineRoute">No route selected</span><p>Only canonical categories can be submitted. Verify this route before publishing.</p>'; if(formGrid) formGrid.insertBefore(destination,formGrid.firstChild);
+    var previews=document.createElement('div'); previews.className='admin-preview-grid full'; previews.innerHTML='<section class="admin-seo-preview"><div class="admin-pipeline-kicker">Google preview</div><div class="seo-preview-title" id="seoPreviewTitle">Your SEO title</div><div class="seo-preview-url" id="seoPreviewUrl">mahmuda.fun/your-story-slug</div><div class="seo-preview-description" id="seoPreviewDescription">Your meta description will appear here.</div></section><section class="admin-card-preview"><div class="admin-pipeline-kicker">Card preview</div><div class="card-preview-label" id="cardPreviewLabel">POSTER RELEASE</div><div class="card-preview-title" id="cardPreviewTitle">Untitled</div><div class="card-preview-summary" id="cardPreviewSummary">Your summary will appear here.</div></section>'; form.parentNode.insertBefore(previews,form);
+    var title=field(form,'title'), seoTitle=field(form,'seoTitle'), meta=field(form,'metaDescription'), excerpt=field(form,'excerpt'), slug=field(form,'id'), tags=field(form,'tags'), cover=field(form,'coverUrl'), content=field(form,'content'), type=field(form,'contentType');
+    var rules=[['title','Title is 15–70 characters',function(){var n=(title.value||'').trim().length;return n>=15&&n<=70;}],['seoTitle','SEO title is 30–65 characters',function(){var n=(seoTitle.value||'').trim().length;return n>=30&&n<=65;}],['meta','Meta description is 70–158 characters',function(){var n=(meta.value||'').trim().length;return n>=70&&n<=158;}],['cover','A cover image is set',function(){return !!(cover.value||'').trim();}],['summary','A summary is written',function(){return (excerpt.value||'').trim().length>=20;}],['slug','URL slug is short and readable',function(){var v=(slug.value||'').trim();return /^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+){0,8}$/.test(v)&&v.length<=80;}],['keywords','Keywords added',function(){return (field(form,'seoKeywords').value||tags.value||'').split(',').map(function(v){return v.trim();}).filter(Boolean).length>0;}],['body','Article body has real depth (300+ characters)',function(){return (content.value||'').replace(/\s/g,'').length>=300;}]];
+    function fixFor(key){var target=key==='meta'?meta:key==='summary'?excerpt:key==='keywords'?field(form,'seoKeywords'):key==='body'?content:key==='cover'?cover:key==='slug'?slug:key==='seoTitle'?seoTitle:title; if(target){target.focus();target.scrollIntoView({behavior:'smooth',block:'center'});}}
+    function update(){var passed=0, html=''; rules.forEach(function(r){var ok=r[2]();if(ok)passed++;html+='<div class="seo-check '+(ok?'is-ok':'is-missing')+'"><span class="seo-check-icon">'+(ok?'✓':'!')+'</span><span>'+r[1]+'</span>'+(ok?'':'<button type="button" data-seo-fix="'+r[0]+'">Fix</button>')+'</div>';}); var list=document.getElementById('seoChecklist');if(list)list.innerHTML=html; var score=document.getElementById('seoHealthScore');if(score)score.textContent=passed+'/8';var head=document.getElementById('seoHealthTitle');if(head)head.textContent=passed===8?'SEO ready to publish.':'A few fields still to fill.';list&&list.querySelectorAll('[data-seo-fix]').forEach(function(b){b.addEventListener('click',function(){fixFor(b.dataset.seoFix);});});var cat=canonicalCategory(category.value), dest=document.getElementById('pipelineDestination'),route=document.getElementById('pipelineRoute');if(dest)dest.textContent=cat?'This post will publish under '+cat[1]:'Choose a category to see the live destination';if(route)route.textContent=cat?'/category/'+cat[0]+'/':'No route selected';var st=(seoTitle.value||title.value||'Your SEO title').trim(), md=(meta.value||excerpt.value||'Your meta description will appear here.').trim(),sl=(slug.value||'your-story-slug').trim();document.getElementById('seoPreviewTitle').textContent=st;document.getElementById('seoPreviewUrl').textContent='mahmuda.fun/story.html?story='+sl;document.getElementById('seoPreviewDescription').textContent=md;document.getElementById('cardPreviewTitle').textContent=(title.value||'Untitled').trim();document.getElementById('cardPreviewSummary').textContent=(excerpt.value||'Your summary will appear here.').trim();var ct=document.getElementById('cardPreviewLabel');if(ct)ct.textContent=(type&&type.value==='video')?'VIDEO':(type&&type.value==='image'?'GALLERY':'POSTER RELEASE');}
+    [category,title,seoTitle,meta,excerpt,slug,tags,cover,content,type,field(form,'seoKeywords')].forEach(function(el){if(el)el.addEventListener('input',update);if(el)el.addEventListener('change',update);}); update();
   }
-  window.MahmudaAdminPipeline = { categories: CATEGORIES, canonicalCategory: canonicalCategory, enhanceEditor: enhanceEditor };
-  function boot() { enhanceEditor(); window.setTimeout(enhanceEditor, 50); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  window.MahmudaAdminPipeline={categories:CATEGORIES,canonicalCategory:canonicalCategory,enhanceEditor:enhanceEditor};
+  function boot(){enhanceEditor();window.setTimeout(enhanceEditor,50);} if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
