@@ -26,6 +26,9 @@ jobs:
     name: Apply D1 migrations and deploy Worker
     if: ${{ vars.ENABLE_CLOUDFLARE_DEPLOY == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -58,11 +61,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Provision configured admin account
-        if: ${{ secrets.ADMIN_USERNAME != '' && secrets.ADMIN_PASSWORD != '' }}
+        if: ${{ env.ADMIN_USERNAME != '' && env.ADMIN_PASSWORD != '' }}
         run: node script/bootstrap-admin.js
         env:
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
