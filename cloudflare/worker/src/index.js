@@ -932,7 +932,8 @@ async function handleAdminUpdateStory(request, env, origin, storyId) {
 
   await env.REVIEWS_DB.prepare(
     `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, categories_json = ?, tags = ?, series = ?, episode = ?,
-     content_type = ?, cover_url = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?, updated_at = datetime('now')
+     content_type = ?, cover_url = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?,
+     synced_at = NULL, updated_at = datetime('now')
      WHERE id = ?`
   ).bind(
     body.title.trim(), body.excerpt.trim(), body.content, selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []),
@@ -957,13 +958,10 @@ async function handleAdminDeleteStory(request, env, origin, storyId) {
   const admin = await getAdminUser(request, env);
   if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
   if (!validStoryId(storyId)) return json({ error: 'Not found' }, 404, corsHeaders(origin));
-  const row = await env.REVIEWS_DB.prepare('SELECT synced_at FROM admin_stories WHERE id = ?').bind(storyId).first();
+  const row = await env.REVIEWS_DB.prepare('SELECT synced_at, status FROM admin_stories WHERE id = ?').bind(storyId).first();
   if (!row) return json({ error: 'Not found' }, 404, corsHeaders(origin));
-  if (row.synced_at) {
-    return json({ error: 'This story is already published to the live site — remove or edit story-post/' + storyId + '.md in the repo instead of deleting it here' }, 409, corsHeaders(origin));
-  }
-  await env.REVIEWS_DB.prepare('DELETE FROM admin_stories WHERE id = ?').bind(storyId).run();
-  return json({ ok: true }, 200, corsHeaders(origin));
+  await env.REVIEWS_DB.prepare("UPDATE admin_stories SET status = 'deleted', updated_at = datetime('now') WHERE id = ?").bind(storyId).run();
+  return json({ ok: true, status: 'deleted', liveRemovalQueued: !!row.synced_at }, 200, corsHeaders(origin));
 }
 
 export default {

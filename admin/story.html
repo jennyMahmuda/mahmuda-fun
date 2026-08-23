@@ -82,7 +82,7 @@
       main.innerHTML =
         '<div class="admin-wrap">' +
           '<h1>' + (isNew ? 'New story' : 'Edit story') + '</h1>' +
-          (!isNew && existing.syncedAt ? '<p class="rr-hint rr-error">This story already went live from an earlier save — editing it here updates the draft record but will NOT change the live page. Edit story-post/' + escapeHtml(existing.id) + '.md directly in the repo for that.</p>' : '') +
+          (!isNew && existing.syncedAt ? '<p class="rr-hint rr-success">This story is live. Changes saved here will requeue it for live regeneration after the next sync/deployment.</p>' : '') +
           '<form class="admin-form-card" id="storyForm">' +
             '<div class="admin-grid">' +
               '<label class="rr-field full"><span>Story ID (used in the URL, letters/numbers/-/_ only — can\'t change after creating)</span>' +

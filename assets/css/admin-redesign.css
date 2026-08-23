@@ -72,6 +72,17 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .seo-check.is-ok .seo-check-icon { background:rgba(43,190,125,.18); color:#55e6a5; }
 .seo-check.is-missing .seo-check-icon { background:rgba(225,29,46,.18); color:var(--mrf-bright); }
 .seo-check button { margin-left:auto; border:1px solid rgba(225,29,46,.5); border-radius:6px; padding:.2rem .5rem; background:transparent; color:var(--mrf-bright); cursor:pointer; font-size:.7rem; }
+.live-preview-backdrop { position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:1rem; background:rgba(0,0,0,.78); }
+.live-preview-modal { position:relative; width:min(780px,100%); max-height:90vh; overflow:auto; padding:2rem; border:1px solid var(--mrf-line); border-radius:16px; background:#111318; box-shadow:0 22px 80px rgba(0,0,0,.55); }
+.live-preview-close { position:absolute; top:.7rem; right:.8rem; border:0; background:transparent; color:var(--mrf-faint); font-size:1.7rem; cursor:pointer; }
+.live-preview-type { margin-top:.65rem; color:var(--mrf-bright); font-size:.65rem; font-weight:800; letter-spacing:.14em; }
+.live-preview-modal h2 { margin:.4rem 0; color:#fff; font-size:clamp(1.35rem,3vw,2.2rem); }
+.live-preview-excerpt { color:var(--mrf-soft); line-height:1.6; }
+.live-preview-routes { display:flex; flex-wrap:wrap; gap:.4rem; margin:1rem 0; }
+.preview-route-chip { padding:.3rem .5rem; border:1px solid rgba(225,29,46,.4); border-radius:999px; color:#ff8791; font-size:.7rem; }
+.live-preview-body { padding-top:1rem; border-top:1px solid var(--mrf-line); color:#e5e7eb; line-height:1.75; }
+.live-preview-seo { margin-top:1rem; padding:.8rem; border-radius:8px; background:rgba(255,255,255,.04); color:var(--mrf-faint); font-size:.75rem; line-height:1.7; }
+.admin-danger { color:#ff8791 !important; border-color:rgba(225,29,46,.42) !important; }
 .admin-category-chooser { margin-top:1rem; padding:1rem; border:1px solid var(--mrf-line); border-radius:12px; background:var(--mrf-panel); }
 .admin-category-chooser legend { padding:0 .35rem; color:#fff; font-weight:750; }
 .admin-category-chooser legend small { display:block; margin-top:.25rem; color:var(--mrf-faint); font-size:.72rem; font-weight:400; }
@@ -164,6 +175,7 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .mrf-admin-mobilebar { display:none; align-items:center; gap:.75rem; padding:1rem; background:var(--mrf-side); border-bottom:1px solid var(--mrf-line); color:#fff; }
 .mrf-admin-mobilebar button { padding:.45rem .7rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.05); color:#fff; }
 @media (max-width: 720px) {
+  .live-preview-modal { padding:1.25rem; }
   .admin-category-checks, .admin-seo-fields, .admin-preview-grid { grid-template-columns:1fr; }
   .admin-seo-fields .rr-field:last-child { grid-column:auto; }
  .admin-row { display:grid !important; grid-template-columns:1fr !important; gap:.6rem !important; } .admin-row-actions { justify-content:flex-start !important; } }

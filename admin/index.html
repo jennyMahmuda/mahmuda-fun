@@ -180,6 +180,8 @@
     }
 
     function statusBadge(story) {
+      if (story.status === 'removed') return '<span class="admin-badge draft">Removed from live</span>';
+      if (story.status === 'deleted') return '<span class="admin-badge draft">Queued for removal</span>';
       if (story.status === 'draft') return '<span class="admin-badge draft">Draft</span>';
       if (story.syncedAt) return '<span class="admin-badge live">Live</span>';
       return '<span class="admin-badge published">Publishing…</span>';
@@ -195,7 +197,9 @@
           '</div>' +
         '</div>' +
         '<div class="admin-row-actions">' +
+          (s.syncedAt ? '<button type="button" data-story-preview="' + escapeHtml(s.id) + '">Live preview</button>' : '') +
           '<a href="story.html?id=' + encodeURIComponent(s.id) + '">Edit</a>' +
+          (s.status !== 'deleted' && s.status !== 'removed' ? '<button type="button" class="admin-danger" data-story-delete="' + escapeHtml(s.id) + '">Delete</button>' : '') +
         '</div>' +
       '</div>';
     }
@@ -220,8 +224,19 @@
         list.innerHTML = '<p class="admin-empty">No stories match "' + escapeHtml(query) + '".</p>';
       } else {
         list.innerHTML = filtered.map(storyRowHtml).join('');
+        bindStoryActions(list, stories);
       }
     }
+
+    function livePreviewHtml(story) {
+      var paragraphs = String(story.content || '').split(/\\n\\s*\\n/).map(function (p) { return '<p>' + escapeHtml(p).replace(/\\n/g, '<br>') + '</p>'; }).join('');
+      var cats = (story.categories || [story.category || '']).map(function (c) { return '<span class="preview-route-chip">' + escapeHtml(c) + '</span>'; }).join('');
+      return '<div class="live-preview-backdrop" data-preview-close><article class="live-preview-modal"><button type="button" class="live-preview-close" data-preview-close aria-label="Close">×</button><div class="admin-pipeline-kicker">Live Preview Mode</div><div class="live-preview-type">' + escapeHtml(story.contentType || 'text').toUpperCase() + '</div><h2>' + escapeHtml(story.title) + '</h2><p class="live-preview-excerpt">' + escapeHtml(story.excerpt || '') + '</p><div class="live-preview-routes">' + cats + '</div><div class="live-preview-body">' + paragraphs + '</div><div class="live-preview-seo"><strong>SEO title:</strong> ' + escapeHtml(story.seoTitle || story.title) + '<br><strong>Meta:</strong> ' + escapeHtml(story.metaDescription || story.excerpt || '') + '</div><div class="admin-row-actions"><a href="story.html?id=' + encodeURIComponent(story.id) + '">Edit this post</a><button type="button" class="admin-danger" data-preview-delete="' + escapeHtml(story.id) + '">Delete post</button></div></article></div>';
+    }
+
+    function showLivePreview(story) { var holder=document.createElement('div'); holder.innerHTML=livePreviewHtml(story); document.body.appendChild(holder.firstElementChild); var modal=document.body.lastElementChild; modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-preview-close'))modal.remove();}); var del=modal.querySelector('[data-preview-delete]'); if(del)del.addEventListener('click',function(){deleteStory(story.id,modal);}); }
+    function deleteStory(id, modal) { if (!window.confirm('Delete this post? If it is already live, removal will be queued for the next site sync.')) return; window.NightsAuth.adminDeleteStory(id).then(function(){if(modal)modal.remove();window.location.reload();}).catch(function(err){window.alert(err.message || 'Could not delete this post.');}); }
+    function bindStoryActions(list, stories) { list.querySelectorAll('[data-story-preview]').forEach(function(btn){btn.addEventListener('click',function(){var story=stories.find(function(s){return s.id===btn.dataset.storyPreview;});if(story)showLivePreview(story);});}); list.querySelectorAll('[data-story-delete]').forEach(function(btn){btn.addEventListener('click',function(){deleteStory(btn.dataset.storyDelete);});}); }
 
     function renderList(stories) {
       var main = document.getElementById('adminMain');
