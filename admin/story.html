@@ -78,10 +78,12 @@
 
     function renderForm(existing) {
       var isNew = !existing;
+      var editorMode = qs('mode');
+      var modeLabel = editorMode === 'video' ? 'Video post' : (editorMode === 'image' ? 'Image post' : 'Story post');
       var main = document.getElementById('adminMain');
       main.innerHTML =
         '<div class="admin-wrap">' +
-          '<h1>' + (isNew ? 'New story' : 'Edit story') + '</h1>' +
+          '<h1>' + (isNew ? 'New ' + modeLabel.toLowerCase() : 'Edit story') + '</h1>' +
           (!isNew && existing.syncedAt ? '<p class="rr-hint rr-success">This story is live. Changes saved here will requeue it for live regeneration after the next sync/deployment.</p>' : '') +
           '<form class="admin-form-card" id="storyForm">' +
             '<div class="admin-grid">' +
@@ -105,6 +107,7 @@
               '<label class="rr-field full"><span>Meta description <small>(70–158 characters)</small></span><textarea name="metaDescription" maxlength="158" placeholder="Search description">' + escapeHtml(existing && existing.metaDescription ? existing.metaDescription : '') + '</textarea></label>' +
               '<label class="rr-field full"><span>SEO keywords <small>(comma separated)</small></span><input type="text" name="seoKeywords" value="' + escapeHtml(existing && existing.seoKeywords ? existing.seoKeywords.join(', ') : '') + '" placeholder="primary keyword, related keyword"></label>' +
               '<label class="rr-field"><span>Video URL (optional — required if Content type is Video; must be a direct file link, e.g. ending .mp4/.webm, not a YouTube page)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"></label>' +
+              '<label class="rr-field"><span>Video thumbnail URL (optional — upload a poster image or paste its direct image URL)</span><input type="text" name="thumbnailUrl" value="' + escapeHtml(existing && existing.thumbnailUrl ? existing.thumbnailUrl : '') + '"></label>' +
               '<label class="rr-field"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
               '<label class="rr-checkbox"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
               '<label class="rr-field full"><span>Story text — plain paragraphs (blank line = new paragraph). # / ## for headings, ![alt](url) for images.</span>' +
@@ -119,6 +122,8 @@
         '</div>';
 
       var form = document.getElementById('storyForm');
+      if (isNew && (editorMode === 'video' || editorMode === 'image')) form.elements.contentType.value = editorMode;
+      if (qs('panel') === 'seo') window.setTimeout(function () { var seo = document.getElementById('seoHealthPanel'); if (seo) seo.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
       var submitAction = 'draft';
       form.querySelectorAll('[data-action]').forEach(function (btn) {
         btn.addEventListener('click', function () { submitAction = btn.getAttribute('data-action'); });
@@ -160,6 +165,7 @@
           contentType: String(fd.get('contentType') || 'text'),
           coverUrl: String(fd.get('coverUrl') || '').trim() || null,
           videoUrl: String(fd.get('videoUrl') || '').trim() || null,
+          thumbnailUrl: String(fd.get('thumbnailUrl') || '').trim() || null,
           audioUrl: String(fd.get('audioUrl') || '').trim() || null,
           seoTitle: String(fd.get('seoTitle') || '').trim() || null,
           metaDescription: String(fd.get('metaDescription') || '').trim() || null,

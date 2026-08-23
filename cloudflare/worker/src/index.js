@@ -850,7 +850,7 @@ function adminStoryRowToJson(row) {
     category: row.category, categories: (() => { try { const parsed = JSON.parse(row.categories_json || '[]'); return parsed.length ? parsed : [row.category]; } catch { return [row.category]; } })(), tags, series: row.series || null,
     episode: row.episode || null, language: row.language,
     contentType: row.content_type || 'text',
-    coverUrl: row.cover_url || null, videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
+    coverUrl: row.cover_url || null, thumbnailUrl: row.thumbnail_url || null, videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
     seoTitle: row.seo_title || '', metaDescription: row.meta_description || '',
     seoKeywords: (() => { try { return JSON.parse(row.seo_keywords || '[]'); } catch { return []; } })(),
     exclusive: !!row.exclusive, status: row.status,
@@ -884,6 +884,7 @@ function validateAdminStoryBody(body) {
   if (!selectedCategories.length) return 'Select at least one valid category';
   if (body?.tags !== undefined && !validAdminTags(body.tags)) return 'Tags must be an array of up to 15 short strings';
   if (!validAdminMediaRef(body?.coverUrl)) return 'Cover image reference is invalid';
+  if (!validAdminMediaRef(body?.thumbnailUrl)) return 'Video thumbnail reference is invalid';
   if (!validAdminMediaRef(body?.videoUrl)) return 'Video reference is invalid';
   if (!validAdminMediaRef(body?.audioUrl)) return 'Audio reference is invalid';
   if (body?.contentType !== undefined && !validContentType(body.contentType)) return 'Content type must be text, video, or image';
@@ -907,12 +908,12 @@ async function handleAdminCreateStory(request, env, origin) {
   if (existing) return json({ error: 'A story with this id already exists — use the update endpoint instead' }, 409, corsHeaders(origin));
 
   await env.REVIEWS_DB.prepare(
-    `INSERT INTO admin_stories (id, title, excerpt, content, category, categories_json, tags, series, episode, content_type, cover_url, video_url, audio_url, seo_title, meta_description, seo_keywords, exclusive, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
+    `INSERT INTO admin_stories (id, title, excerpt, content, category, categories_json, tags, series, episode, content_type, cover_url, thumbnail_url, video_url, audio_url, seo_title, meta_description, seo_keywords, exclusive, status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
   ).bind(
     body.id, body.title.trim(), body.excerpt.trim(), body.content,
     selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []), body.series || null, body.episode || null,
-    body.contentType || 'text', body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
+    body.contentType || 'text', body.coverUrl || null, body.thumbnailUrl || null, body.videoUrl || null, body.audioUrl || null,
     body.seoTitle || null, body.metaDescription || null, JSON.stringify(body.seoKeywords || []), body.exclusive ? 1 : 0, admin.userId
   ).run();
   return json({ ok: true, id: body.id }, 201, corsHeaders(origin));
@@ -933,12 +934,12 @@ async function handleAdminUpdateStory(request, env, origin, storyId) {
 
   await env.REVIEWS_DB.prepare(
     `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, categories_json = ?, tags = ?, series = ?, episode = ?,
-     content_type = ?, cover_url = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?,
+     content_type = ?, cover_url = ?, thumbnail_url = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?,
      synced_at = NULL, updated_at = datetime('now')
      WHERE id = ?`
   ).bind(
     body.title.trim(), body.excerpt.trim(), body.content, selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []),
-    body.series || null, body.episode || null, body.contentType || 'text', body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
+    body.series || null, body.episode || null,     body.contentType || 'text', body.coverUrl || null, body.thumbnailUrl || null, body.videoUrl || null, body.audioUrl || null,
     body.seoTitle || null, body.metaDescription || null, JSON.stringify(body.seoKeywords || []), body.exclusive ? 1 : 0, storyId
   ).run();
   return json({ ok: true, alreadySynced: !!row.synced_at }, 200, corsHeaders(origin));
@@ -1140,9 +1141,19 @@ export default {
     const website = typeof body?.website === 'string' ? body.website.trim().slice(0, 300) : null;
     const notifyFollowUp = body?.notifyFollowUp === true ? 1 : 0;
     const notifyNewPosts = body?.notifyNewPosts === true;
-    await env.REVIEWS_DB.prepare(
-      'INSERT INTO story_reviews (story_id, display_name, review_text, anonymous_key, email, website, notify_follow_up) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    ).bind(route.storyId, displayName, reviewText, anonymousKey, reviewEmail, website, notifyFollowUp).run();
+    const dedupeKey = reviewText.toLowerCase().replace(/\s+/g, ' ').trim();
+    const duplicate = await env.REVIEWS_DB.prepare(
+      'SELECT id FROM story_reviews WHERE story_id = ? AND anonymous_key = ? AND lower(trim(review_text)) = lower(trim(?)) LIMIT 1'
+    ).bind(route.storyId, anonymousKey, reviewText).first();
+    if (duplicate) return json({ error: 'You already submitted this comment for this post.' }, 409, corsHeaders(origin));
+    try {
+      await env.REVIEWS_DB.prepare(
+        'INSERT INTO story_reviews (story_id, display_name, review_text, anonymous_key, dedupe_key, email, website, notify_follow_up) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+      ).bind(route.storyId, displayName, reviewText, anonymousKey, dedupeKey, reviewEmail, website, notifyFollowUp).run();
+    } catch (err) {
+      if (String(err?.message || err).toLowerCase().includes('unique')) return json({ error: 'You already submitted this comment for this post.' }, 409, corsHeaders(origin));
+      throw err;
+    }
     // "Notify me of new posts by email" — a real newsletter opt-in,
     // independent of review moderation (the review can sit pending while
     // the subscription is active immediately). Silently no-ops without an
