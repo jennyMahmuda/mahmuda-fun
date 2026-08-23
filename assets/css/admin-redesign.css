@@ -72,6 +72,13 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .seo-check.is-ok .seo-check-icon { background:rgba(43,190,125,.18); color:#55e6a5; }
 .seo-check.is-missing .seo-check-icon { background:rgba(225,29,46,.18); color:var(--mrf-bright); }
 .seo-check button { margin-left:auto; border:1px solid rgba(225,29,46,.5); border-radius:6px; padding:.2rem .5rem; background:transparent; color:var(--mrf-bright); cursor:pointer; font-size:.7rem; }
+.admin-category-chooser { margin-top:1rem; padding:1rem; border:1px solid var(--mrf-line); border-radius:12px; background:var(--mrf-panel); }
+.admin-category-chooser legend { padding:0 .35rem; color:#fff; font-weight:750; }
+.admin-category-chooser legend small { display:block; margin-top:.25rem; color:var(--mrf-faint); font-size:.72rem; font-weight:400; }
+.admin-category-checks { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.4rem .55rem; margin-top:.7rem; }
+.admin-category-checks label { display:flex; align-items:center; gap:.45rem; padding:.42rem .5rem; border:1px solid transparent; border-radius:7px; color:var(--mrf-soft); font-size:.74rem; cursor:pointer; }
+.admin-category-checks label:has(input:checked) { border-color:rgba(225,29,46,.45); background:rgba(225,29,46,.12); color:#fff; }
+.category-route-preview { margin-top:.7rem; color:var(--mrf-bright); font:700 .7rem ui-monospace,SFMono-Regular,Menlo,monospace; line-height:1.6; }
 .admin-seo-fields { display:grid; gap:.8rem; grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:.8rem; padding:1rem; border:1px solid var(--mrf-line); border-radius:10px; background:rgba(255,255,255,.02); }
 .admin-field-heading { grid-column:1/-1; color:#fff; font-size:.9rem; font-weight:700; }
 .admin-seo-fields .rr-field:last-child { grid-column:1/-1; }
@@ -157,6 +164,6 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .mrf-admin-mobilebar { display:none; align-items:center; gap:.75rem; padding:1rem; background:var(--mrf-side); border-bottom:1px solid var(--mrf-line); color:#fff; }
 .mrf-admin-mobilebar button { padding:.45rem .7rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.05); color:#fff; }
 @media (max-width: 720px) {
-  .admin-seo-fields, .admin-preview-grid { grid-template-columns:1fr; }
+  .admin-category-checks, .admin-seo-fields, .admin-preview-grid { grid-template-columns:1fr; }
   .admin-seo-fields .rr-field:last-child { grid-column:auto; }
  .admin-row { display:grid !important; grid-template-columns:1fr !important; gap:.6rem !important; } .admin-row-actions { justify-content:flex-start !important; } }

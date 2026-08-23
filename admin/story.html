@@ -89,7 +89,7 @@
                 '<input type="text" name="id" id="storyId" pattern="[a-zA-Z0-9_-]{1,160}" required ' + (isNew ? '' : 'readonly') + ' value="' + escapeHtml(existing ? existing.id : '') + '"></label>' +
               '<label class="rr-field full"><span>Title</span><input type="text" name="title" required maxlength="300" value="' + escapeHtml(existing ? existing.title : '') + '"></label>' +
               '<label class="rr-field full"><span>Excerpt / Summary (short teaser shown on cards)</span><textarea name="excerpt" required maxlength="600">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></label>' +
-              '<label class="rr-field"><span>Category</span><input type="text" name="category" required maxlength="60" value="' + escapeHtml(existing ? existing.category : '') + '"></label>' +
+              '<label class="rr-field"><span>Category</span><input type="text" name="category" required maxlength="60" value="' + escapeHtml(existing && existing.categories ? existing.categories.join(',') : (existing ? existing.category : '')) + '"></label>' +
               '<label class="rr-field"><span>Tags (comma separated)</span><input type="text" name="tags" value="' + escapeHtml(existing && existing.tags ? existing.tags.join(', ') : '') + '"></label>' +
               '<label class="rr-field"><span>Series (optional)</span><input type="text" name="series" maxlength="120" value="' + escapeHtml(existing && existing.series ? existing.series : '') + '"></label>' +
               '<label class="rr-field"><span>Episode number (optional)</span><input type="number" name="episode" min="1" value="' + (existing && existing.episode ? existing.episode : '') + '"></label>' +
@@ -142,12 +142,18 @@
           status.innerHTML = '<p class="rr-hint rr-error">Content type is "Image gallery" but the Cover image URL field is empty — fill it in, or switch Content type back to "Story (text)".</p>';
           return;
         }
+        var selectedCategories = fd.getAll('categories').map(function (value) { return String(value || '').trim(); }).filter(Boolean);
+        if (!selectedCategories.length) {
+          status.innerHTML = '<p class="rr-hint rr-error">Tick at least one category before saving or publishing.</p>';
+          return;
+        }
         var payload = {
           id: id,
           title: String(fd.get('title') || '').trim(),
           excerpt: String(fd.get('excerpt') || '').trim(),
           content: String(fd.get('content') || ''),
-          category: String(fd.get('category') || '').trim(),
+          category: selectedCategories[0] || String(fd.get('category') || '').trim(),
+          categories: selectedCategories,
           tags: String(fd.get('tags') || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean),
           series: String(fd.get('series') || '').trim() || null,
           episode: fd.get('episode') ? Number(fd.get('episode')) : null,

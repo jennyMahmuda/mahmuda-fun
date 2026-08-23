@@ -67,6 +67,9 @@ function buildFrontMatter(row) {
   if (row.series) lines.push('series: ' + yamlScalar(row.series));
   if (row.episode) lines.push('episode: ' + row.episode);
   lines.push('category: ' + yamlScalar(row.category));
+  let categories = [];
+  try { categories = JSON.parse(row.categories_json || '[]'); } catch { categories = []; }
+  if (categories.length) lines.push('categories: ' + yamlList(categories));
   if (tags.length) lines.push('tags: ' + yamlList(tags));
   // Was hardcoded to 'text' regardless of content_type — meaning an
   // admin-created video/gallery post could never actually be typed as

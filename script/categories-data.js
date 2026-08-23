@@ -125,6 +125,20 @@ const CATEGORIES = [
     description: 'Affair and cheating-wife romance stories on mahmuda.fun: infidelity, guilt and desire that won’t stay hidden. 18+ fiction.',
     intro: 'Affair fiction leans into what happens when desire crosses a line that was never meant to be crossed.',
     theme: 'rose' },
+  // Exact publishing destinations requested for the admin dashboard. These
+  // aliases intentionally remain separate from the broader genre taxonomy.
+  { slug: 'forbidden', label: 'Forbidden', title: 'Forbidden Stories', description: 'Forbidden stories on mahmuda.fun.', intro: 'Stories tagged Forbidden.', theme: 'accent' },
+  { slug: 'spicy', label: 'Spicy', title: 'Spicy Stories', description: 'Spicy stories on mahmuda.fun.', intro: 'Stories tagged Spicy.', theme: 'rose' },
+  { slug: 'dirtytalk', label: 'Dirtytalk', title: 'Dirtytalk Stories', description: 'Dirtytalk stories on mahmuda.fun.', intro: 'Stories tagged Dirtytalk.', theme: 'danger' },
+  { slug: 'senior', label: 'Senior', title: 'Senior Stories', description: 'Senior stories on mahmuda.fun.', intro: 'Stories tagged Senior.', theme: 'luxury' },
+  { slug: 'climax', label: 'Climax', title: 'Climax Stories', description: 'Climax stories on mahmuda.fun.', intro: 'Stories tagged Climax.', theme: 'rose' },
+  { slug: 'agegap', label: 'Agegap', title: 'Agegap Stories', description: 'Agegap stories on mahmuda.fun.', intro: 'Stories tagged Agegap.', theme: 'rose' },
+  { slug: 'tension', label: 'Tension', title: 'Tension Stories', description: 'Tension stories on mahmuda.fun.', intro: 'Stories tagged Tension.', theme: 'danger' },
+  { slug: 'madam', label: 'Madam', title: 'Madam Stories', description: 'Madam stories on mahmuda.fun.', intro: 'Stories tagged Madam.', theme: 'luxury' },
+  { slug: 'university', label: 'University', title: 'University Stories', description: 'University stories on mahmuda.fun.', intro: 'Stories tagged University.', theme: 'warm' },
+  { slug: 'chemistry', label: 'Chemistry', title: 'Chemistry Stories', description: 'Chemistry stories on mahmuda.fun.', intro: 'Stories tagged Chemistry.', theme: 'accent' },
+  { slug: 'junior', label: 'Junior', title: 'Junior Stories', description: 'Junior stories on mahmuda.fun.', intro: 'Stories tagged Junior.', theme: 'warm' },
+  { slug: 'neighbor', label: 'Neighbor', title: 'Neighbor Stories', description: 'Neighbor stories on mahmuda.fun.', intro: 'Stories tagged Neighbor.', theme: 'earthy' },
 ];
 
 module.exports = { CATEGORIES };

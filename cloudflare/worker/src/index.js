@@ -846,7 +846,7 @@ function adminStoryRowToJson(row) {
   try { tags = JSON.parse(row.tags || '[]'); } catch { tags = []; }
   return {
     id: row.id, title: row.title, excerpt: row.excerpt, content: row.content,
-    category: row.category, tags, series: row.series || null,
+    category: row.category, categories: (() => { try { const parsed = JSON.parse(row.categories_json || '[]'); return parsed.length ? parsed : [row.category]; } catch { return [row.category]; } })(), tags, series: row.series || null,
     episode: row.episode || null, language: row.language,
     contentType: row.content_type || 'text',
     coverUrl: row.cover_url || null, videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
@@ -860,6 +860,9 @@ function adminStoryRowToJson(row) {
 function validContentType(value) {
   return value === 'text' || value === 'video' || value === 'image';
 }
+const ADMIN_CATEGORY_SLUGS = new Set(['all','forbidden','spicy','dirtytalk','senior','climax','agegap','tension','madam','university','chemistry','junior','neighbor','affair-romance','age-gap-romance','alpha-males','bad-boys','bhabi-romance','billionaire-romance','clean-wholesome','college','comedy','cowboy-romance','dark-romance','enemies-to-lovers','fated-mates','forbidden-romance','high-school-romance','mafia-romance','paranormal-fantasy-romance','second-chance-romance','slow-burn','spicy-romance','sports','vampire-romance']);
+function validAdminCategories(value) { return Array.isArray(value) && value.length > 0 && value.length <= 40 && value.every((item) => typeof item === 'string' && ADMIN_CATEGORY_SLUGS.has(item)); }
+function normalizeAdminCategories(body) { return validAdminCategories(body?.categories) ? body.categories : (typeof body?.category === 'string' && ADMIN_CATEGORY_SLUGS.has(body.category.trim()) ? [body.category.trim()] : []); }
 
 async function handleAdminListStories(request, env, origin) {
   const admin = await getAdminUser(request, env);
@@ -876,7 +879,8 @@ function validateAdminStoryBody(body) {
   if (!validAdminTitle(body?.title)) return 'Title is required (2-300 characters)';
   if (!validAdminExcerpt(body?.excerpt)) return 'Excerpt is required (2-600 characters)';
   if (!validAdminContent(body?.content)) return 'Story text is required (at least 20 characters, max 200,000)';
-  if (!validAdminCategory(body?.category)) return 'Category is required (max 60 characters)';
+  const selectedCategories = normalizeAdminCategories(body);
+  if (!selectedCategories.length) return 'Select at least one valid category';
   if (body?.tags !== undefined && !validAdminTags(body.tags)) return 'Tags must be an array of up to 15 short strings';
   if (!validAdminMediaRef(body?.coverUrl)) return 'Cover image reference is invalid';
   if (!validAdminMediaRef(body?.videoUrl)) return 'Video reference is invalid';
@@ -896,16 +900,17 @@ async function handleAdminCreateStory(request, env, origin) {
   const body = await readJson(request);
   const error = validateAdminStoryBody(body);
   if (error) return json({ error }, 400, corsHeaders(origin));
+  const selectedCategories = normalizeAdminCategories(body);
 
   const existing = await env.REVIEWS_DB.prepare('SELECT id FROM admin_stories WHERE id = ?').bind(body.id).first();
   if (existing) return json({ error: 'A story with this id already exists — use the update endpoint instead' }, 409, corsHeaders(origin));
 
   await env.REVIEWS_DB.prepare(
-    `INSERT INTO admin_stories (id, title, excerpt, content, category, tags, series, episode, content_type, cover_url, video_url, audio_url, seo_title, meta_description, seo_keywords, exclusive, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
+    `INSERT INTO admin_stories (id, title, excerpt, content, category, categories_json, tags, series, episode, content_type, cover_url, video_url, audio_url, seo_title, meta_description, seo_keywords, exclusive, status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
   ).bind(
     body.id, body.title.trim(), body.excerpt.trim(), body.content,
-    body.category.trim(), JSON.stringify(body.tags || []), body.series || null, body.episode || null,
+    selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []), body.series || null, body.episode || null,
     body.contentType || 'text', body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
     body.seoTitle || null, body.metaDescription || null, JSON.stringify(body.seoKeywords || []), body.exclusive ? 1 : 0, admin.userId
   ).run();
@@ -923,13 +928,14 @@ async function handleAdminUpdateStory(request, env, origin, storyId) {
   const body = await readJson(request);
   const error = validateAdminStoryBody({ ...body, id: storyId });
   if (error) return json({ error }, 400, corsHeaders(origin));
+  const selectedCategories = normalizeAdminCategories(body);
 
   await env.REVIEWS_DB.prepare(
-    `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, tags = ?, series = ?, episode = ?,
+    `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, categories_json = ?, tags = ?, series = ?, episode = ?,
      content_type = ?, cover_url = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?, updated_at = datetime('now')
      WHERE id = ?`
   ).bind(
-    body.title.trim(), body.excerpt.trim(), body.content, body.category.trim(), JSON.stringify(body.tags || []),
+    body.title.trim(), body.excerpt.trim(), body.content, selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []),
     body.series || null, body.episode || null, body.contentType || 'text', body.coverUrl || null, body.videoUrl || null, body.audioUrl || null,
     body.seoTitle || null, body.metaDescription || null, JSON.stringify(body.seoKeywords || []), body.exclusive ? 1 : 0, storyId
   ).run();

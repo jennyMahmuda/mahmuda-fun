@@ -349,6 +349,7 @@ const CATEGORY_MATCH_STOPWORDS = ['romance', 'and', 'the', 'a', 'to', 'of', '&']
 function storyMatchesCategory(story, slug, label) {
   const needle = normCategoryText(slug);
   const haystack = [story.type || 'text', story.category || '']
+    .concat(story.categories || [])
     .concat(story.tags || [])
     .concat(story.series ? [story.series] : [])
     .map(normCategoryText);
@@ -393,7 +394,7 @@ function categoryCardData(story) {
   const img = story.cover || (story.images && story.images.length ? story.images[0] : '') || null;
   return {
     id: story.id, title: story.title, excerpt: story.excerpt, date: story.date,
-    readTime: story.readTime, series: story.series, category: story.category,
+    readTime: story.readTime, series: story.series, category: story.category, categories: story.categories || [],
     type: story.type, cover: img, exclusive: !!story.exclusive,
   };
 }
@@ -576,6 +577,7 @@ function buildStory(filePath) {
   const video = meta.video ? resolveMediaUrl(meta.video) : null;
   const audio = meta.audio ? resolveMediaUrl(meta.audio) : null;
   const tags = Array.isArray(meta.tags) ? meta.tags : [];
+  const categories = Array.isArray(meta.categories) ? meta.categories : (meta.categories ? String(meta.categories).split(',').map(function (v) { return v.trim(); }).filter(Boolean) : []);
 
   checkMediaRef(cover, id, 'cover');
   (Array.isArray(meta.images) ? meta.images : (typeof meta.images === 'string' ? [meta.images] : []))
@@ -592,6 +594,7 @@ function buildStory(filePath) {
     slug: meta.slug || slugify(title),
     excerpt: meta.excerpt || body.replace(/<[^>]*>?/gm, '').replace(/\n/g, ' ').substring(0, 160).trim() + '…',
     category: meta.category || 'Story',
+    categories: categories,
     tags: tags,
     type: meta.type || 'text',
     series: meta.series || null,
