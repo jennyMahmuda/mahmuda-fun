@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="stylesheet" href="../assets/css/navigation.css" />
   <link rel="stylesheet" href="../assets/css/blog.css" />
-  <link rel="stylesheet" href="../assets/css/ads.css" />
+    <link rel="stylesheet" href="../assets/css/ads.css" />
+    <link rel="stylesheet" href="../assets/css/admin-redesign.css" />
   <style>
     .admin-wrap { max-width: 900px; margin: 0 auto; padding: 100px 16px 60px; }
     .admin-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
@@ -217,33 +218,43 @@
     function renderList(stories) {
       var main = document.getElementById('adminMain');
 
+      document.body.classList.add('admin-dashboard-active');
       main.innerHTML =
-        '<div class="admin-wrap">' +
-          '<div class="admin-head">' +
-            '<h1>Content Manager</h1>' +
-            '<a class="rr-submit" style="text-decoration:none;" href="story.html">+ New story</a>' +
-          '</div>' +
-          '<nav class="admin-tabs" aria-label="Dashboard sections">' +
-            '<a href="#adminStoriesSection">📝 Stories</a>' +
-            '<a href="#adminReviewsSection">💬 Pending reviews</a>' +
-            '<a href="#adminNewsletterSection">✉️ Subscribers</a>' +
-            '<a href="#adminAnalyticsSection">📊 Analytics</a>' +
-          '</nav>' +
-          '<input type="search" id="storySearch" class="admin-search" placeholder="Search stories by title, id, or category…" aria-label="Search stories" />' +
-          adminGuideHtml() +
-          '<p class="rr-hint" style="margin-bottom:18px;">Stories you publish here are written as real story-post files and go live automatically within about 20 minutes (or trigger the "Sync admin-submitted stories" GitHub Action manually for right away). Editing a story after it has gone live needs to be done in the repo directly — this panel writes the file once, it does not keep overwriting it.</p>' +
-          '<div id="adminStoriesSection" class="admin-list"></div>' +
-          '<div id="adminReviewsSection"></div>' +
-          '<div id="adminNewsletterSection"></div>' +
-          '<div id="adminAnalyticsSection"></div>' +
+        '<div class="mrf-admin-mobilebar"><button type="button" id="adminMenuToggle" aria-expanded="false">☰ Menu</button><strong>Content Manager</strong></div>' +
+        '<div class="mrf-admin-shell">' +
+          '<aside class="mrf-admin-sidebar" id="adminSidebar">' +
+            '<div class="mrf-admin-brand"><img src="../assets/logo.svg" alt="" width="30" height="30"><span><strong>MAHMUDA.FUN</strong><span>STUDIO</span></span></div>' +
+            '<p class="mrf-admin-group">Overview</p>' +
+            '<a class="mrf-admin-nav is-active" href="#adminStoriesSection">▦ <span>Dashboard</span></a>' +
+            '<p class="mrf-admin-group">Create</p>' +
+            '<a class="mrf-admin-nav" href="story.html">✎ <span>Publish story</span></a>' +
+            '<a class="mrf-admin-nav" href="#adminStoriesSection">☷ <span>All stories</span></a>' +
+            '<a class="mrf-admin-nav" href="#adminNewsletterSection">✉ <span>Subscribers</span></a>' +
+            '<p class="mrf-admin-group">Community</p>' +
+            '<a class="mrf-admin-nav" href="#adminReviewsSection">♡ <span>Reviews</span></a>' +
+            '<a class="mrf-admin-nav" href="#adminAnalyticsSection">⌁ <span>Analytics</span></a>' +
+            '<div class="mrf-admin-sidefoot"><a href="../index.html" target="_blank" rel="noopener">Open the site</a><button type="button" id="adminLogoutBtn">Sign out</button></div>' +
+          '</aside>' +
+          '<section class="mrf-admin-workspace">' +
+            '<div class="mrf-admin-topbar"><div><h1>Content Manager</h1><p>Publish, moderate and understand what readers are discovering.</p></div><div class="mrf-admin-actions"><a href="story.html">+ New story</a></div></div>' +
+            '<nav class="admin-tabs" aria-label="Dashboard sections">' +
+              '<a href="#adminStoriesSection">Stories</a><a href="#adminReviewsSection">Pending reviews</a><a href="#adminNewsletterSection">Subscribers</a><a href="#adminAnalyticsSection">Analytics</a>' +
+            '</nav>' +
+            '<input type="search" id="storySearch" class="admin-search" placeholder="Search stories by title, id, or category…" aria-label="Search stories" />' +
+            '<div class="mrf-admin-panel">' + adminGuideHtml() + '<p class="rr-hint" style="margin-bottom:18px;">Stories published here are written as story-post files and sync to the live site automatically. A published story’s live file remains the source of truth for later editorial changes.</p>' + '</div>' +
+            '<div id="adminStoriesSection" class="admin-list"></div>' +
+            '<div id="adminReviewsSection"></div>' +
+            '<div id="adminNewsletterSection"></div>' +
+            '<div id="adminAnalyticsSection"></div>' +
+          '</section>' +
         '</div>';
       renderStoryRows(stories, '');
       var searchInput = document.getElementById('storySearch');
-      if (searchInput) {
-        searchInput.addEventListener('input', function () {
-          renderStoryRows(stories, searchInput.value);
-        });
-      }
+      if (searchInput) searchInput.addEventListener('input', function () { renderStoryRows(stories, searchInput.value); });
+      var menuToggle = document.getElementById('adminMenuToggle');
+      if (menuToggle) menuToggle.addEventListener('click', function () { var sidebar = document.getElementById('adminSidebar'); var open = sidebar.classList.toggle('is-open'); menuToggle.setAttribute('aria-expanded', String(open)); });
+      var logout = document.getElementById('adminLogoutBtn');
+      if (logout) logout.addEventListener('click', function () { window.NightsAuth.logout().then(function () { window.location.reload(); }); });
       loadReviews();
       loadNewsletter();
       loadAnalytics();
