@@ -38,9 +38,14 @@ body.admin-dashboard-active > .navbar { display: none; }
 #adminMain .admin-gate h1 { color:#fff; font-size:1.6rem; }
 #adminMain .admin-gate .rr-hint { color:var(--mrf-faint) !important; }
 #adminMain .admin-gate .rr-submit { display:inline-block; padding:.65rem 1.1rem; border-radius:8px; }
+.admin-login-form { width:min(100%,360px); display:grid; gap:.8rem; margin-top:.6rem; padding:1.1rem; border:1px solid var(--mrf-line); border-radius:12px; background:var(--mrf-panel); text-align:left; }
+.admin-login-form .rr-field { display:grid; gap:.35rem; color:var(--mrf-soft); font-size:.78rem; }
+.admin-login-form input { width:100%; box-sizing:border-box; padding:.68rem .75rem; border:1px solid var(--mrf-line); border-radius:8px; background:var(--mrf-input); color:var(--mrf-ink); }
+.admin-login-form input:focus { outline:2px solid var(--mrf-bright); outline-offset:1px; }
+
 
 body:has(.admin-form-card) { background:var(--mrf-bg) !important; color:var(--mrf-ink) !important; }
-body:has(.admin-form-card) > .navbar { display:none; }
+body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { display:none; }
 .admin-form-card { background:var(--mrf-panel) !important; border-color:var(--mrf-line) !important; border-radius:12px !important; }
 .admin-form-card .rr-field { color:var(--mrf-soft) !important; }
 .admin-form-card .rr-field input,
@@ -52,6 +57,16 @@ body:has(.admin-form-card) > .navbar { display:none; }
 .admin-form-card .rr-checkbox { color:var(--mrf-soft); }
 .admin-form-card .rr-hint { color:var(--mrf-faint) !important; }
 .admin-actions { gap:.6rem !important; }
+.admin-pipeline-panel { margin-top:1rem; padding:1rem; border:1px solid rgba(225,29,46,.35); border-radius:10px; background:linear-gradient(135deg,rgba(225,29,46,.13),rgba(255,255,255,.025)); display:grid; gap:.3rem; }
+.admin-pipeline-kicker { color:var(--mrf-bright); font-size:.64rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+#pipelineDestination { color:#fff; font-size:.95rem; }
+#pipelineRoute { color:var(--mrf-soft); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.78rem; }
+.admin-pipeline-panel p { color:var(--mrf-faint); font-size:.78rem; margin:.35rem 0 0; }
+.admin-seo-preview { margin-top:1rem; padding:1rem 1.1rem; border:1px solid var(--mrf-line); border-radius:10px; background:#101217; }
+.seo-preview-title { margin-top:.45rem; color:#8ab4f8; font:500 1.05rem Arial,sans-serif; }
+.seo-preview-url { margin:.3rem 0; color:#9aa0a6; font:12px Arial,sans-serif; }
+.seo-preview-description { color:#bdc1c6; font:13px/1.45 Arial,sans-serif; max-width:680px; }
+
 
 
 .mrf-admin-shell {
@@ -76,6 +91,13 @@ body:has(.admin-form-card) > .navbar { display:none; }
 .mrf-admin-nav:hover { background:rgba(255,255,255,.06); color:var(--mrf-ink); }
 .mrf-admin-nav.is-active { background:rgba(225,29,46,.16); color:#fff; box-shadow:inset 2px 0 0 var(--mrf-brand); }
 .mrf-admin-nav svg { width:17px; height:17px; flex-shrink:0; }
+.mrf-destination-menu { margin:0 .35rem .4rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.025); }
+.mrf-destination-menu summary { padding:.55rem .65rem; color:var(--mrf-soft); cursor:pointer; font-size:.76rem; list-style:none; }
+.mrf-destination-menu summary::-webkit-details-marker { display:none; }
+.mrf-destination-list { display:grid; gap:.1rem; max-height:240px; overflow:auto; padding:0 .35rem .4rem; }
+.mrf-destination-list a { padding:.32rem .35rem; border-radius:5px; color:var(--mrf-faint); font-size:.69rem; line-height:1.2; text-decoration:none; }
+.mrf-destination-list a:hover { background:rgba(255,255,255,.06); color:#fff; }
+
 .mrf-admin-sidefoot { margin-top:auto; padding-top:1rem; border-top:1px solid var(--mrf-line); display:grid; gap:.35rem; }
 .mrf-admin-sidefoot a, .mrf-admin-sidefoot button { width:100%; padding:.55rem .7rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--mrf-ink); text-align:center; text-decoration:none; cursor:pointer; }
 .mrf-admin-workspace { min-width:0; padding:1.5rem clamp(1rem,3vw,2.25rem) 4rem; }

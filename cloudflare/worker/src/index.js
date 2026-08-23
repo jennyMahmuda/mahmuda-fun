@@ -422,6 +422,22 @@ async function handleLogin(request, env, origin) {
   return json({ ok: true, sessionToken }, 200, corsHeaders(origin));
 }
 
+async function handleAdminLogin(request, env, origin) {
+  const body = await readJson(request);
+  const username = typeof body?.username === 'string' ? body.username.trim() : '';
+  const password = typeof body?.password === 'string' ? body.password : '';
+  const ipHash = await hashIp(request, env);
+  if (!username || !password || !env.ADMIN_USERNAME || !env.REVIEWS_DB) return json({ error: 'Admin login is not configured' }, 503, corsHeaders(origin));
+  if (await isRateLimited(env, username, ipHash)) return json({ error: 'Too many attempts. Try again in a few minutes.' }, 429, corsHeaders(origin));
+  const user = await env.REVIEWS_DB.prepare('SELECT id, password_hash AS passwordHash FROM users WHERE email = ? AND is_admin = 1').bind(username).first();
+  const ok = await verifyPassword(password, user ? user.passwordHash : DUMMY_PASSWORD_HASH);
+  await recordLoginAttempt(env, username, ipHash, ok && !!user);
+  if (!user || username !== env.ADMIN_USERNAME || !ok) return json({ error: 'Incorrect admin username or password' }, 401, corsHeaders(origin));
+  const sessionToken = generateToken();
+  await env.REVIEWS_DB.prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))").bind(sessionToken, user.id).run();
+  return json({ ok: true, sessionToken }, 200, corsHeaders(origin));
+}
+
 async function handleLogout(request, env, origin) {
   const token = getBearerToken(request);
   if (validToken(token)) {
@@ -987,6 +1003,7 @@ export default {
     if (pathname === '/api/auth/signup' && request.method === 'POST') return handleSignup(request, env, origin);
     if (pathname === '/api/auth/verify' && request.method === 'POST') return handleVerifyEmail(request, env, origin);
     if (pathname === '/api/auth/login' && request.method === 'POST') return handleLogin(request, env, origin);
+    if (pathname === '/api/admin/login' && request.method === 'POST') return handleAdminLogin(request, env, origin);
     if (pathname === '/api/auth/logout' && request.method === 'POST') return handleLogout(request, env, origin);
     if (pathname === '/api/auth/me' && request.method === 'GET') return handleMe(request, env, origin);
     if (pathname === '/api/auth/request-password-reset' && request.method === 'POST') return handleRequestPasswordReset(request, env, origin);

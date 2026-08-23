@@ -114,10 +114,18 @@
       var main = document.getElementById('adminMain');
       main.innerHTML =
         '<div class="admin-gate">' +
-          '<h1>Content Manager</h1>' +
+          '<div class="mrf-admin-brand" style="border:0;justify-content:center;"><img src="../assets/logo.svg" alt="" width="30" height="30"><span><strong>MAHMUDA.FUN</strong><span>STUDIO</span></span></div>' +
+          '<h1>Admin workspace</h1>' +
           '<p class="rr-hint">' + escapeHtml(message) + '</p>' +
-          (showLoginLink ? '<p><a class="rr-submit" style="display:inline-block;text-decoration:none;margin-top:10px;" href="../account/">Log in</a></p>' : '') +
+          (showLoginLink ? '<form id="adminLoginForm" class="admin-login-form"><label class="rr-field"><span>Admin username</span><input name="username" autocomplete="username" required></label><label class="rr-field"><span>Admin password</span><input name="password" type="password" autocomplete="current-password" required></label><button class="rr-submit" type="submit">Sign in securely</button><p id="adminLoginStatus" class="rr-hint"></p></form><p class="rr-hint">Credentials are checked server-side through Worker secrets.</p>' : '') +
         '</div>';
+      var form = document.getElementById('adminLoginForm');
+      if (form) form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var fd = new FormData(form), status = document.getElementById('adminLoginStatus');
+        status.textContent = 'Signing in…';
+        window.NightsAuth.adminLogin(String(fd.get('username') || ''), String(fd.get('password') || '')).then(function () { window.location.reload(); }).catch(function (err) { status.textContent = err.message || 'Sign in failed'; });
+      });
     }
 
     // Full A-to-Z walkthrough, right here on the page instead of only in
@@ -233,6 +241,12 @@
             '<p class="mrf-admin-group">Community</p>' +
             '<a class="mrf-admin-nav" href="#adminReviewsSection">♡ <span>Reviews</span></a>' +
             '<a class="mrf-admin-nav" href="#adminAnalyticsSection">⌁ <span>Analytics</span></a>' +
+            '<p class="mrf-admin-group">Live destinations</p>' +
+            '<details class="mrf-destination-menu"><summary>Browse all 30 routes</summary><div class="mrf-destination-list">' +
+              '<a href="../index.html">Home</a><a href="../category/">Categories</a>' +
+              '<a href="../category/affair-romance/">Affair &amp; Cheating Romance</a><a href="../category/age-gap-romance/">Age Gap Romance</a><a href="../category/alpha-males/">Alpha Males</a><a href="../category/bad-boys/">Bad Boys</a><a href="../category/bhabi-romance/">Bhabi Romance</a><a href="../category/billionaire-romance/">Billionaire Romance</a><a href="../category/clean-wholesome/">Clean &amp; Wholesome</a><a href="../category/college/">College</a><a href="../category/comedy/">Comedy</a><a href="../category/cowboy-romance/">Cowboy Romance</a><a href="../category/dark-romance/">Dark Romance</a><a href="../category/enemies-to-lovers/">Enemies to Lovers</a><a href="../category/fated-mates/">Fated Mates</a><a href="../category/forbidden-romance/">Forbidden Romance</a><a href="../category/high-school-romance/">High School Romance</a><a href="../category/mafia-romance/">Mafia Romance</a><a href="../category/paranormal-fantasy-romance/">Paranormal &amp; Fantasy</a><a href="../category/second-chance-romance/">Second Chance Romance</a><a href="../category/slow-burn/">Slow Burn</a><a href="../category/spicy-romance/">Spicy Romance</a><a href="../category/sports/">Sports</a><a href="../category/vampire-romance/">Vampire Romance</a>' +
+              '<a href="../new-releases/">New Releases</a><a href="../series/">Series</a><a href="../trending/">Trending</a><a href="../top-rated/">Top Rated</a><a href="../video/">Video</a><a href="../gellery/">Gallery</a>' +
+            '</div></details>' +
             '<div class="mrf-admin-sidefoot"><a href="../index.html" target="_blank" rel="noopener">Open the site</a><button type="button" id="adminLogoutBtn">Sign out</button></div>' +
           '</aside>' +
           '<section class="mrf-admin-workspace">' +

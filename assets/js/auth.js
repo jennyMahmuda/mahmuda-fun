@@ -139,6 +139,12 @@
   // ---- Admin content manager (assets/js/admin.js) ----
   // Every call here 401s/403s server-side for a non-admin session — these
   // are thin wrappers, not the actual access control.
+  function adminLogin(username, password) {
+    return apiFetch('/api/admin/login', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username: username, password: password }),
+    }).then(function (data) { if (data && data.sessionToken) setToken(data.sessionToken); return data; });
+  }
+
   function adminListStories() {
     return apiFetch('/api/admin/stories');
   }
@@ -213,6 +219,7 @@
     me: me,
     getToken: getToken,
     fetchExclusiveContent: fetchExclusiveContent,
+    adminLogin: adminLogin,
     adminListStories: adminListStories,
     adminCreateStory: adminCreateStory,
     adminUpdateStory: adminUpdateStory,
