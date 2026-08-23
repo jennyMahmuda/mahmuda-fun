@@ -152,6 +152,11 @@
           status.innerHTML = '<p class="rr-hint rr-error">Tick at least one category before saving or publishing.</p>';
           return;
         }
+        if (submitAction === 'publish' && form.dataset.seoReady !== 'true') {
+          status.innerHTML = '<p class="rr-hint rr-error">Complete every SEO readiness item until the score reaches 100 before publishing. You can still save a draft.</p>';
+          var health = document.querySelector('.admin-seo-health'); if (health) health.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
         var payload = {
           id: id,
           title: String(fd.get('title') || '').trim(),
