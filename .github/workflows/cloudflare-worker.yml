@@ -67,6 +67,14 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Configure admin login secrets
+        if: ${{ env.ADMIN_USERNAME != '' && env.ADMIN_PASSWORD != '' }}
+        run: |
+          set -e
+          printf '%s' "$ADMIN_USERNAME" | npx wrangler secret put ADMIN_USERNAME
+          printf '%s' "$ADMIN_PASSWORD" | npx wrangler secret put ADMIN_PASSWORD
+          echo "Admin login secrets configured without printing secret values"
+
       - name: Deploy Worker
         run: npm run cf:deploy
         env:
@@ -138,9 +146,7 @@ jobs:
             echo "GA_PROPERTY_ID not set — skipping (required for the GA4 'Trending' top-content section; find it in GA4 Admin -> Property Settings -> Property ID, a plain number)"
           fi
           if [ -n "$ADMIN_USERNAME" ] && [ -n "$ADMIN_PASSWORD" ]; then
-            printf '%s' "$ADMIN_USERNAME" | npx wrangler secret put ADMIN_USERNAME
-            printf '%s' "$ADMIN_PASSWORD" | npx wrangler secret put ADMIN_PASSWORD
-            echo "ADMIN_USERNAME / ADMIN_PASSWORD configured without printing secret values"
+            echo "ADMIN_USERNAME / ADMIN_PASSWORD already configured in the pre-deploy step"
           else
-            echo "ADMIN_USERNAME / ADMIN_PASSWORD not set — admin secret login will remain disabled"
+            echo "ADMIN_USERNAME / ADMIN_PASSWORD not set — admin secret login remains disabled"
           fi
