@@ -182,6 +182,7 @@
     function statusBadge(story) {
       if (story.status === 'removed') return '<span class="admin-badge draft">Removed from live</span>';
       if (story.status === 'deleted') return '<span class="admin-badge draft">Queued for removal</span>';
+      if (story.status === 'hidden') return '<span class="admin-badge draft">Hidden</span>';
       if (story.status === 'draft') return '<span class="admin-badge draft">Draft</span>';
       if (story.syncedAt) return '<span class="admin-badge live">Live</span>';
       return '<span class="admin-badge published">Publishing…</span>';
@@ -236,7 +237,28 @@
 
     function showLivePreview(story) { var holder=document.createElement('div'); holder.innerHTML=livePreviewHtml(story); document.body.appendChild(holder.firstElementChild); var modal=document.body.lastElementChild; modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-preview-close'))modal.remove();}); var del=modal.querySelector('[data-preview-delete]'); if(del)del.addEventListener('click',function(){deleteStory(story.id,modal);}); }
     function deleteStory(id, modal) { if (!window.confirm('Delete this post? If it is already live, removal will be queued for the next site sync.')) return; window.NightsAuth.adminDeleteStory(id).then(function(){if(modal)modal.remove();window.location.reload();}).catch(function(err){window.alert(err.message || 'Could not delete this post.');}); }
-    function bindStoryActions(list, stories) { list.querySelectorAll('[data-story-preview]').forEach(function(btn){btn.addEventListener('click',function(){var story=stories.find(function(s){return s.id===btn.dataset.storyPreview;});if(story)showLivePreview(story);});}); list.querySelectorAll('[data-story-delete]').forEach(function(btn){btn.addEventListener('click',function(){deleteStory(btn.dataset.storyDelete);});}); }
+    function hideStory(id) { if (!window.confirm('Hide this live post? It will be removed from public feeds on the next sync, but the record will remain editable.')) return; window.NightsAuth.adminHideStory(id).then(function(){window.location.reload();}).catch(function(err){window.alert(err.message || 'Could not hide this post.');}); }
+    function bindStoryActions(list, stories) { list.querySelectorAll('[data-story-preview]').forEach(function(btn){btn.addEventListener('click',function(){var story=stories.find(function(s){return s.id===btn.dataset.storyPreview;});if(story)showLivePreview(story);});}); list.querySelectorAll('[data-story-delete]').forEach(function(btn){btn.addEventListener('click',function(){deleteStory(btn.dataset.storyDelete);});}); list.querySelectorAll('[data-story-hide]').forEach(function(btn){btn.addEventListener('click',function(){hideStory(btn.dataset.storyHide);});}); }
+
+    function seoIssues(s) {
+      var checks = [
+        ['Missing title', (s.title || '').trim().length >= 15 && (s.title || '').trim().length <= 70],
+        ['Missing SEO title', (s.seoTitle || '').trim().length >= 30 && (s.seoTitle || '').trim().length <= 65],
+        ['Missing meta description', (s.metaDescription || '').trim().length >= 70 && (s.metaDescription || '').trim().length <= 158],
+        ['Missing cover image', !!((s.coverUrl || '').trim() || (s.thumbnailUrl || '').trim())],
+        ['Missing summary', (s.excerpt || '').trim().length >= 20],
+        ['Missing readable slug', /^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+){0,8}$/.test((s.id || '').trim())],
+        ['Missing keywords', Array.isArray(s.seoKeywords) && s.seoKeywords.length > 0],
+        ['Shallow article body', String(s.content || '').replace(/\\s/g, '').length >= 300]
+      ];
+      return checks.filter(function (x) { return !x[1]; }).map(function (x) { return x[0]; });
+    }
+    function adminImage(s) { return escapeHtml(s.thumbnailUrl || s.coverUrl || '../assets/images/default-cover.svg'); }
+    function contentRoute(s) { var routes=[]; if(s.contentType==='video') routes.push('/video/'); if(s.contentType==='image') routes.push('/gellery/'); if(s.series) routes.push('/series/'); (s.categories || [s.category]).forEach(function(c){ if(c) routes.push(c==='all'?'/category/':'/category/'+c+'/'); }); return routes.filter(function(v,i,a){return a.indexOf(v)===i;}).join(' • ') || 'No route'; }
+    function allContentCard(s) { var issues=seoIssues(s); return '<article class="all-content-card"><img class="all-content-thumb" src="'+adminImage(s)+'" alt="" loading="lazy" onerror="this.src=\'../assets/images/default-cover.svg\'"><div class="all-content-info"><h3>'+escapeHtml(s.title || 'Untitled')+'</h3><div class="all-content-meta">'+statusBadge(s)+' <span>'+escapeHtml(s.contentType || 'text')+'</span> · <span>'+escapeHtml((s.categories || [s.category]).join(', '))+'</span></div><div class="all-content-route">'+escapeHtml(contentRoute(s))+'</div><div class="all-content-actions"><a href="story.html?id='+encodeURIComponent(s.id)+'">Edit</a>'+(s.syncedAt?' <button type="button" data-story-preview="'+escapeHtml(s.id)+'">View</button>':'')+(s.status!=='deleted'&&s.status!=='removed'?' <button type="button" class="admin-hide-action" data-story-hide="'+escapeHtml(s.id)+'">Hide</button>':'')+(s.status!=='deleted'&&s.status!=='removed'?' <button type="button" class="admin-danger" data-story-delete="'+escapeHtml(s.id)+'">Delete</button>':'')+'</div></div></article>'; }
+    function renderAllContent(stories, state) { var section=document.getElementById('adminAllContentSection'); if(!section)return; state=state||{}; var q=(state.q||'').toLowerCase().trim(), cat=state.cat||'', kind=state.kind||'', status=state.status||''; var filtered=stories.filter(function(s){var hay=[s.title,s.id,s.excerpt,s.category,(s.categories||[]).join(' ')].join(' ').toLowerCase(); return (!q||hay.indexOf(q)!==-1)&&(!cat||cat==='all'||(s.categories||[s.category]).indexOf(cat)!==-1)&&(!kind||kind==='all'||(kind==='story'&&(!s.contentType||s.contentType==='text'))||s.contentType===kind)&&(!status||status==='all'||(status==='live'&&s.syncedAt)||s.status===status);}); section.innerHTML='<div class="admin-section-head"><div><h2>All content</h2><p class="rr-hint">Search, edit, hide, view or delete anything on the site.</p></div><a class="admin-primary-link" href="story.html?mode=story">+ Publish something</a></div><div class="all-content-filters"><input id="allContentSearch" type="search" placeholder="Search by title, slug or summary…" value="'+escapeHtml(state.q||'')+'"><select id="allContentCategory"><option value="all">All categories</option>'+((window.MahmudaAdminPipeline&&window.MahmudaAdminPipeline.categories)||[]).filter(function(x){return !['video','image','series'].includes(x[0]);}).map(function(x){return '<option value="'+x[0]+'"'+(cat===x[0]?' selected':'')+'>'+escapeHtml(x[1])+'</option>';}).join('')+'</select><select id="allContentKind"><option value="all">All kinds</option><option value="story"'+(kind==='story'?' selected':'')+'>Story</option><option value="video"'+(kind==='video'?' selected':'')+'>Video</option><option value="image"'+(kind==='image'?' selected':'')+'>Image</option></select><select id="allContentStatus"><option value="all">Published and drafts</option><option value="live"'+(status==='live'?' selected':'')+'>Live</option><option value="draft"'+(status==='draft'?' selected':'')+'>Draft</option></select><button type="button" id="allContentClear">Clear</button></div><div class="all-content-list">'+(filtered.length?filtered.map(allContentCard).join(''):'<p class="admin-empty">No content matches these filters.</p>')+'</div>'; ['allContentSearch','allContentCategory','allContentKind','allContentStatus'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('input',function(){renderAllContent(stories,{q:document.getElementById('allContentSearch').value,cat:document.getElementById('allContentCategory').value,kind:document.getElementById('allContentKind').value,status:document.getElementById('allContentStatus').value});});}); var clear=document.getElementById('allContentClear');if(clear)clear.addEventListener('click',function(){renderAllContent(stories,{});}); bindStoryActions(section,stories); }
+    function renderSeoHealth(stories) { var section=document.getElementById('adminSEOHealthSection'); if(!section)return; var problem=stories.filter(function(s){return seoIssues(s).length;}); section.innerHTML='<div class="admin-section-head"><div><h2>SEO health</h2><p class="rr-hint">Published and draft items missing metadata, media or content depth. Each item is a page search engines can struggle with.</p></div><button type="button" id="seoHealthRefresh">Refresh</button></div><div class="seo-health-cards">'+(problem.length?problem.map(function(s){var issues=seoIssues(s);return '<article class="seo-health-card"><img class="seo-health-thumb" src="'+adminImage(s)+'" alt="" loading="lazy" onerror="this.src=\'../assets/images/default-cover.svg\'"><div class="seo-health-item"><h3>'+escapeHtml(s.title||'Untitled')+'</h3><div class="seo-health-issue">'+escapeHtml(issues[0])+'</div><div class="seo-health-issue-list">'+issues.slice(1).map(function(i){return '<span>'+escapeHtml(i)+'</span>';}).join('')+'</div><a class="admin-fix-link" href="story.html?id='+encodeURIComponent(s.id)+'&panel=seo">Fix it</a></div></article>';}).join(''):'<p class="admin-empty">All content is SEO ready.</p>')+'</div>'; var refresh=document.getElementById('seoHealthRefresh');if(refresh)refresh.addEventListener('click',function(){renderSeoHealth(stories);}); }
+    function bindDashboardNavigation(stories) { document.querySelectorAll('[data-admin-view]').forEach(function(link){link.addEventListener('click',function(e){e.preventDefault();var view=link.getAttribute('data-admin-view');document.querySelectorAll('[data-admin-view]').forEach(function(x){x.classList.remove('is-active');});link.classList.add('is-active');document.querySelectorAll('.admin-dashboard-view').forEach(function(x){x.hidden=true;});var target=document.getElementById(view);if(target)target.hidden=false;});}); }
 
     function renderList(stories) {
       var main = document.getElementById('adminMain');
@@ -248,10 +270,13 @@
           '<aside class="mrf-admin-sidebar" id="adminSidebar">' +
             '<div class="mrf-admin-brand"><img src="../assets/logo.svg" alt="" width="30" height="30"><span><strong>MAHMUDA.FUN</strong><span>STUDIO</span></span></div>' +
             '<p class="mrf-admin-group">Overview</p>' +
-            '<a class="mrf-admin-nav is-active" href="#adminStoriesSection">▦ <span>Dashboard</span></a>' +
+            '<a class="mrf-admin-nav is-active" data-admin-view="adminStoriesSection" href="#adminStoriesSection">▦ <span>Dashboard</span></a>' +
             '<p class="mrf-admin-group">Create</p>' +
-            '<a class="mrf-admin-nav" href="story.html">✎ <span>Publish story</span></a>' +
-            '<a class="mrf-admin-nav" href="#adminStoriesSection">☷ <span>All stories</span></a>' +
+            '<a class="mrf-admin-nav" href="story.html?mode=story">✎ <span>Story post</span></a>' +
+            '<a class="mrf-admin-nav" href="story.html?mode=video">▶ <span>Video post</span></a>' +
+            '<a class="mrf-admin-nav" href="story.html?mode=image">▧ <span>Image post</span></a>' +
+            '<a class="mrf-admin-nav" data-admin-view="adminSEOHealthSection" href="#adminSEOHealthSection">⌁ <span>SEO Health</span></a>' +
+            '<a class="mrf-admin-nav" data-admin-view="adminAllContentSection" href="#adminAllContentSection">☷ <span>All content</span></a>' +
             '<a class="mrf-admin-nav" href="#adminNewsletterSection">✉ <span>Subscribers</span></a>' +
             '<p class="mrf-admin-group">Community</p>' +
             '<a class="mrf-admin-nav" href="#adminReviewsSection">♡ <span>Reviews</span></a>' +
@@ -271,13 +296,18 @@
             '</nav>' +
             '<input type="search" id="storySearch" class="admin-search" placeholder="Search stories by title, id, or category…" aria-label="Search stories" />' +
             '<div class="mrf-admin-panel">' + adminGuideHtml() + '<p class="rr-hint" style="margin-bottom:18px;">Stories published here are written as story-post files and sync to the live site automatically. A published story’s live file remains the source of truth for later editorial changes.</p>' + '</div>' +
-            '<div id="adminStoriesSection" class="admin-list"></div>' +
+            '<div id="adminStoriesSection" class="admin-list admin-dashboard-view"></div>' +
+            '<div id="adminAllContentSection" class="admin-dashboard-view" hidden></div>' +
+            '<div id="adminSEOHealthSection" class="admin-dashboard-view" hidden></div>' +
             '<div id="adminReviewsSection"></div>' +
             '<div id="adminNewsletterSection"></div>' +
             '<div id="adminAnalyticsSection"></div>' +
           '</section>' +
         '</div>';
       renderStoryRows(stories, '');
+      renderAllContent(stories, {});
+      renderSeoHealth(stories);
+      bindDashboardNavigation(stories);
       var searchInput = document.getElementById('storySearch');
       if (searchInput) searchInput.addEventListener('input', function () { renderStoryRows(stories, searchInput.value); });
       var menuToggle = document.getElementById('adminMenuToggle');

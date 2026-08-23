@@ -101,7 +101,7 @@ function main() {
 
   let rows;
   try {
-    rows = runD1("SELECT * FROM admin_stories WHERE ((status = 'published' AND synced_at IS NULL) OR (status = 'deleted' AND synced_at IS NOT NULL)) ORDER BY created_at ASC LIMIT 50");
+    rows = runD1("SELECT * FROM admin_stories WHERE ((status = 'published' AND synced_at IS NULL) OR ((status = 'deleted' OR status = 'hidden') AND synced_at IS NOT NULL)) ORDER BY created_at ASC LIMIT 50");
   } catch (err) {
     log('Could not query D1 (' + err.message + ') — skipping this run without failing the build.');
     return;
@@ -122,7 +122,7 @@ function main() {
       continue;
     }
     const filePath = path.join(STORY_POST_DIR, row.id + '.md');
-    if (row.status === 'deleted') {
+    if (row.status === 'deleted' || row.status === 'hidden') {
       if (fs.existsSync(filePath)) { fs.unlinkSync(filePath); log('Removed story-post/' + row.id + '.md'); }
       syncedIds.push(row.id);
       continue;
@@ -140,7 +140,7 @@ function main() {
 
   const idList = syncedIds.map((id) => "'" + id.replace(/'/g, "''") + "'").join(',');
   try {
-    runD1("UPDATE admin_stories SET synced_at = datetime('now'), status = CASE WHEN status = 'deleted' THEN 'removed' ELSE status END WHERE id IN (" + idList + ')');
+    runD1("UPDATE admin_stories SET synced_at = CASE WHEN status = 'hidden' THEN NULL ELSE datetime('now') END, status = CASE WHEN status = 'deleted' THEN 'removed' ELSE status END WHERE id IN (" + idList + ')');
     log('Marked ' + syncedIds.length + ' story/ies as synced in D1.');
   } catch (err) {
     log('WARNING: wrote the file(s) but failed to mark them synced in D1 (' + err.message + '). ' +

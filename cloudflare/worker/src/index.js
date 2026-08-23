@@ -44,7 +44,7 @@ function routeStoryContent(pathname) {
 // dispatcher (see fetch() below); reusing that instead of widening the
 // allowed-methods/CORS surface for one feature.
 function routeAdminStoryAction(pathname) {
-  const match = pathname.match(/^\/api\/admin\/stories\/([^/]+)\/(update|publish|delete)$/);
+  const match = pathname.match(/^\/api\/admin\/stories\/([^/]+)\/(update|publish|hide|delete)$/);
   return match ? { storyId: decodeURIComponent(match[1]), action: match[2] } : null;
 }
 
@@ -956,6 +956,13 @@ async function handleAdminPublishStory(request, env, origin, storyId) {
   return json({ ok: true, status: 'published' }, 200, corsHeaders(origin));
 }
 
+async function handleAdminHideStory(request, env, origin, storyId) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const result = await env.REVIEWS_DB.prepare("UPDATE admin_stories SET status = 'hidden', updated_at = datetime('now') WHERE id = ? AND status = 'published'").bind(storyId).run();
+  if (!result.meta || !result.meta.changes) return json({ error: 'Only a published story can be hidden' }, 409, corsHeaders(origin));
+  return json({ ok: true, status: 'hidden' }, 200, corsHeaders(origin));
+}
 async function handleAdminDeleteStory(request, env, origin, storyId) {
   const admin = await getAdminUser(request, env);
   if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
@@ -1037,6 +1044,7 @@ export default {
       if (!validStoryId(adminAction.storyId)) return json({ error: 'Not found' }, 404, corsHeaders(origin));
       if (adminAction.action === 'update') return handleAdminUpdateStory(request, env, origin, adminAction.storyId);
       if (adminAction.action === 'publish') return handleAdminPublishStory(request, env, origin, adminAction.storyId);
+      if (adminAction.action === 'hide') return handleAdminHideStory(request, env, origin, adminAction.storyId);
       if (adminAction.action === 'delete') return handleAdminDeleteStory(request, env, origin, adminAction.storyId);
     }
     if (pathname === '/api/admin/reviews' && request.method === 'GET') return handleAdminListReviews(request, env, origin);

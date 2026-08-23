@@ -123,7 +123,7 @@
 
       var form = document.getElementById('storyForm');
       if (isNew && (editorMode === 'video' || editorMode === 'image')) form.elements.contentType.value = editorMode;
-      if (qs('panel') === 'seo') window.setTimeout(function () { var seo = document.getElementById('seoHealthPanel'); if (seo) seo.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+      if (qs('panel') === 'seo') window.setTimeout(function () { var seo = document.querySelector('.admin-seo-health'); if (seo) seo.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
       var submitAction = 'draft';
       form.querySelectorAll('[data-action]').forEach(function (btn) {
         btn.addEventListener('click', function () { submitAction = btn.getAttribute('data-action'); });

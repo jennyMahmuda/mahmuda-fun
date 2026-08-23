@@ -72,6 +72,22 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .seo-check.is-ok .seo-check-icon { background:rgba(43,190,125,.18); color:#55e6a5; }
 .seo-check.is-missing .seo-check-icon { background:rgba(225,29,46,.18); color:var(--mrf-bright); }
 .seo-check button { margin-left:auto; border:1px solid rgba(225,29,46,.5); border-radius:6px; padding:.2rem .5rem; background:transparent; color:var(--mrf-bright); cursor:pointer; font-size:.7rem; }
+.all-content-filters { display:grid; grid-template-columns:minmax(0,2fr) repeat(3,minmax(130px,1fr)) auto; gap:.65rem; margin:1rem 0; }
+.all-content-filters input, .all-content-filters select, .all-content-filters button { min-height:42px; padding:.6rem .75rem; border:1px solid var(--mrf-line); border-radius:9px; background:#1a1c26; color:#f5f5f7; }
+.all-content-list, .seo-health-cards { display:grid; gap:.8rem; }
+.all-content-card, .seo-health-card { display:flex; gap:1rem; padding:1rem; border:1px solid var(--mrf-line); border-radius:14px; background:#15171e; }
+.all-content-thumb, .seo-health-thumb { flex:0 0 92px; width:92px; height:70px; object-fit:cover; border-radius:8px; background:#252833; }
+.all-content-info, .seo-health-item { min-width:0; flex:1; }
+.all-content-info h3, .seo-health-item h3 { margin:0 0 .35rem; color:#fff; font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.all-content-meta, .all-content-route { color:var(--mrf-faint); font-size:.75rem; line-height:1.6; }
+.all-content-route { color:#aaaebc; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+.all-content-actions { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.65rem; }
+.all-content-actions a, .all-content-actions button, .admin-primary-link, .admin-fix-link { display:inline-block; padding:.42rem .65rem; border:1px solid var(--mrf-line); border-radius:7px; color:#f5f5f7; background:transparent; text-decoration:none; cursor:pointer; }
+.admin-primary-link, .admin-fix-link { background:#ef233c; border-color:#ef233c; color:#fff; font-weight:700; }
+.seo-health-card { align-items:flex-start; }
+.seo-health-issue { display:inline-block; margin:.25rem .3rem .35rem 0; padding:.25rem .55rem; border:1px solid #a08022; border-radius:999px; color:#f3c84b; font-size:.72rem; }
+.seo-health-issue-list { display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.65rem; color:var(--mrf-faint); font-size:.72rem; }
+.seo-health-issue-list span + span::before { content:' · '; color:#666b78; margin-right:.3rem; }
 .live-preview-backdrop { position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:1rem; background:rgba(0,0,0,.78); }
 .live-preview-modal { position:relative; width:min(780px,100%); max-height:90vh; overflow:auto; padding:2rem; border:1px solid var(--mrf-line); border-radius:16px; background:#111318; box-shadow:0 22px 80px rgba(0,0,0,.55); }
 .live-preview-close { position:absolute; top:.7rem; right:.8rem; border:0; background:transparent; color:var(--mrf-faint); font-size:1.7rem; cursor:pointer; }
@@ -175,6 +191,9 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .mrf-admin-mobilebar { display:none; align-items:center; gap:.75rem; padding:1rem; background:var(--mrf-side); border-bottom:1px solid var(--mrf-line); color:#fff; }
 .mrf-admin-mobilebar button { padding:.45rem .7rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.05); color:#fff; }
 @media (max-width: 720px) {
+  .all-content-filters { grid-template-columns:1fr; }
+  .all-content-card, .seo-health-card { gap:.7rem; padding:.75rem; }
+  .all-content-thumb, .seo-health-thumb { flex-basis:72px; width:72px; height:58px; }
   .live-preview-modal { padding:1.25rem; }
   .admin-category-checks, .admin-seo-fields, .admin-preview-grid { grid-template-columns:1fr; }
   .admin-seo-fields .rr-field:last-child { grid-column:auto; }

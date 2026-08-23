@@ -161,6 +161,9 @@
   function adminPublishStory(id) {
     return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/publish', { method: 'POST' });
   }
+  function adminHideStory(id) {
+    return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/hide', { method: 'POST' });
+  }
   function adminDeleteStory(id) {
     return apiFetch('/api/admin/stories/' + encodeURIComponent(id) + '/delete', { method: 'POST' });
   }
@@ -224,6 +227,7 @@
     adminCreateStory: adminCreateStory,
     adminUpdateStory: adminUpdateStory,
     adminPublishStory: adminPublishStory,
+    adminHideStory: adminHideStory,
     adminDeleteStory: adminDeleteStory,
     adminListReviews: adminListReviews,
     adminModerateReview: adminModerateReview,
