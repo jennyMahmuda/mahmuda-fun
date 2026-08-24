@@ -345,6 +345,18 @@ function writeSitemap(stories) {
 function normCategoryText(value) {
   return String(value || '').toLowerCase().replace(/[-\s]+/g, ' ').trim();
 }
+function canonicalCategorySlug(value) {
+  const raw = normCategoryText(value);
+  const aliases = {
+    'age gap': 'agegap',
+    'age gap romance': 'age-gap-romance',
+    'college romance': 'college',
+    'story': 'all'
+  };
+  if (aliases[raw]) return aliases[raw];
+  const found = CATEGORIES.find(function (cat) { return normCategoryText(cat.slug) === raw || normCategoryText(cat.label) === raw; });
+  return found ? found.slug : raw.replace(/\s+/g, '-');
+}
 const CATEGORY_MATCH_STOPWORDS = ['romance', 'and', 'the', 'a', 'to', 'of', '&'];
 
 function storyMatchesCategory(story, slug, label) {
@@ -353,7 +365,8 @@ function storyMatchesCategory(story, slug, label) {
     .concat(story.categories || [])
     .concat(story.tags || [])
     .concat(story.series ? [story.series] : [])
-    .map(normCategoryText);
+    .map(function (value) { return [normCategoryText(value), canonicalCategorySlug(value)]; })
+    .reduce(function (all, values) { return all.concat(values); }, []);
   if (haystack.indexOf(needle) !== -1 || haystack.join(' ').indexOf(needle) !== -1) return true;
   // Compound category names ("Bhabi Romance", "Affair & Cheating Romance")
   // won't substring-match a story tagged with just one plain word ("Bhabi",
