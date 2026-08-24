@@ -1,5 +1,5 @@
 const ALLOWED_ORIGINS = new Set(['https://mahmuda.fun', 'https://www.mahmuda.fun']);
-const SAFE_KEY = /^[A-Za-z0-9][A-Za-z0-9/_-]{0,180}$/;
+const SAFE_KEY = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,180}$/;
 const ALLOWED_TYPES = new Set([
   'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif',
   'video/mp4', 'video/webm', 'video/quicktime'

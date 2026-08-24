@@ -1,0 +1,10 @@
+import gateway from '../cloudflare/media-gateway/src/index.js';
+const store=new Map();
+const env={MEDIA_GATEWAY_AUTH_SECRET:'test-secret',MEDIA_BUCKET:{async put(key,body,opts){store.set(key,{body:await new Response(body).arrayBuffer(),contentType:opts.httpMetadata.contentType});},async get(key){const item=store.get(key);if(!item)return null;return {body:new Response(item.body).body,httpEtag:'"test"',writeHttpMetadata(h){h.set('content-type',item.contentType);}}}},MAX_UPLOAD_BYTES:'52428800'};
+const req=(url,init={})=>new Request(url,{...init,headers:{Origin:'https://mahmuda.fun',...(init.headers||{})}});
+let r=await gateway.fetch(req('https://gateway.test/health'),env);if(!r.ok)throw new Error('health failed');
+r=await gateway.fetch(req('https://gateway.test/media/images/test/a.webp',{method:'PUT',headers:{Authorization:'Bearer test-secret','Content-Type':'image/webp','Content-Length':'4'},body:new Uint8Array([1,2,3,4])}),env);if(r.status!==201)throw new Error('image PUT failed '+r.status+' '+await r.text());
+r=await gateway.fetch(req('https://gateway.test/media/videos/test/a.mp4',{method:'PUT',headers:{Authorization:'Bearer test-secret','Content-Type':'video/mp4','Content-Length':'4'},body:new Uint8Array([1,2,3,4])}),env);if(r.status!==201)throw new Error('video PUT failed '+r.status+' '+await r.text());
+r=await gateway.fetch(req('https://gateway.test/media/images/test/a.webp',{headers:{Authorization:'Bearer test-secret'}}),env);if(r.status!==200||r.headers.get('content-type')!=='image/webp')throw new Error('GET failed');
+r=await gateway.fetch(req('https://gateway.test/media/images/test/b.webp',{method:'PUT',headers:{Authorization:'Bearer wrong','Content-Type':'image/webp'},body:new Uint8Array([1])}),env);if(r.status!==401)throw new Error('auth failed');
+console.log('media gateway contract OK');

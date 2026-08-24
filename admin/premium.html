@@ -53,7 +53,7 @@
   <script src="../assets/js/site-components.js" defer></script>
   <script src="../assets/js/story-promo.js" defer></script>
   <script src="../assets/js/newsletter-footer.js" defer></script>
-  <script src="../assets/js/admin-pipeline.js?v=20260824" defer></script>
+  <script src="../assets/js/admin-pipeline.js" defer></script>
   <script>
   (function () {
     'use strict';
@@ -85,37 +85,36 @@
         '<div class="admin-wrap">' +
           '<div class="admin-pipeline-kicker">Premium Studio</div>' +
           '<h1>' + (isNew ? 'New premium content' : 'Edit premium content') + '</h1>' +
-          '<p class="rr-hint rr-success">This separate workflow always publishes to verified members only. Story, video and image formats remain available, with the same SEO readiness checks.</p>' +
+          '<p class="rr-hint rr-success">This separate workflow always publishes to verified members only.</p>' +
           (!isNew && existing.syncedAt ? '<p class="rr-hint rr-success">This story is live. Changes saved here will requeue it for live regeneration after the next sync/deployment.</p>' : '') +
           '<form class="admin-form-card" id="storyForm">' +
             '<div class="admin-grid">' +
               '<label class="rr-field full"><span>Story ID (used in the URL, letters/numbers/-/_ only — can\'t change after creating)</span>' +
                 '<input type="text" name="id" id="storyId" pattern="[a-zA-Z0-9_-]{1,160}" required ' + (isNew ? '' : 'readonly') + ' value="' + escapeHtml(existing ? existing.id : '') + '"></label>' +
               '<label class="rr-field full"><span>Title</span><input type="text" name="title" required maxlength="300" value="' + escapeHtml(existing ? existing.title : '') + '"></label>' +
-              '<label class="rr-field full"><span>Excerpt / Summary (short teaser shown on cards)</span><textarea name="excerpt" required maxlength="600">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></label>' +
-              '<label class="rr-field"><span>Category</span><input type="text" name="category" required maxlength="60" value="' + escapeHtml(existing && existing.categories ? existing.categories.join(',') : (existing ? existing.category : '')) + '"></label>' +
-              '<label class="rr-field"><span>Tags (comma separated)</span><input type="text" name="tags" value="' + escapeHtml(existing && existing.tags ? existing.tags.join(', ') : '') + '"></label>' +
-              '<label class="rr-field"><span>Series (optional)</span><input type="text" name="series" maxlength="120" value="' + escapeHtml(existing && existing.series ? existing.series : '') + '"></label>' +
-              '<label class="rr-field"><span>Episode number (optional)</span><input type="number" name="episode" min="1" value="' + (existing && existing.episode ? existing.episode : '') + '"></label>' +
+              '<label class="rr-field full" data-editor-type="story video image audio"><span>Excerpt / Summary / Description (optional for Image)</span><textarea name="excerpt" maxlength="600">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></label>' +
+              '<label class="rr-field" data-editor-type="story"><span>Category</span><input type="text" name="category" maxlength="60" value="' + escapeHtml(existing && existing.categories ? existing.categories.join(',') : (existing ? existing.category : '')) + '"></label>' +
+              '<label class="rr-field" data-editor-type="story"><span>Tags (comma separated)</span><input type="text" name="tags" value="' + escapeHtml(existing && existing.tags ? existing.tags.join(', ') : '') + '"></label>' +
+              '<label class="rr-field" data-editor-type="story"><span>Series (optional)</span><input type="text" name="series" maxlength="120" value="' + escapeHtml(existing && existing.series ? existing.series : '') + '"></label>' +
+              '<label class="rr-field" data-editor-type="story"><span>Episode number (optional)</span><input type="number" name="episode" min="1" value="' + (existing && existing.episode ? existing.episode : '') + '"></label>' +
               '<label class="rr-field"><span>Content type</span><select name="contentType">' +
                 '<option value="text"' + (!existing || existing.contentType === 'text' ? ' selected' : '') + '>Story (text)</option>' +
                 '<option value="video"' + (existing && existing.contentType === 'video' ? ' selected' : '') + '>Video</option>' +
                 '<option value="image"' + (existing && existing.contentType === 'image' ? ' selected' : '') + '>Image gallery</option>' +
+                '<option value="audio"' + (existing && existing.contentType === 'audio' ? ' selected' : '') + '>Audio</option>' +
               '</select>' +
-              '<span class="rr-hint" id="contentTypeHelp" style="margin-top:4px;">Choose a type to show only the fields used by that live destination.</span>' +
+              '<span class="rr-hint" style="margin-top:4px;">Video → shows on /video/. Image gallery → shows on /gellery/. This is what those pages actually filter by — filling in a Video/Cover URL below without setting this here will not make it appear there.</span>' +
               '</label>' +
-              '<label class="rr-field"><span>Cover image URL (optional)</span><input type="text" name="coverUrl" value="' + escapeHtml(existing && existing.coverUrl ? existing.coverUrl : '') + '"><input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp,image/avif" data-upload-field="coverUrl" style="margin-top:8px"></label>' +
-              '<label class="rr-field"><span>Cover image Alt text <small>(describe the image for accessibility and SEO)</small></span><input type="text" name="coverAlt" maxlength="180" value="' + escapeHtml(existing && existing.coverAlt ? existing.coverAlt : '') + '" placeholder="Example: Main poster for the new episode"></label>' +
-              '<label class="rr-field full"><span>SEO title <small>(30–65 characters)</small></span><input type="text" name="seoTitle" maxlength="65" value="' + escapeHtml(existing && existing.seoTitle ? existing.seoTitle : '') + '" placeholder="Search title"></label>' +
-              '<label class="rr-field full"><span>Meta description <small>(70–158 characters)</small></span><textarea name="metaDescription" maxlength="158" placeholder="Search description">' + escapeHtml(existing && existing.metaDescription ? existing.metaDescription : '') + '</textarea></label>' +
-              '<label class="rr-field full"><span>SEO keywords <small>(comma separated)</small></span><input type="text" name="seoKeywords" value="' + escapeHtml(existing && existing.seoKeywords ? existing.seoKeywords.join(', ') : '') + '" placeholder="primary keyword, related keyword"></label>' +
-              '<label class="rr-field" data-editor-type="video"><span>Video URL (required for Video posts; direct .mp4/.webm link)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"><input type="file" name="videoFile" accept="video/mp4,video/webm,video/quicktime" data-upload-field="videoUrl" style="margin-top:8px"></label>' +
-              '<label class="rr-field" data-editor-type="video"><span>Video thumbnail URL (recommended for Video posts)</span><input type="text" name="thumbnailUrl" value="' + escapeHtml(existing && existing.thumbnailUrl ? existing.thumbnailUrl : '') + '"><input type="file" name="thumbnailFile" accept="image/jpeg,image/png,image/webp,image/avif" data-upload-field="thumbnailUrl" style="margin-top:8px"></label>' +
-              '<label class="rr-field" data-editor-type="video"><span>Video thumbnail Alt text <small>(describe the poster image)</small></span><input type="text" name="thumbnailAlt" maxlength="180" value="' + escapeHtml(existing && existing.thumbnailAlt ? existing.thumbnailAlt : '') + '" placeholder="Example: Video poster showing the lead actors"></label>' +
-              '<label class="rr-field" data-editor-type="story video premium"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
-              '<label class="rr-checkbox"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
-              '<label class="rr-field full"><span>Story text — plain paragraphs (blank line = new paragraph). # / ## for headings, ![alt](url) for images.</span>' +
-                '<textarea name="content" id="storyContent" required>' + escapeHtml(existing ? existing.content : '') + '</textarea></label>' +
+              '<label class="rr-field" data-editor-type="story image"><span>Cover image URL (optional)</span><input type="text" name="coverUrl" value="' + escapeHtml(existing && existing.coverUrl ? existing.coverUrl : '') + '"><input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp,image/avif" data-upload-field="coverUrl" style="margin-top:8px"></label>' +
+              '<label class="rr-field full" data-editor-type="story image"><span>SEO title <small>(30–65 characters)</small></span><input type="text" name="seoTitle" maxlength="65" value="' + escapeHtml(existing && existing.seoTitle ? existing.seoTitle : '') + '" placeholder="Search title"></label>' +
+              '<label class="rr-field full" data-editor-type="story image"><span>Meta description <small>(70–158 characters)</small></span><textarea name="metaDescription" maxlength="158" placeholder="Search description">' + escapeHtml(existing && existing.metaDescription ? existing.metaDescription : '') + '</textarea></label>' +
+              '<label class="rr-field full" data-editor-type="story"><span>SEO keywords <small>(comma separated)</small></span><input type="text" name="seoKeywords" value="' + escapeHtml(existing && existing.seoKeywords ? existing.seoKeywords.join(', ') : '') + '" placeholder="primary keyword, related keyword"></label>' +
+              '<label class="rr-field" data-editor-type="video"><span>Video URL (YouTube link or raw upload)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"><input type="file" name="videoFile" accept="video/mp4,video/webm,video/quicktime" data-upload-field="videoUrl" style="margin-top:8px"></label>' +
+              '<label class="rr-field" data-editor-type="video"><span>Video thumbnail URL (optional)</span><input type="text" name="thumbnailUrl" value="' + escapeHtml(existing && existing.thumbnailUrl ? existing.thumbnailUrl : '') + '"><input type="file" name="thumbnailFile" accept="image/jpeg,image/png,image/webp,image/avif" data-upload-field="thumbnailUrl" style="margin-top:8px"></label>' +
+              '<label class="rr-field" data-editor-type="audio"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
+              '<label class="rr-checkbox" data-editor-type="story"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
+              '<label class="rr-field full" data-editor-type="story"><span>Story text — plain paragraphs (blank line = new paragraph). # / ## for headings, ![alt](url) for images.</span>' +
+                '<textarea name="content" id="storyContent">' + escapeHtml(existing ? existing.content : '') + '</textarea></label>' +
             '</div>' +
             '<div class="admin-actions">' +
               '<button type="submit" class="rr-submit admin-btn-secondary" data-action="draft">Save draft</button>' +
@@ -128,30 +127,10 @@
       var form = document.getElementById('storyForm');
       if (isNew && (editorMode === 'video' || editorMode === 'image')) form.elements.contentType.value = editorMode;
       if (isNew && editorMode === 'premium') form.elements.exclusive.checked = true;
-      function syncEditorType() { var kind = String(form.elements.contentType.value || 'text'); form.querySelectorAll('[data-editor-type]').forEach(function (field) { var types = String(field.getAttribute('data-editor-type') || '').split(/\s+/); field.hidden = types.indexOf(kind) === -1; }); var help = document.getElementById('contentTypeHelp'); if (help) help.textContent = kind === 'video' ? 'Video posts route to /video/. Upload a direct video file and add a thumbnail for the card.' : (kind === 'image' ? 'Image gallery posts route to /gellery/. Use the cover upload as the gallery image source.' : 'Story posts use the text editor and selected categories. Premium mode keeps the same type fields but unlocks content for verified members.'); }
-      form.elements.contentType.addEventListener('change', syncEditorType);
-      syncEditorType();
+      function syncEditorType() { var kind=String(form.elements.contentType.value||'text'); form.querySelectorAll('[data-editor-type]').forEach(function(field){ var types=String(field.getAttribute('data-editor-type')||'').split(/\s+/); field.hidden=types.indexOf(kind)===-1; }); }
+      form.elements.contentType.addEventListener('change', syncEditorType); syncEditorType();
+      form.querySelectorAll('[data-upload-field]').forEach(function(input){ input.addEventListener('change',function(){ var file=input.files&&input.files[0]; if(!file)return; var target=form.elements[input.getAttribute('data-upload-field')], status=document.getElementById('formStatus'); var prefix=input.name==='videoFile'?'videos':'images'; var key=prefix+'/'+(form.elements.id.value||'draft')+'/'+Date.now()+'-'+file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-'); status.textContent='Uploading '+file.name+'…'; window.NightsAuth.adminUploadMedia(file,key).then(function(r){target.value=r.url;status.textContent='Upload complete.';}).catch(function(err){status.textContent='Upload failed: '+(err.message||'unknown error');}); }); });
       if (qs('panel') === 'seo') window.setTimeout(function () { var seo = document.querySelector('.admin-seo-health'); if (seo) seo.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
-      form.querySelectorAll('[data-upload-field]').forEach(function (input) {
-        input.addEventListener('change', function () {
-          var file = input.files && input.files[0];
-          if (!file) return;
-          var target = form.elements[input.getAttribute('data-upload-field')];
-          var status = document.getElementById('formStatus');
-          var prefix = input.name === 'videoFile' ? 'videos' : 'images';
-          var storyKey = form.elements.id.value || 'draft';
-          var safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-120) || 'upload';
-          var key = prefix + '/' + storyKey + '/' + Date.now() + '-' + safeName;
-          status.innerHTML = '<p class="rr-hint">Uploading ' + escapeHtml(file.name) + '…</p>';
-          window.NightsAuth.adminUploadMedia(file, key).then(function (result) {
-            target.value = result.url;
-            status.innerHTML = '<p class="rr-hint rr-success">Upload complete. The media URL was added automatically.</p>';
-          }).catch(function (err) {
-            input.value = '';
-            status.innerHTML = '<p class="rr-hint rr-error">Upload failed: ' + escapeHtml(err.message) + '</p>';
-          });
-        });
-      });
       var submitAction = 'draft';
       form.querySelectorAll('[data-action]').forEach(function (btn) {
         btn.addEventListener('click', function () { submitAction = btn.getAttribute('data-action'); });
@@ -159,7 +138,6 @@
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        form.elements.exclusive.checked = true;
         var status = document.getElementById('formStatus');
         var fd = new FormData(form);
         var id = String(fd.get('id') || '').trim();
@@ -177,7 +155,7 @@
           return;
         }
         var selectedCategories = fd.getAll('categories').map(function (value) { return String(value || '').trim(); }).filter(Boolean);
-        if (!selectedCategories.length) {
+        if (contentTypeVal === 'text' && !selectedCategories.length) {
           status.innerHTML = '<p class="rr-hint rr-error">Tick at least one category before saving or publishing.</p>';
           return;
         }
@@ -198,15 +176,13 @@
           episode: fd.get('episode') ? Number(fd.get('episode')) : null,
           contentType: String(fd.get('contentType') || 'text'),
           coverUrl: String(fd.get('coverUrl') || '').trim() || null,
-          coverAlt: String(fd.get('coverAlt') || '').trim() || null,
           videoUrl: String(fd.get('videoUrl') || '').trim() || null,
           thumbnailUrl: String(fd.get('thumbnailUrl') || '').trim() || null,
-          thumbnailAlt: String(fd.get('thumbnailAlt') || '').trim() || null,
           audioUrl: String(fd.get('audioUrl') || '').trim() || null,
           seoTitle: String(fd.get('seoTitle') || '').trim() || null,
           metaDescription: String(fd.get('metaDescription') || '').trim() || null,
           seoKeywords: String(fd.get('seoKeywords') || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean),
-          exclusive: fd.get('exclusive') === 'on',
+          exclusive: true,
         };
 
         status.innerHTML = '<p class="rr-hint">Saving…</p>';
@@ -227,7 +203,6 @@
           status.innerHTML = '<p class="rr-hint rr-error">' + escapeHtml(err.message) + '</p>';
         });
       });
-      if (window.MahmudaAdminPipeline) window.MahmudaAdminPipeline.enhanceEditor();
     }
 
     function init() {

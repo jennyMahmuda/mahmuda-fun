@@ -939,7 +939,7 @@ function adminStoryRowToJson(row) {
 }
 
 function validContentType(value) {
-  return value === 'text' || value === 'video' || value === 'image';
+  return value === 'text' || value === 'video' || value === 'image' || value === 'audio';
 }
 const ADMIN_CATEGORY_SLUGS = new Set(['all','forbidden','spicy','dirtytalk','senior','climax','agegap','tension','madam','university','chemistry','junior','neighbor','affair-romance','age-gap-romance','alpha-males','bad-boys','bhabi-romance','billionaire-romance','clean-wholesome','college','comedy','cowboy-romance','dark-romance','enemies-to-lovers','fated-mates','forbidden-romance','high-school-romance','mafia-romance','paranormal-fantasy-romance','second-chance-romance','slow-burn','spicy-romance','sports','vampire-romance']);
 function validAdminCategories(value) { return Array.isArray(value) && value.length > 0 && value.length <= 40 && value.every((item) => typeof item === 'string' && ADMIN_CATEGORY_SLUGS.has(item)); }
@@ -958,22 +958,65 @@ function validateAdminStoryBody(body) {
   const id = typeof body?.id === 'string' ? body.id.trim() : '';
   if (!validStoryId(id)) return 'A story id is required (letters, numbers, - and _ only, max 160 chars)';
   if (!validAdminTitle(body?.title)) return 'Title is required (2-300 characters)';
-  if (!validAdminExcerpt(body?.excerpt)) return 'Excerpt is required (2-600 characters)';
-  if (!validAdminContent(body?.content)) return 'Story text is required (at least 20 characters, max 200,000)';
+  const contentType = body?.contentType || 'text';
+  if (!validContentType(contentType)) return 'Content type must be text, video, image, or audio';
+  if (contentType === 'text') {
+    if (!validAdminExcerpt(body?.excerpt)) return 'Story summary is required (2-600 characters)';
+    if (!validAdminContent(body?.content)) return 'Story text is required (at least 20 characters, max 200,000)';
+    if (!normalizeAdminCategories(body).length) return 'Select at least one valid category for a Story';
+  } else if (contentType === 'video') {
+    if (!validAdminMediaRef(body?.videoUrl) || !String(body.videoUrl || '').trim()) return 'Video posts require a YouTube link or direct video URL';
+  } else if (contentType === 'image') {
+    if (!validAdminMediaRef(body?.coverUrl) || !String(body.coverUrl || '').trim()) return 'Image posts require a cover image URL or upload';
+  }
   const selectedCategories = normalizeAdminCategories(body);
-  if (!selectedCategories.length) return 'Select at least one valid category';
   if (body?.tags !== undefined && !validAdminTags(body.tags)) return 'Tags must be an array of up to 15 short strings';
   if (!validAdminMediaRef(body?.coverUrl)) return 'Cover image reference is invalid';
   if (!validAdminMediaRef(body?.thumbnailUrl)) return 'Video thumbnail reference is invalid';
   if (!validAdminMediaRef(body?.videoUrl)) return 'Video reference is invalid';
   if (!validAdminMediaRef(body?.audioUrl)) return 'Audio reference is invalid';
-  if (body?.contentType !== undefined && !validContentType(body.contentType)) return 'Content type must be text, video, or image';
   if (body?.seoTitle != null && (typeof body.seoTitle !== 'string' || body.seoTitle.length > 65)) return 'SEO title must be 65 characters or fewer';
   if (body?.metaDescription != null && (typeof body.metaDescription !== 'string' || body.metaDescription.length > 158)) return 'Meta description must be 158 characters or fewer';
   if (body?.seoKeywords != null && (!Array.isArray(body.seoKeywords) || body.seoKeywords.length > 20 || body.seoKeywords.some((k) => typeof k !== 'string' || k.length > 60))) return 'SEO keywords must be up to 20 short phrases';
   if (body?.series !== undefined && body.series !== null && (typeof body.series !== 'string' || body.series.length > 120)) return 'Series name is too long';
   if (body?.episode !== undefined && body.episode !== null && !(Number.isInteger(body.episode) && body.episode > 0 && body.episode < 10000)) return 'Episode must be a positive whole number';
   return null;
+}
+
+async function handleAdminMediaUpload(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  if (!env.MEDIA_GATEWAY_URL || !env.MEDIA_GATEWAY_AUTH_SECRET) {
+    return json({ error: 'Media gateway is not configured' }, 503, corsHeaders(origin));
+  }
+  let form;
+  try { form = await request.formData(); } catch { return json({ error: 'Use multipart/form-data' }, 400, corsHeaders(origin)); }
+  const file = form.get('file');
+  const requestedKey = String(form.get('key') || '').trim();
+  if (!file || typeof file.stream !== 'function' || !requestedKey) return json({ error: 'A file and media key are required' }, 400, corsHeaders(origin));
+  const contentType = String(file.type || '').toLowerCase().split(';')[0];
+  const allowedTypes = new Set(['image/jpeg','image/png','image/webp','image/gif','image/avif','video/mp4','video/webm','video/quicktime','audio/mpeg','audio/wav','audio/ogg','audio/mp4']);
+  const size = Number(file.size || 0);
+  if (!allowedTypes.has(contentType)) return json({ error: 'Only approved image, video or audio files are allowed' }, 415, corsHeaders(origin));
+  if (!size || size > 50 * 1024 * 1024) return json({ error: 'File exceeds the 50 MB upload limit' }, 413, corsHeaders(origin));
+  if (!/^[A-Za-z0-9][A-Za-z0-9._/-]{0,180}$/.test(requestedKey) || requestedKey.includes('..') || requestedKey.startsWith('/')) return json({ error: 'Invalid media key' }, 400, corsHeaders(origin));
+  const gatewayBase = String(env.MEDIA_GATEWAY_URL).replace(/\/$/, '');
+  const gatewayPath = requestedKey.split('/').map(encodeURIComponent).join('/');
+  let gatewayResponse;
+  try {
+    gatewayResponse = await fetch(`${gatewayBase}/media/${gatewayPath}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${env.MEDIA_GATEWAY_AUTH_SECRET}`, 'Content-Type': contentType, 'Content-Length': String(size) },
+      body: file.stream(),
+    });
+  } catch (error) {
+    return json({ error: 'Media gateway request failed' }, 502, corsHeaders(origin));
+  }
+  const responseText = await gatewayResponse.text().catch(() => '');
+  let payload = {};
+  try { payload = JSON.parse(responseText); } catch {}
+  if (!gatewayResponse.ok) return json({ error: payload.error || 'Media gateway upload failed' }, gatewayResponse.status >= 500 ? 502 : gatewayResponse.status, corsHeaders(origin));
+  return json({ ok: true, key: requestedKey, url: `${new URL(request.url).origin}/api/media/${gatewayPath}` }, 201, corsHeaders(origin));
 }
 
 async function handleAdminCreateStory(request, env, origin) {
@@ -1173,6 +1216,7 @@ export default {
     if (pathname.startsWith('/api/admin/') && !origin && request.headers.get('Origin')) {
       return json({ error: 'Origin not allowed' }, 403);
     }
+    if (pathname === '/api/admin/media/upload' && request.method === 'POST') return handleAdminMediaUpload(request, env, origin);
     if (pathname === '/api/admin/stories' && request.method === 'GET') return handleAdminListStories(request, env, origin);
     if (pathname === '/api/admin/stories' && request.method === 'POST') return handleAdminCreateStory(request, env, origin);
     const adminAction = routeAdminStoryAction(pathname);
