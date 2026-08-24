@@ -184,12 +184,16 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 
 @media (max-width:900px) {
   .mrf-admin-shell { display:block; }
-  .mrf-admin-sidebar { position:fixed; inset:0 auto 0 0; z-index:50; width:248px; transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 60px rgba(0,0,0,.6); }
+  .mrf-admin-sidebar { position:fixed; inset:0 auto 0 0; z-index:50; width:min(82vw,300px); transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 60px rgba(0,0,0,.6); overflow-y:auto; }
   .mrf-admin-sidebar.is-open { transform:translateX(0); }
   .mrf-admin-mobilebar { display:flex !important; }
 }
 .mrf-admin-mobilebar { display:none; align-items:center; gap:.75rem; padding:1rem; background:var(--mrf-side); border-bottom:1px solid var(--mrf-line); color:#fff; }
+.mrf-admin-sidebar-backdrop { display:none; position:fixed; inset:0; z-index:40; border:0; background:rgba(0,0,0,.58); cursor:pointer; }
+.mrf-admin-sidebar-backdrop.is-visible { display:block; }
+body.admin-drawer-open { overflow:hidden; }
 .mrf-admin-mobilebar button { padding:.45rem .7rem; border:1px solid var(--mrf-line); border-radius:8px; background:rgba(255,255,255,.05); color:#fff; }
+@media (min-width:901px) { .mrf-admin-sidebar-backdrop { display:none !important; } }
 @media (max-width: 720px) {
   .all-content-filters { grid-template-columns:1fr; }
   .all-content-card, .seo-health-card { gap:.7rem; padding:.75rem; }

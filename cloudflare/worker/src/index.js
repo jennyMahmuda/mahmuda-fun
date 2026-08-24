@@ -490,7 +490,7 @@ async function handleUserMessages(request, env, origin) {
 async function handleAdminPremiumLeads(request, env, origin) {
   const admin = await getAdminUser(request, env);
   if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
-  const result = await env.REVIEWS_DB.prepare('SELECT l.id, l.user_id AS userId, l.email, l.consent, l.source, l.created_at AS createdAt, l.updated_at AS updatedAt FROM premium_leads l ORDER BY l.created_at DESC LIMIT 500').all();
+  const result = await env.REVIEWS_DB.prepare('SELECT l.id, l.user_id AS userId, u.display_name AS name, l.email, l.consent, l.source, l.created_at AS createdAt, l.updated_at AS updatedAt FROM premium_leads l JOIN users u ON u.id = l.user_id ORDER BY l.created_at DESC LIMIT 500').all();
   return json({ leads: result.results || [] }, 200, corsHeaders(origin));
 }
 
