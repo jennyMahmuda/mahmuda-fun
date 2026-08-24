@@ -214,7 +214,7 @@ async function getSessionUser(request, env) {
   const token = getBearerToken(request);
   if (!validToken(token) || !env.REVIEWS_DB) return null;
   return env.REVIEWS_DB.prepare(
-    `SELECT u.id AS userId, u.email AS email, u.email_verified AS emailVerified, u.is_admin AS isAdmin
+    `SELECT u.id AS userId, u.email AS email, u.display_name AS displayName, u.email_verified AS emailVerified, u.is_admin AS isAdmin
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token = ? AND s.expires_at > datetime('now')`
   ).bind(token).first();
@@ -305,11 +305,12 @@ async function recordLoginAttempt(env, email, ipHash, success) {
 
 async function handleSignup(request, env, origin) {
   const body = await readJson(request);
+  const displayName = typeof body?.name === 'string' ? body.name.trim().replace(/\s+/g, ' ') : '';
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
   const password = body?.password;
   const gaClientId = typeof body?.gaClientId === 'string' ? body.gaClientId : null;
-  if (!validEmail(email) || !validPassword(password)) {
-    return json({ error: 'A valid email and a password of at least 8 characters are required' }, 400, corsHeaders(origin));
+  if (displayName.length < 2 || displayName.length > 80 || /[<>]/.test(displayName) || !validEmail(email) || !validPassword(password)) {
+    return json({ error: 'Name must be 2–80 characters, with a valid email and a password of at least 8 characters' }, 400, corsHeaders(origin));
   }
 
   const existing = await env.REVIEWS_DB.prepare('SELECT id, email_verified AS emailVerified FROM users WHERE email = ?').bind(email).first();
@@ -334,8 +335,8 @@ async function handleSignup(request, env, origin) {
   let inserted;
   try {
     inserted = await env.REVIEWS_DB.prepare(
-      'INSERT INTO users (email, password_hash) VALUES (?, ?) RETURNING id'
-    ).bind(email, passwordHash).first();
+      'INSERT INTO users (email, password_hash, display_name) VALUES (?, ?, ?) RETURNING id'
+    ).bind(email, passwordHash, displayName).first();
   } catch {
     // UNIQUE constraint on email — a concurrent signup for the same address
     // landed between our existence check and this insert. Same response
@@ -450,7 +451,7 @@ async function handleLogout(request, env, origin) {
 async function handleMe(request, env, origin) {
   const user = await getSessionUser(request, env);
   if (!user) return json({ authenticated: false }, 200, corsHeaders(origin));
-  return json({ authenticated: true, userId: user.userId, email: user.email, emailVerified: !!user.emailVerified, isAdmin: !!user.isAdmin }, 200, corsHeaders(origin));
+  return json({ authenticated: true, userId: user.userId, name: user.displayName || '', email: user.email, emailVerified: !!user.emailVerified, isAdmin: !!user.isAdmin }, 200, corsHeaders(origin));
 }
 
 async function handlePremiumLead(request, env, origin) {

@@ -65,12 +65,12 @@
     });
   }
 
-  function signup(email, password) {
+  function signup(name, email, password) {
     return getGaClientId().then(function (gaClientId) {
       return apiFetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password, gaClientId: gaClientId }),
+        body: JSON.stringify({ name: name, email: email, password: password, gaClientId: gaClientId }),
       });
     });
   }
