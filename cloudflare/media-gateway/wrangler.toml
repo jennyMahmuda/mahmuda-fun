@@ -1,0 +1,21 @@
+name = "mahmuda-fun-media-gateway"
+main = "src/index.js"
+compatibility_date = "2026-08-24"
+workers_dev = true
+
+# This binding belongs only to the separate Cloudflare account that owns
+# arifjennymedia. It must never be copied into the main mahmuda-fun-api Worker.
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "arifjennymedia"
+
+[vars]
+ALLOWED_ORIGINS = "https://mahmuda.fun,https://www.mahmuda.fun"
+MAX_UPLOAD_BYTES = "52428800"
+
+# Set with `wrangler secret put MEDIA_GATEWAY_AUTH_SECRET` after deployment.
+# Do not put this value in this file or in GitHub source.
+# MEDIA_GATEWAY_AUTH_SECRET
+
+# The Cloudflare account is selected by the deployment credential/account ID.
+# No S3 Access Key or Secret Access Key is required for this Worker binding.

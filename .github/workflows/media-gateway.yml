@@ -1,0 +1,46 @@
+name: Deploy isolated Media Gateway
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type deploy-media-gateway to confirm deployment'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-media-gateway:
+    if: ${{ inputs.confirm == 'deploy-media-gateway' }}
+    runs-on: ubuntu-latest
+    environment: media-gateway
+    defaults:
+      run:
+        working-directory: cloudflare/media-gateway
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.MEDIA_GATEWAY_CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.MEDIA_GATEWAY_CLOUDFLARE_ACCOUNT_ID }}
+      MEDIA_GATEWAY_AUTH_SECRET: ${{ secrets.MEDIA_GATEWAY_AUTH_SECRET }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate isolated deployment inputs
+        run: |
+          set -eu
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Missing MEDIA_GATEWAY_CLOUDFLARE_API_TOKEN'; exit 1; }
+          test "$CLOUDFLARE_ACCOUNT_ID" = '8b331a24ba04dafdab27b8e173666422' || { echo 'The account ID does not match the isolated media account'; exit 1; }
+          test -n "$MEDIA_GATEWAY_AUTH_SECRET" || { echo 'Missing MEDIA_GATEWAY_AUTH_SECRET'; exit 1; }
+          grep -q 'bucket_name = "arifjennymedia"' wrangler.toml || { echo 'Unexpected R2 bucket configuration'; exit 1; }
+
+      - name: Install Wrangler
+        run: npm install --global wrangler@latest
+
+      - name: Deploy isolated Media Gateway Worker
+        run: wrangler deploy --config wrangler.toml
+
+      - name: Configure gateway authentication secret
+        run: printf '%s' "$MEDIA_GATEWAY_AUTH_SECRET" | wrangler secret put MEDIA_GATEWAY_AUTH_SECRET --config wrangler.toml
