@@ -94,14 +94,14 @@
       const res = await fetch('stories/index.json', { cache: 'no-store' });
       if (!res.ok) throw new Error('index missing');
       const data = await res.json();
-      allStories = Array.isArray(data) ? data : (data.stories || []);
+      allStories = (Array.isArray(data) ? data : (data.stories || [])).filter(function (story) { return !story || story.exclusive !== true; });
       if (!allStories.length) throw new Error('empty');
     } catch (e) {
-      allStories = await loadByIds(KNOWN_IDS);
+      allStories = (await loadByIds(KNOWN_IDS)).filter(function (story) { return !story || story.exclusive !== true; });
     }
 
     if (allStories.length < 8) {
-      var extra = await loadByIds(KNOWN_IDS);
+      var extra = (await loadByIds(KNOWN_IDS)).filter(function (story) { return !story || story.exclusive !== true; });
       var seen = {};
       allStories.forEach(function (s) { if (s && s.id) seen[s.id] = true; });
       extra.forEach(function (s) {

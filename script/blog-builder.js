@@ -432,7 +432,9 @@ function categoryCardData(story) {
 // computed and embedded at build time, not fetched client-side, so the
 // page has real content on first paint with zero extra requests.
 function writeCategoryPages(stories) {
-  const publicStories = stories.map(publicStoryJson);
+  // Exclusive records belong only to the dedicated Premium page. They must not
+  // be embedded in ordinary category pages or discoverable listing routes.
+  const publicStories = stories.filter(function (story) { return !story.exclusive; }).map(publicStoryJson);
   let written = 0;
   CATEGORIES.forEach(function (cat) {
     const matches = publicStories.filter(function (s) { return storyMatchesCategory(s, cat.slug, cat.label); });
@@ -644,7 +646,10 @@ function replaceListingSeed(file, id, html) {
   fs.writeFileSync(file, next, 'utf8');
 }
 function writeListingFirstPaint(stories) {
-  const publicStories = stories.map(publicStoryJson).sort(function (a,b) { return String(b.date||'').localeCompare(String(a.date||'')); });
+  // Keep Premium records out of ordinary Video, Gallery, Series, Trending,
+  // Top Rated, Category and Recent Releases surfaces. premium.html consumes
+  // stories/index.json directly and applies the inverse exclusive-only filter.
+  const publicStories = stories.filter(function (story) { return !story.exclusive; }).map(publicStoryJson).sort(function (a,b) { return String(b.date||'').localeCompare(String(a.date||'')); });
   const base = '../';
   const video = publicStories.filter(function (s) { return s.type === 'video' || s.video; });
   const image = publicStories.filter(function (s) { return s.type === 'image' || (s.type !== 'text' && s.type !== 'video' && (s.cover || (s.images && s.images.length))); });
