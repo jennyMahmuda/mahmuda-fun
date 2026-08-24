@@ -495,7 +495,7 @@ function writeCategoryPages(stories) {
       '<p class="section-desc">' + matches.length + ' ' + (matches.length === 1 ? 'story' : 'stories') + '</p></div>' +
       '<div class="cat-intro"><p>' + escapeXml(cat.intro) + '</p></div>' +
       '<p style="margin:0 0 24px;"><a href="../" style="color:var(--accent);text-decoration:none;">← Browse all categories</a></p>' +
-      '<div class="regular-stories-grid" id="catGrid"><div class="loading-state"><p>Loading…</p></div></div>' +
+      '<div class="regular-stories-grid" id="catGrid">' + (matches.map(function (s) { return listingCardHtml(s, '../../', 'story'); }).join('') || '<div class="empty-state"><p>No stories in this category yet — check back soon.</p></div>') + '</div>' +
       '</div></main>\n' +
       '<div class="ad-between-sections"><div data-ad="mid" class="ad-slot"></div></div>\n' +
       writeCategoryFooterHtml() +
