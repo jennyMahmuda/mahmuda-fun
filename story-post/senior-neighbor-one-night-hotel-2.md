@@ -74,6 +74,6 @@ seo:
 
 **পর্ব ২ শেষ**
 
-**পড়ার লিংক:** https://mahmuda.fun/?story=senior-neighbor-one-night-hotel-2
+**পড়ার লিংক:** https://mahmuda.fun/story/senior-neighbor-one-night-hotel-2/
 
 **[পর্ব ১](?story=senior-neighbor-one-night-hotel)** · পরশু স্বামী ফিরবে—আগের রাত শেষ সুযোগ।

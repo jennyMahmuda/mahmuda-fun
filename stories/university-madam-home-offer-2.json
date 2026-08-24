@@ -19,6 +19,8 @@
   "series": null,
   "episode": null,
   "cover": null,
+  "coverAlt": "ইউনিভার্সিটি ম্যাডাম · পর্ব ২ · খেলা শুরু",
+  "thumbnailAlt": "ইউনিভার্সিটি ম্যাডাম · পর্ব ২ · খেলা শুরু",
   "audio": null,
   "video": null,
   "images": [],
@@ -47,7 +49,7 @@
       "dirtytalk"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=university-madam-home-offer-2"
+    "canonical": "https://mahmuda.fun/story/university-madam-home-offer-2/"
   },
   "ads": {
     "enabled": true,

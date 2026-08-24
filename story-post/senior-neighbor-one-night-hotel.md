@@ -114,6 +114,6 @@ seo:
 
 **গল্প শেষ**
 
-**পড়ার লিংক:** https://mahmuda.fun/?story=senior-neighbor-one-night-hotel
+**পড়ার লিংক:** https://mahmuda.fun/story/senior-neighbor-one-night-hotel/
 
 পরের রাত (মুখ + পেছন, আরও নোংরা) চাইলে বলো।

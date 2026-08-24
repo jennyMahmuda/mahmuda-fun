@@ -18,6 +18,8 @@
   "series": null,
   "episode": null,
   "cover": "https://mahmuda.fun/assets/images/gallery/university-medam-say-please-take-photo.jpg",
+  "coverAlt": "কক্সবাজার কেবিন · পর্ব ২ · স্বামী বাইরে",
+  "thumbnailAlt": "কক্সবাজার কেবিন · পর্ব ২ · স্বামী বাইরে",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": "https://mahmuda.fun/assets/images/gallery/university-medam-say-please-take-photo.jpg",
-    "canonical": "https://mahmuda.fun/?story=unsatisfied-women-cox-bazar-cabin-2"
+    "canonical": "https://mahmuda.fun/story/unsatisfied-women-cox-bazar-cabin-2/"
   },
   "ads": {
     "enabled": true,

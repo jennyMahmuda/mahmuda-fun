@@ -261,7 +261,7 @@ function writeSitemap(stories) {
   (stories || []).forEach(function (s) {
     const slug = s.id || s.slug;
     if (!slug) return;
-    addUrl(SITE_URL + '/?story=' + encodeURIComponent(slug), (s.date || today).slice(0, 10), 'weekly', '0.8');
+    addUrl(SITE_URL + '/story/' + encodeURIComponent(slug) + '/', (s.date || today).slice(0, 10), 'weekly', '0.8');
   });
 
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -272,7 +272,8 @@ function writeSitemap(stories) {
     xml += '    <lastmod>' + escapeXml(u.lastmod) + '</lastmod>\n';
     xml += '    <changefreq>' + u.changefreq + '</changefreq>\n';
     xml += '    <priority>' + u.priority + '</priority>\n';
-    const story = (stories || []).find(function (s) { return SITE_URL + '/?story=' + encodeURIComponent(s.id || s.slug) === u.loc; });
+          const story = (stories || []).find(function (s) { return SITE_URL + '/story/' + encodeURIComponent(s.id || s.slug) + '/' === u.loc; });
+
     if (story) {
       const media = [story.cover].concat(story.images || []).filter(Boolean);
       Array.from(new Set(media)).slice(0, 10).forEach(function (img) {
@@ -484,7 +485,7 @@ function writeCategoryPages(stories) {
       '  else{grid.innerHTML=CATEGORY_STORIES.map(function(s){\n' +
       '    var img=coverUrl(s);\n' +
       '    var badge=s.exclusive?"🔒 Members":(s.series?esc(s.series):esc(s.category||s.type||"Story"));\n' +
-      '    return "<a class=\\"feed-card\\" href=\\"../../index.html?story="+encodeURIComponent(s.id)+"\\" style=\\"text-decoration:none\\">"+\n' +
+      '    return "<a class=\\"feed-card\\" href=\\"../../story/"+encodeURIComponent(s.id)+"/\\" style=\\"text-decoration:none\\">"+\n' +
       '      "<div class=\\"feed-card-media\\"><img src=\\""+esc(img)+"\\" alt=\\""+esc(s.title)+"\\" loading=\\"lazy\\" decoding=\\"async\\" onerror=\\"this.style.display=\'none\'\\"></div>"+\n' +
       '      "<div class=\\"feed-card-header\\"><div class=\\"feed-avatar\\">N</div><div class=\\"feed-meta\\"><div class=\\"feed-author\\">SecretChapters</div><div class=\\"feed-time\\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+\n' +
       '      "<span class=\\"feed-type-badge\\">"+badge+"</span><span data-rating-slot=\\""+esc(s.id)+"\\"></span></div>"+\n' +
@@ -561,6 +562,48 @@ function writeCategoryFooterHtml() {
     '</div></footer>\n';
 }
 
+function writeStoryPages(stories) {
+  const outRoot = path.join(ROOT, 'story');
+  if (!fs.existsSync(outRoot)) fs.mkdirSync(outRoot, { recursive: true });
+  (stories || []).forEach(function (story) {
+    const safeId = String(story.id || '').trim();
+    if (!/^[a-zA-Z0-9_-]{1,160}$/.test(safeId)) return;
+    const dir = path.join(outRoot, safeId);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const canonical = SITE_URL + '/story/' + encodeURIComponent(safeId) + '/';
+    const description = String((story.seo && story.seo.description) || story.excerpt || story.title).slice(0, 158);
+    const image = story.cover || (story.images && story.images[0]) || '';
+    const body = story.exclusive
+      ? '<div class="locked-story-teaser"><p>This story is available to verified members. Sign in to continue reading.</p><p><a href="../../premium.html">Log in or create an account</a></p></div>'
+      : (story.content || '<p>Continue reading this story on mahmuda.fun.</p>');
+    const jsonLd = JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'BlogPosting', headline: story.title,
+      description: description, url: canonical, datePublished: story.date || undefined,
+      image: image ? [image] : undefined, articleSection: story.category || 'Story',
+      keywords: story.tags || [], inLanguage: story.language || 'en'
+    }).replace(/</g, '\\u003c');
+    const html = '<!doctype html>\\n<html lang="' + escapeXml(story.language || 'en') + '">\\n<head>\\n' +
+      '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\\n' +
+      '<title>' + escapeXml(story.seo && story.seo.title || story.title) + '</title>\\n' +
+      '<meta name="description" content="' + escapeXml(description) + '">\\n' +
+      '<meta name="robots" content="index, follow, max-image-preview:large">\\n' +
+      '<link rel="canonical" href="' + escapeXml(canonical) + '">\\n' +
+      '<meta property="og:type" content="article"><meta property="og:title" content="' + escapeXml(story.title) + '"><meta property="og:description" content="' + escapeXml(description) + '"><meta property="og:url" content="' + escapeXml(canonical) + '">' +
+      (image ? '<meta property="og:image" content="' + escapeXml(image) + '">' : '') + '\\n' +
+      '<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/navigation.css"><link rel="stylesheet" href="../../assets/css/blog.css">\\n' +
+      '<script type="application/ld+json">' + jsonLd + '</script>\\n</head>\\n<body>\\n' +
+      '<header class="site-header"><div class="container"><a href="../../" aria-label="mahmuda.fun home">mahmuda.fun</a></div></header>\\n' +
+      '<main class="container story-page"><article><p class="story-kicker">' + escapeXml(story.category || 'Story') + '</p><h1>' + escapeXml(story.title) + '</h1>' +
+      (image ? '<img class="story-cover" src="' + escapeXml(image) + '" alt="' + escapeXml(story.coverAlt || story.title) + '" fetchpriority="high">' : '') +
+      '<p class="story-excerpt">' + escapeXml(story.excerpt || description) + '</p><div class="story-body">' + body + '</div></article></main>\\n' +
+      writeStoryFooterHtml() + '\\n</body>\\n</html>\\n';
+    fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf8');
+  });
+  console.log('✓ clean story pages (' + (stories || []).length + ' pages)');
+}
+function writeStoryFooterHtml() {
+  return '<footer class="footer"><div class="container"><p><a href="../../">mahmuda.fun</a> · <a href="../../premium.html">Premium</a> · <a href="../../sitemap.xml">Sitemap</a></p></div></footer>';
+}
 function buildStory(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8');
   const parsed = parseFrontMatter(raw);
@@ -621,7 +664,7 @@ function buildStory(filePath) {
       description: String(meta.metaDescription || buildDescription({ title: title, excerpt: meta.excerpt, category: meta.category, language: meta.language })).slice(0, 158),
       keywords: Array.isArray(meta.seoKeywords) ? meta.seoKeywords : (typeof meta.seoKeywords === 'string' ? meta.seoKeywords.split(',').map(function (k) { return k.trim(); }).filter(Boolean) : buildKeywords({ category: meta.category, tags: tags, language: meta.language })),
       ogImage: images[0] || cover ? resolveMediaUrl(images[0] || cover) : null,
-      canonical: SITE_URL + '/?story=' + encodeURIComponent(id)
+      canonical: SITE_URL + '/story/' + encodeURIComponent(id) + '/'
     },
     ads: {
       enabled: true,
@@ -717,6 +760,7 @@ function build() {
 
   console.log('\n✓ stories/index.json (' + stories.length + ' stories)');
   writeCategoryPages(stories);
+  writeStoryPages(stories);
   writeCategoryBackgroundsManifest();
   writeSitemap(stories);
 

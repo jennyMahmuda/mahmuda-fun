@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 11,
   "cover": null,
+  "coverAlt": "সিনিয়র আপু · পর্ব ১১ · তিনজনের পার্টি",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ১১ · তিনজনের পার্টি",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep11"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep11/"
   },
   "ads": {
     "enabled": true,

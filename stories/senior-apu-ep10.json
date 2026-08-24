@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 10,
   "cover": null,
+  "coverAlt": "সিনিয়র আপু · পর্ব ১০ · শেষ এন্ট্রি, নতুন দরজা",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ১০ · শেষ এন্ট্রি, নতুন দরজা",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep10"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep10/"
   },
   "ads": {
     "enabled": true,

@@ -18,6 +18,8 @@
   "series": null,
   "episode": null,
   "cover": "https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg",
+  "coverAlt": "ইউনিভার্সিটি ম্যাডাম · বাসায় এসো · নম্বর বাড়বে",
+  "thumbnailAlt": "ইউনিভার্সিটি ম্যাডাম · বাসায় এসো · নম্বর বাড়বে",
   "audio": null,
   "video": null,
   "images": [
@@ -48,7 +50,7 @@
       "mahmuda.fun"
     ],
     "ogImage": "https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg",
-    "canonical": "https://mahmuda.fun/?story=university-madam-home-offer"
+    "canonical": "https://mahmuda.fun/story/university-madam-home-offer/"
   },
   "ads": {
     "enabled": true,

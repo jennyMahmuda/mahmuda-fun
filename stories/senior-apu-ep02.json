@@ -17,6 +17,8 @@
   "series": "Senior Apu",
   "episode": 2,
   "cover": "story-post/image/senior-apu-cover.webp",
+  "coverAlt": "সিনিয়র আপু · পর্ব ২ · সন্ধ্যার কর্নার",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ২ · সন্ধ্যার কর্নার",
   "audio": null,
   "video": null,
   "images": [],
@@ -45,7 +47,7 @@
       "premium adult stories"
     ],
     "ogImage": "story-post/image/senior-apu-cover.webp",
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep02"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep02/"
   },
   "ads": {
     "enabled": true,

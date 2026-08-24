@@ -65,7 +65,7 @@
         '<div class="story-promo-grid">' +
           picks.map(function (s) {
             var img = coverUrl(s, root);
-            return '<a class="story-promo-card" href="' + root + 'index.html?story=' + encodeURIComponent(s.id) + '">' +
+            return '<a class="story-promo-card" href="' + root + 'story/' + encodeURIComponent(s.id) + '/">' +
               '<div class="story-promo-media"><img src="' + escapeHtml(img) + '" alt="' + escapeHtml(s.title) + '" loading="lazy" decoding="async" onerror="this.remove()"></div>' +
               '<div class="story-promo-body">' +
                 '<span class="story-promo-cat">' + escapeHtml(s.category || 'Story') + '</span>' +

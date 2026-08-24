@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 9,
   "cover": null,
+  "coverAlt": "সিনিয়র আপু · পর্ব ৯ · কর্ণারের আগুন",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ৯ · কর্ণারের আগুন",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep09"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep09/"
   },
   "ads": {
     "enabled": true,

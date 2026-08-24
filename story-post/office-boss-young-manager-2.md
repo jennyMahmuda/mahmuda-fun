@@ -79,6 +79,6 @@ seo:
 
 **পর্ব ২ শেষ**
 
-**পড়ার লিংক:** https://mahmuda.fun/?story=office-boss-young-manager-2
+**পড়ার লিংক:** https://mahmuda.fun/story/office-boss-young-manager-2/
 
 **[পর্ব ১](?story=office-boss-young-manager)** · পরের পর্বে তিনবার—মুখ + পেছন + সামনে।

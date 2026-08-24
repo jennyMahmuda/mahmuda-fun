@@ -85,6 +85,6 @@ seo:
 
 **গল্প শেষ (পর্ব ১)**
 
-**পড়ার লিংক:** https://mahmuda.fun/?story=office-boss-young-manager
+**পড়ার লিংক:** https://mahmuda.fun/story/office-boss-young-manager/
 
 **[পর্ব ২ পড়ুন →](?story=office-boss-young-manager-2)**

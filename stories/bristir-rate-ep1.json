@@ -15,6 +15,8 @@
   "series": "Bhabhi Devar Rain",
   "episode": 1,
   "cover": "story-post/image/bristir-rat-cover.webp",
+  "coverAlt": "বৃষ্টির রাতে – পর্ব ১ · প্রথম স্পর্শ",
+  "thumbnailAlt": "বৃষ্টির রাতে – পর্ব ১ · প্রথম স্পর্শ",
   "audio": null,
   "video": null,
   "images": [],
@@ -43,7 +45,7 @@
       "bangla golpo"
     ],
     "ogImage": "story-post/image/bristir-rat-cover.webp",
-    "canonical": "https://mahmuda.fun/?story=bristir-rate-ep1"
+    "canonical": "https://mahmuda.fun/story/bristir-rate-ep1/"
   },
   "ads": {
     "enabled": true,

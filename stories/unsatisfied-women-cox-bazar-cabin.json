@@ -18,6 +18,8 @@
   "series": null,
   "episode": null,
   "cover": "https://mahmuda.fun/assets/images/gallery/unsatisfied-women-one-night-hotel.jpg",
+  "coverAlt": "কক্সবাজার কেবিন · অসন্তুষ্ট নারী · এক রাত",
+  "thumbnailAlt": "কক্সবাজার কেবিন · অসন্তুষ্ট নারী · এক রাত",
   "audio": null,
   "video": null,
   "images": [
@@ -48,7 +50,7 @@
       "mahmuda.fun"
     ],
     "ogImage": "https://mahmuda.fun/assets/images/gallery/unsatisfied-women-one-night-hotel.jpg",
-    "canonical": "https://mahmuda.fun/?story=unsatisfied-women-cox-bazar-cabin"
+    "canonical": "https://mahmuda.fun/story/unsatisfied-women-cox-bazar-cabin/"
   },
   "ads": {
     "enabled": true,

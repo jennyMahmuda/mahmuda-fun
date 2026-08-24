@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 12,
   "cover": "https://mahmuda.fun/assets/images/gallery/University.JPG",
+  "coverAlt": "সিনিয়র আপু · পর্ব ১২ · ধামাকা রাত — শেষ পার্টি",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ১২ · ধামাকা রাত — শেষ পার্টি",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": "https://mahmuda.fun/assets/images/gallery/University.JPG",
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep12"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep12/"
   },
   "ads": {
     "enabled": true,

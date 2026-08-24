@@ -148,7 +148,7 @@
       }
       grid.innerHTML = '<div class="rank-list">' + ranked.map(function (row, i) {
         var s = row.s, r = row.r;
-        return '<a class="rank-row" href="../index.html?story=' + encodeURIComponent(s.id) + '">' +
+        return '<a class="rank-row" href="../story/' + encodeURIComponent(s.id) + '/">' +
           '<span class="rank-num">' + (i + 1) + '</span>' +
           '<img class="rank-cover" src="' + esc(coverUrl(s)) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
           '<div class="rank-body">' +

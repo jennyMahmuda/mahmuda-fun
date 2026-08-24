@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 8,
   "cover": null,
+  "coverAlt": "সিনিয়র আপু · পর্ব ৮ · আগুনের রানওয়ে",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ৮ · আগুনের রানওয়ে",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep08"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep08/"
   },
   "ads": {
     "enabled": true,

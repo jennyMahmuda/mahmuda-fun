@@ -14,6 +14,8 @@
   "series": null,
   "episode": null,
   "cover": "story-post/image/bristir-rat-cover.webp",
+  "coverAlt": "বৃষ্টির রাতে – এক নিষিদ্ধ ফ্যান্টাসি",
+  "thumbnailAlt": "বৃষ্টির রাতে – এক নিষিদ্ধ ফ্যান্টাসি",
   "audio": null,
   "video": null,
   "images": [],
@@ -41,7 +43,7 @@
       "bangla golpo"
     ],
     "ogImage": "story-post/image/bristir-rat-cover.webp",
-    "canonical": "https://mahmuda.fun/?story=bristir-rate"
+    "canonical": "https://mahmuda.fun/story/bristir-rate/"
   },
   "ads": {
     "enabled": true,

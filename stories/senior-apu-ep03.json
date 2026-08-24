@@ -17,6 +17,8 @@
   "series": "Senior Apu",
   "episode": 3,
   "cover": "story-post/image/senior-apu-cover.webp",
+  "coverAlt": "সিনিয়র আপু · পর্ব ৩ · আরও কাছে",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ৩ · আরও কাছে",
   "audio": null,
   "video": null,
   "images": [],
@@ -45,7 +47,7 @@
       "premium adult stories"
     ],
     "ogImage": "story-post/image/senior-apu-cover.webp",
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep03"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep03/"
   },
   "ads": {
     "enabled": true,

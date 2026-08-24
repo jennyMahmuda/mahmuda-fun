@@ -16,6 +16,8 @@
   "series": null,
   "episode": null,
   "cover": null,
+  "coverAlt": "ক্লাসের পর ম্যাম আমাকে খেলা শিখাবে বললেন",
+  "thumbnailAlt": "ক্লাসের পর ম্যাম আমাকে খেলা শিখাবে বললেন",
   "audio": null,
   "video": null,
   "images": [],
@@ -44,7 +46,7 @@
       "bengali adult story"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=university-mam-playful"
+    "canonical": "https://mahmuda.fun/story/university-mam-playful/"
   },
   "ads": {
     "enabled": true,

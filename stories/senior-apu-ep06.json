@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 6,
   "cover": null,
+  "coverAlt": "সিনিয়র আপু · পর্ব ৬ · তিনজনের ছায়া",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ৬ · তিনজনের ছায়া",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep06"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep06/"
   },
   "ads": {
     "enabled": true,

@@ -17,6 +17,8 @@
   "series": "Senior Apu",
   "episode": 13,
   "cover": "https://mahmuda.fun/assets/images/gallery/University.JPG",
+  "coverAlt": "সিনিয়র আপু · শেষ শট — মেগা এন্ডিং",
+  "thumbnailAlt": "সিনিয়র আপু · শেষ শট — মেগা এন্ডিং",
   "audio": null,
   "video": null,
   "images": [
@@ -48,7 +50,7 @@
       "premium adult stories"
     ],
     "ogImage": "https://mahmuda.fun/assets/images/gallery/University.JPG",
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ending"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ending/"
   },
   "ads": {
     "enabled": true,

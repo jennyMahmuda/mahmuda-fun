@@ -42,7 +42,7 @@
     var cardsHtml = reviews.map(function (r) {
       var isSiteReview = r.storyId === SITE_STORY_ID;
       var story = storyMap[r.storyId];
-      var href = isSiteReview ? 'index.html' : 'index.html?story=' + encodeURIComponent(r.storyId);
+      var href = isSiteReview ? 'index.html' : 'story/' + encodeURIComponent(r.storyId) + '/';
       var subLabel = isSiteReview ? '★ Site review' : 'on ' + escapeHtml(story ? story.title : r.storyId);
       return '<a class="rr-item" href="' + href + '">' +
         '<div class="rr-item-head">' +

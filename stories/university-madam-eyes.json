@@ -17,6 +17,8 @@
   "series": null,
   "episode": null,
   "cover": "story-post/image/senior-apu-cover.webp",
+  "coverAlt": "চোখের দেখা · ম্যাম ও স্টুডেন্ট",
+  "thumbnailAlt": "চোখের দেখা · ম্যাম ও স্টুডেন্ট",
   "audio": null,
   "video": null,
   "images": [],
@@ -45,7 +47,7 @@
       "premium adult stories"
     ],
     "ogImage": "story-post/image/senior-apu-cover.webp",
-    "canonical": "https://mahmuda.fun/?story=university-madam-eyes"
+    "canonical": "https://mahmuda.fun/story/university-madam-eyes/"
   },
   "ads": {
     "enabled": true,

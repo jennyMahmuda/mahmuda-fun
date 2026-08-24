@@ -19,7 +19,13 @@
   let openedFromHistory = false;
 
   function storyUrl(id) {
-    return 'index.html?story=' + encodeURIComponent(id);
+    return 'story/' + encodeURIComponent(id) + '/';
+  }
+  function cleanStoryIdFromLocation() {
+    var match = (window.location.pathname || '').match(/\/story\/([^/]+)\/?$/);
+    if (match) return decodeURIComponent(match[1]);
+    var query = (window.location.search || '').match(/[?&]story=([^&]+)/);
+    return query ? decodeURIComponent(query[1]) : null;
   }
 
   function normalizeCategory(value) {
@@ -592,7 +598,7 @@
       '@type': 'BlogPosting',
       'headline': story.title,
       'description': seo.description || story.excerpt || story.title,
-      'url': seo.canonical || (location.origin + '/?story=' + encodeURIComponent(story.id)),
+      'url': seo.canonical || (location.origin + '/story/' + encodeURIComponent(story.id) + '/'),
       'datePublished': story.date || undefined,
       'image': image ? [image] : undefined,
       'articleSection': story.category || 'Story',
@@ -784,9 +790,8 @@
   }
 
   function openDeepLink() {
-    var m = (window.location.search || '').match(/[?&]story=([^&]+)/);
-    if (m) {
-      var id = decodeURIComponent(m[1]);
+    var id = cleanStoryIdFromLocation();
+    if (id) {
       var story = allStories.find(function (s) { return s.id === id; });
       if (story) {
         expandedId = null;

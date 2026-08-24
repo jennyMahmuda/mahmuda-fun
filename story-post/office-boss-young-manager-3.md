@@ -85,6 +85,6 @@ seo:
 
 **পর্ব ৩ শেষ**
 
-**পড়ার লিংক:** https://mahmuda.fun/?story=office-boss-young-manager-3
+**পড়ার লিংক:** https://mahmuda.fun/story/office-boss-young-manager-3/
 
 **[পর্ব ১](?story=office-boss-young-manager)** · **[পর্ব ২](?story=office-boss-young-manager-2)**

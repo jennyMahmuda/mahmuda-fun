@@ -53,4 +53,4 @@ excerpt: আবার একা। আবার সেই দরজার শব
 
 বাইরে রোদ এখনো ছিল। কিন্তু রিয়ার মনে হচ্ছিল—বৃষ্টি আবার নামবে। শীঘ্রই।
 
-*— পর্ব ৩ শেষ।*[তিন দিন পরে](https://mahmuda.fun/?story=gorom-bhabi-orange-3)
+*— পর্ব ৩ শেষ।*[তিন দিন পরে](https://mahmuda.fun/story/gorom-bhabi-orange-3/)

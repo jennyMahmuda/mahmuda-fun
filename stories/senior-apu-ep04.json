@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 4,
   "cover": "story-post/image/senior-apu-cover.webp",
+  "coverAlt": "সিনিয়র আপু · পর্ব ৪ · মুখে মুখে",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ৪ · মুখে মুখে",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": "story-post/image/senior-apu-cover.webp",
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep04"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep04/"
   },
   "ads": {
     "enabled": true,

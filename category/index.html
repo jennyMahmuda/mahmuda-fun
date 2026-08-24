@@ -177,7 +177,7 @@
       grid.innerHTML = list.map(function (s) {
         var img = coverUrl(s);
         var badge = s.series ? esc(s.series) : esc(s.category || s.type || 'Story');
-        return '<a class="feed-card" href="../index.html?story=' + encodeURIComponent(s.id) + '" style="text-decoration:none">' +
+        return '<a class="feed-card" href="../story/' + encodeURIComponent(s.id) + '/" style="text-decoration:none">' +
           (img ? '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>' : '') +
           '<div class="feed-card-header"><div class="feed-avatar">N</div><div class="feed-meta"><div class="feed-author">SecretChapters</div><div class="feed-time">' + esc(s.date || '') + ' · ' + esc(s.readTime || '') + '</div></div>' +
           '<span class="feed-type-badge">' + badge + '</span>' +
@@ -226,7 +226,7 @@
         topGrid.innerHTML = ranked.map(function (id) {
           var s = byId[id];
           var img = coverUrl(s);
-          return '<a class="top-rated-card" href="../index.html?story=' + encodeURIComponent(id) + '">' +
+          return '<a class="top-rated-card" href="../story/' + encodeURIComponent(id) + '/">' +
             window.NightsRatingReview.badgeHtml(map[id]) +
             '<div class="top-rated-name">' + esc(s.title) + '</div>' +
             '</a>';

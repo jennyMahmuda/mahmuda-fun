@@ -18,6 +18,8 @@
   "series": "Senior Apu",
   "episode": 7,
   "cover": null,
+  "coverAlt": "সিনিয়র আপু · পর্ব ৭ · হোটেলের চাবি",
+  "thumbnailAlt": "সিনিয়র আপু · পর্ব ৭ · হোটেলের চাবি",
   "audio": null,
   "video": null,
   "images": [],
@@ -46,7 +48,7 @@
       "mahmuda.fun"
     ],
     "ogImage": null,
-    "canonical": "https://mahmuda.fun/?story=senior-apu-ep07"
+    "canonical": "https://mahmuda.fun/story/senior-apu-ep07/"
   },
   "ads": {
     "enabled": true,

@@ -129,7 +129,7 @@
     }
     function cardHtml(s) {
       var img = coverUrl(s);
-      return '<a class="feed-card" href="../index.html?story=' + encodeURIComponent(s.id) + '" style="text-decoration:none">' +
+      return '<a class="feed-card" href="../story/' + encodeURIComponent(s.id) + '/" style="text-decoration:none">' +
         '<div class="feed-card-media"><img src="' + esc(img) + '" alt="' + esc(s.title) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'"></div>' +
         '<div class="feed-card-header"><div class="feed-avatar">S</div><div class="feed-meta"><div class="feed-author">SecretChapters</div><div class="feed-time">' + esc(s.date || '') + '</div></div>' +
         '<span class="feed-type-badge">' + esc(s.category || 'Story') + '</span></div>' +
