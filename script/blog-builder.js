@@ -562,9 +562,33 @@ function writeCategoryFooterHtml() {
     '</div></footer>\n';
 }
 
+function removeStaleGeneratedStoryArtifacts(stories) {
+  const activeIds = new Set((stories || []).map(function (story) { return String(story.id || '').trim(); }).filter(function (id) { return /^[a-zA-Z0-9_-]{1,160}$/.test(id); }));
+  if (fs.existsSync(OUTPUT_DIR)) {
+    fs.readdirSync(OUTPUT_DIR).forEach(function (name) {
+      if (!name.endsWith('.json') || name === 'index.json') return;
+      const id = name.slice(0, -5);
+      if (!activeIds.has(id)) {
+        fs.unlinkSync(path.join(OUTPUT_DIR, name));
+        console.log('Removed stale stories/' + name);
+      }
+    });
+  }
+  const storyPagesRoot = path.join(ROOT, 'story');
+  if (fs.existsSync(storyPagesRoot)) {
+    fs.readdirSync(storyPagesRoot, { withFileTypes: true }).forEach(function (entry) {
+      if (!entry.isDirectory() || !/^[a-zA-Z0-9_-]{1,160}$/.test(entry.name)) return;
+      if (!activeIds.has(entry.name)) {
+        fs.rmSync(path.join(storyPagesRoot, entry.name), { recursive: true, force: true });
+        console.log('Removed stale story/' + entry.name + '/');
+      }
+    });
+  }
+}
 function writeStoryPages(stories) {
   const outRoot = path.join(ROOT, 'story');
   if (!fs.existsSync(outRoot)) fs.mkdirSync(outRoot, { recursive: true });
+  removeStaleGeneratedStoryArtifacts(stories);
   (stories || []).forEach(function (story) {
     const safeId = String(story.id || '').trim();
     if (!/^[a-zA-Z0-9_-]{1,160}$/.test(safeId)) return;
@@ -704,15 +728,16 @@ function writeExclusiveContentSeed(stories) {
   const sqlFile = path.join(genDir, 'exclusive-content.sql');
   const exclusiveStories = stories.filter(function (s) { return s.exclusive; });
   if (!exclusiveStories.length) {
-    fs.writeFileSync(sqlFile, '-- No exclusive stories in this build.\n', 'utf8');
-    console.log('✓ cloudflare/generated/exclusive-content.sql (0 exclusive stories)');
+    fs.writeFileSync(sqlFile, 'DELETE FROM exclusive_content;\n', 'utf8');
+    console.log('✓ cloudflare/generated/exclusive-content.sql (0 exclusive stories; stale rows removed)');
     return;
   }
-  const lines = exclusiveStories.map(function (s) {
+  const ids = exclusiveStories.map(function (s) { return sqlString(s.id); }).join(', ');
+  const lines = ['DELETE FROM exclusive_content WHERE story_id NOT IN (' + ids + ');'].concat(exclusiveStories.map(function (s) {
     return 'INSERT INTO exclusive_content (story_id, content, updated_at) VALUES (' +
       sqlString(s.id) + ', ' + sqlString(s.content) + ", datetime('now'))" +
       ' ON CONFLICT(story_id) DO UPDATE SET content = excluded.content, updated_at = excluded.updated_at;';
-  });
+  }));
   fs.writeFileSync(sqlFile, lines.join('\n') + '\n', 'utf8');
   console.log('✓ cloudflare/generated/exclusive-content.sql (' + exclusiveStories.length + ' exclusive stories)');
 }
