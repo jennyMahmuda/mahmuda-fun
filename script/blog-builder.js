@@ -619,12 +619,29 @@ function listingCardHtml(story, base, kind) {
 }
 function replaceListingSeed(file, id, html) {
   if (!fs.existsSync(file)) return;
-  let source = fs.readFileSync(file, 'utf8');
-  const re = new RegExp('(<(?:div|section)[^>]*\\bid=["\\\\\\\']' + id + '["\\\\\\\'][^>]*>)[\\s\\S]*?(</(?:div|section)>)', 'i');
-  if (!re.test(source)) return;
-  source = source.replace(re, '$1' + html + '$2');
-  source = source.replace(/<p>Loading…<\/p>/g, '');
-  fs.writeFileSync(file, source, 'utf8');
+  const source = fs.readFileSync(file, 'utf8');
+  const openRe = new RegExp('<(div|section)\\b[^>]*\\bid=["\\\\\\\']' + id + '["\\\\\\\'][^>]*>', 'i');
+  const match = openRe.exec(source);
+  if (!match) return;
+  const tag = match[1].toLowerCase();
+  const start = match.index;
+  const contentStart = start + match[0].length;
+  const tokenRe = new RegExp('<\\/?' + tag + '\\b[^>]*>', 'gi');
+  tokenRe.lastIndex = contentStart;
+  let depth = 1;
+  let endStart = -1;
+  let token;
+  while ((token = tokenRe.exec(source))) {
+    if (/^<\//.test(token[0])) depth--;
+    else if (!/\/>$/.test(token[0])) depth++;
+    if (depth === 0) { endStart = token.index; break; }
+  }
+  if (endStart < 0) return;
+  const end = tokenRe.lastIndex;
+  const openTag = source.slice(start, contentStart);
+  let next = source.slice(0, contentStart) + html + source.slice(endStart, end) + source.slice(end);
+  next = next.replace(/<p>Loading…<\/p>/g, '').replace(/<\/div><\/a><\/article>(?=<article)/g, '<\/div>');
+  fs.writeFileSync(file, next, 'utf8');
 }
 function writeListingFirstPaint(stories) {
   const publicStories = stories.map(publicStoryJson).sort(function (a,b) { return String(b.date||'').localeCompare(String(a.date||'')); });
