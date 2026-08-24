@@ -2,207 +2,380 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mahmuda.fun/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/gellery/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/video/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/series/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/top-rated/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/trending/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/new-releases/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/faq.html</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/premium.html</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/privacy-policy.html</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/llms.txt</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/dark-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/mafia-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/paranormal-fantasy-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/billionaire-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/alpha-males/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/high-school-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/spicy-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/age-gap-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/vampire-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/cowboy-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/forbidden-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/second-chance-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/clean-wholesome/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/fated-mates/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/comedy/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/bad-boys/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/slow-burn/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/enemies-to-lovers/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/sports/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/college/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/bhabi-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mahmuda.fun/category/affair-romance/</loc>
-    <lastmod>2026-08-09</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/forbidden/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/spicy/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/dirtytalk/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/senior/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/climax/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/agegap/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/tension/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/madam/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/university/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/chemistry/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/junior/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/category/neighbor/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=northsouth-university-senior-apu-viral-video</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=university-senior-secret-hotel-story-north-south-university</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/try-my-junior-cover.jpg</image:loc><image:title>I Tried My University Junior — A Secret Night at the Hotel | North South University</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=office-boss-young-manager-4</loc>
+    <lastmod>2026-08-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/cheating-wife-husband-friend-hotel.jpg</image:loc><image:title>অফিস বস · পর্ব ৪ · নিচে কিছু নেই</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=office-boss-young-manager-2</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/cheating-wife-husband-friend-hotel.jpg</image:loc><image:title>অফিস বস · পর্ব ২ · মিটিংয়ের পর কেবিন</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=office-boss-young-manager-3</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/cheating-wife-husband-friend-hotel.jpg</image:loc><image:title>অফিস বস · পর্ব ৩ · তিনবার</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=office-boss-young-manager</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/cheating-wife-husband-friend-hotel.jpg</image:loc><image:title>অফিস বস · তরুণ ম্যানেজার · আজকের রাত</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=tin-bondhu-tin-bou-wife-swap-tabu-golpo</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=husband-friend-wife-exchange-banglachoti</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=bhabi-wife-cheating-age-gap</loc>
+    <lastmod>2026-08-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/bhabi-wife-cheating-story.jpg</image:loc><image:title>ভাবির গোপন সম্পর্ক · জামাই বাইরে · এজ-গ্যাপ</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=senior-neighbor-one-night-hotel-2</loc>
+    <lastmod>2026-08-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/cheating-wife-husband-friend-hotel.jpg</image:loc><image:title>পাশের সিনিয়র · পর্ব ২ · মুখ + পেছন</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=senior-neighbor-one-night-hotel</loc>
+    <lastmod>2026-08-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/gallery-post/cheating-wife-husband-friend-hotel.jpg</image:loc><image:title>পাশের সিনিয়র · এক রাত চায় · হোটেল</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=unsatisfied-women-cox-bazar-cabin-2</loc>
+    <lastmod>2026-08-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/university-medam-say-please-take-photo.jpg</image:loc><image:title>কক্সবাজার কেবিন · পর্ব ২ · স্বামী বাইরে</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=unsatisfied-women-cox-bazar-cabin</loc>
+    <lastmod>2026-08-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/unsatisfied-women-one-night-hotel.jpg</image:loc><image:title>কক্সবাজার কেবিন · অসন্তুষ্ট নারী · এক রাত</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=husband-friend-cheating-wife</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mahmuda.fun/?story=university-madam-invited-me-home-husband-not-home-romance</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://mahmuda.fun/assets/images/gallery/university-teacher-home.jpg</image:loc><image:title>University Madam Invited Me Home While Her Husband Was Away | Forbidden Romance Story</image:title></image:image>
   </url>
   <url>
     <loc>https://mahmuda.fun/?story=gorom-bhabi-orange-2</loc>

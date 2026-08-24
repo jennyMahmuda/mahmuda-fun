@@ -1,7 +1,7 @@
 {
   "dark-romance": {
-    "path": "assets/images/categories/theme-danger.jpg",
-    "photo": true
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
   },
   "mafia-romance": {
     "path": "assets/images/categories/mafia-romance.jpg",
@@ -9,27 +9,27 @@
   },
   "paranormal-fantasy-romance": {
     "path": "assets/images/categories/theme-mystic.svg",
-    "photo": true
+    "photo": false
   },
   "billionaire-romance": {
     "path": "assets/images/categories/theme-luxury.svg",
-    "photo": true
+    "photo": false
   },
   "alpha-males": {
     "path": "assets/images/categories/theme-luxury.svg",
-    "photo": true
+    "photo": false
   },
   "high-school-romance": {
-    "path": "assets/images/categories/theme-warm.svg",
+    "path": "assets/images/categories/high-school-romance.jpg",
     "photo": true
   },
   "spicy-romance": {
     "path": "assets/images/categories/theme-rose.svg",
-    "photo": true
+    "photo": false
   },
   "age-gap-romance": {
     "path": "assets/images/categories/theme-rose.svg",
-    "photo": true
+    "photo": false
   },
   "vampire-romance": {
     "path": "assets/images/categories/vampire-romance.webp",
@@ -37,54 +37,102 @@
   },
   "cowboy-romance": {
     "path": "assets/images/categories/theme-earthy.svg",
-    "photo": true
+    "photo": false
   },
   "forbidden-romance": {
     "path": "assets/images/categories/theme-accent.svg",
-    "photo": true
+    "photo": false
   },
   "second-chance-romance": {
     "path": "assets/images/categories/theme-accent.svg",
-    "photo": true
+    "photo": false
   },
   "clean-wholesome": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": true
+    "photo": false
   },
   "fated-mates": {
     "path": "assets/images/categories/theme-mystic.svg",
-    "photo": true
+    "photo": false
   },
   "comedy": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": true
+    "photo": false
   },
   "bad-boys": {
     "path": "assets/images/categories/theme-danger.svg",
-    "photo": true
+    "photo": false
   },
   "slow-burn": {
     "path": "assets/images/categories/theme-accent.svg",
-    "photo": true
+    "photo": false
   },
   "enemies-to-lovers": {
     "path": "assets/images/categories/theme-danger.svg",
-    "photo": true
+    "photo": false
   },
   "sports": {
-    "path": "assets/images/categories/theme-earthy.jpg",
-    "photo": true
+    "path": "assets/images/categories/theme-earthy.svg",
+    "photo": false
   },
   "college": {
     "path": "assets/images/categories/theme-warm.svg",
-    "photo": true
+    "photo": false
   },
   "bhabi-romance": {
-    "path": "assets/images/categories/Bhabi-saree.jpg",
+    "path": "assets/images/categories/bhabi-romance.jpg",
     "photo": true
   },
   "affair-romance": {
-    "path": "assets/images/categories/Cheating-wife.jpg",
-    "photo": true
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  },
+  "forbidden": {
+    "path": "assets/images/categories/theme-accent.svg",
+    "photo": false
+  },
+  "spicy": {
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  },
+  "dirtytalk": {
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
+  },
+  "senior": {
+    "path": "assets/images/categories/theme-luxury.svg",
+    "photo": false
+  },
+  "climax": {
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  },
+  "agegap": {
+    "path": "assets/images/categories/theme-rose.svg",
+    "photo": false
+  },
+  "tension": {
+    "path": "assets/images/categories/theme-danger.svg",
+    "photo": false
+  },
+  "madam": {
+    "path": "assets/images/categories/theme-luxury.svg",
+    "photo": false
+  },
+  "university": {
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": false
+  },
+  "chemistry": {
+    "path": "assets/images/categories/theme-accent.svg",
+    "photo": false
+  },
+  "junior": {
+    "path": "assets/images/categories/theme-warm.svg",
+    "photo": false
+  },
+  "neighbor": {
+    "path": "assets/images/categories/theme-earthy.svg",
+    "photo": false
   }
 }

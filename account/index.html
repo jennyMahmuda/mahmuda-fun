@@ -208,10 +208,13 @@
             ? '<a class="rr-submit" style="text-decoration:none;display:block;box-sizing:border-box;" href="../admin/">📊 Go to Admin Dashboard</a>'
             : '') +
           '<button type="button" class="rr-submit" id="logoutBtn">Log out</button>' +
+          '<section class="account-panel active" style="margin-top:20px;text-align:left"><h2>Contact admin</h2><p class="sub">Send a private message to the site admin. Do not include passwords or payment details.</p><div id="accountMessages"><p class="rr-hint">Loading messages…</p></div><form id="accountMessageForm" class="rr-form"><label class="rr-field"><span>Message</span><textarea name="body" required maxlength="2000" placeholder="Write your message…"></textarea></label><button type="submit" class="rr-submit">Send message</button><p id="accountMessageStatus" class="rr-hint"></p></form></section>' +
         '</div>';
       document.getElementById('logoutBtn').addEventListener('click', function () {
         window.NightsAuth.logout().then(function () { window.location.reload(); });
       });
+      window.NightsAuth.listMessages().then(function (data) { var box = document.getElementById('accountMessages'); if (!box) return; var messages = data.messages || []; box.innerHTML = messages.length ? messages.map(function (m) { return '<p class="rr-hint"><strong>' + escapeHtml(m.senderRole === 'user' ? 'You' : 'Admin') + ':</strong> ' + escapeHtml(m.body) + '<br><small>' + escapeHtml(m.createdAt || '') + '</small></p>'; }).join('') : '<p class="rr-hint">No messages yet.</p>'; }).catch(function () { var box = document.getElementById('accountMessages'); if (box) box.innerHTML = '<p class="rr-hint rr-error">Could not load messages.</p>'; });
+      document.getElementById('accountMessageForm').addEventListener('submit', function (e) { e.preventDefault(); var form = e.currentTarget, status = document.getElementById('accountMessageStatus'), body = form.elements.body.value.trim(); status.textContent = 'Sending…'; window.NightsAuth.sendMessage(body, 'user-' + Date.now() + '-' + Math.random().toString(36).slice(2)).then(function () { status.textContent = 'Message sent.'; form.reset(); }).catch(function (err) { status.textContent = err.message || 'Could not send message.'; }); });
     }
 
     function init() {

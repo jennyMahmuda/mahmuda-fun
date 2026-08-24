@@ -135,6 +135,11 @@
   function fetchExclusiveContent(storyId) {
     return apiFetch('/api/stories/' + encodeURIComponent(storyId) + '/content');
   }
+  function joinPremium(source) {
+    return apiFetch('/api/premium/lead', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ consent: true, source: source || 'premium_page' }) });
+  }
+  function listMessages() { return apiFetch('/api/messages'); }
+  function sendMessage(body, clientKey) { return apiFetch('/api/messages', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ body: body, clientKey: clientKey }) }); }
 
   // ---- Admin content manager (assets/js/admin.js) ----
   // Every call here 401s/403s server-side for a non-admin session — these
@@ -194,6 +199,9 @@
   function adminGa4Status() {
     return apiFetch('/api/admin/ga4-status');
   }
+  function adminPremiumLeads() { return apiFetch('/api/admin/premium-leads'); }
+  function adminMessages(userId) { return apiFetch('/api/admin/messages' + (userId ? '?userId=' + encodeURIComponent(userId) : '')); }
+  function adminSendMessage(userId, body, clientKey) { return apiFetch('/api/admin/messages', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId: userId, body: body, clientKey: clientKey }) }); }
 
   // Updates the shared #navAccountLink / #navAccountLabel present on every
   // page's nav (points at /account/ either way — that page itself shows a
@@ -222,6 +230,9 @@
     me: me,
     getToken: getToken,
     fetchExclusiveContent: fetchExclusiveContent,
+    joinPremium: joinPremium,
+    listMessages: listMessages,
+    sendMessage: sendMessage,
     adminLogin: adminLogin,
     adminListStories: adminListStories,
     adminCreateStory: adminCreateStory,
@@ -233,5 +244,8 @@
     adminModerateReview: adminModerateReview,
     adminListNewsletter: adminListNewsletter,
     adminGa4Status: adminGa4Status,
+    adminPremiumLeads: adminPremiumLeads,
+    adminMessages: adminMessages,
+    adminSendMessage: adminSendMessage,
   };
 })();

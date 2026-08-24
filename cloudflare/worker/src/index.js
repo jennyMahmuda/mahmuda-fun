@@ -450,7 +450,69 @@ async function handleLogout(request, env, origin) {
 async function handleMe(request, env, origin) {
   const user = await getSessionUser(request, env);
   if (!user) return json({ authenticated: false }, 200, corsHeaders(origin));
-  return json({ authenticated: true, email: user.email, emailVerified: !!user.emailVerified, isAdmin: !!user.isAdmin }, 200, corsHeaders(origin));
+  return json({ authenticated: true, userId: user.userId, email: user.email, emailVerified: !!user.emailVerified, isAdmin: !!user.isAdmin }, 200, corsHeaders(origin));
+}
+
+async function handlePremiumLead(request, env, origin) {
+  const user = await getSessionUser(request, env);
+  if (!user) return json({ error: 'Login required' }, 401, corsHeaders(origin));
+  if (!user.emailVerified) return json({ error: 'Verify your email before joining Premium' }, 403, corsHeaders(origin));
+  const body = await readJson(request);
+  if (body?.consent !== true) return json({ error: 'Premium lead consent is required' }, 400, corsHeaders(origin));
+  const source = typeof body.source === 'string' && body.source.length <= 80 ? body.source : 'premium_page';
+  const result = await env.REVIEWS_DB.prepare("INSERT INTO premium_leads (user_id, email, consent, source) VALUES (?, ?, 1, ?) ON CONFLICT(user_id) DO UPDATE SET email = excluded.email, consent = 1, source = excluded.source, updated_at = datetime('now')").bind(user.userId, user.email, source).run();
+  return json({ ok: true, leadId: result.meta?.last_row_id || null }, 200, corsHeaders(origin));
+}
+
+function validMessageBody(value) { return typeof value === 'string' && value.trim().length >= 1 && value.trim().length <= 2000; }
+function validClientKey(value) { return typeof value === 'string' && /^[A-Za-z0-9_-]{8,120}$/.test(value); }
+
+async function handleUserMessages(request, env, origin) {
+  const user = await getSessionUser(request, env);
+  if (!user) return json({ error: 'Login required' }, 401, corsHeaders(origin));
+  if (request.method === 'GET') {
+    const result = await env.REVIEWS_DB.prepare('SELECT id, user_id AS userId, sender_role AS senderRole, body, read_at AS readAt, created_at AS createdAt FROM admin_messages WHERE user_id = ? ORDER BY created_at ASC LIMIT 200').bind(user.userId).all();
+    await env.REVIEWS_DB.prepare("UPDATE admin_messages SET read_at = datetime('now') WHERE user_id = ? AND sender_role = 'admin' AND read_at IS NULL").bind(user.userId).run();
+    return json({ messages: result.results || [] }, 200, corsHeaders(origin));
+  }
+  const body = await readJson(request);
+  if (!validMessageBody(body?.body) || !validClientKey(body?.clientKey)) return json({ error: 'Message body or client key is invalid' }, 400, corsHeaders(origin));
+  try {
+    const result = await env.REVIEWS_DB.prepare("INSERT INTO admin_messages (user_id, sender_role, body, client_key) VALUES (?, 'user', ?, ?)").bind(user.userId, body.body.trim(), body.clientKey).run();
+    return json({ ok: true, id: result.meta?.last_row_id || null }, 201, corsHeaders(origin));
+  } catch (err) {
+    if (String(err?.message || err).toLowerCase().includes('unique')) return json({ ok: true, duplicate: true }, 200, corsHeaders(origin));
+    throw err;
+  }
+}
+
+async function handleAdminPremiumLeads(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const result = await env.REVIEWS_DB.prepare('SELECT l.id, l.user_id AS userId, l.email, l.consent, l.source, l.created_at AS createdAt, l.updated_at AS updatedAt FROM premium_leads l ORDER BY l.created_at DESC LIMIT 500').all();
+  return json({ leads: result.results || [] }, 200, corsHeaders(origin));
+}
+
+async function handleAdminMessages(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const url = new URL(request.url);
+  const userId = Number(url.searchParams.get('userId') || 0);
+  if (request.method === 'GET') {
+    const sql = userId > 0 ? 'SELECT m.id, m.user_id AS userId, u.email, m.sender_role AS senderRole, m.body, m.read_at AS readAt, m.created_at AS createdAt FROM admin_messages m JOIN users u ON u.id = m.user_id WHERE m.user_id = ? ORDER BY m.created_at ASC LIMIT 200' : 'SELECT m.id, m.user_id AS userId, u.email, m.sender_role AS senderRole, m.body, m.read_at AS readAt, m.created_at AS createdAt FROM admin_messages m JOIN users u ON u.id = m.user_id ORDER BY m.created_at DESC LIMIT 500';
+    const result = userId > 0 ? await env.REVIEWS_DB.prepare(sql).bind(userId).all() : await env.REVIEWS_DB.prepare(sql).all();
+    return json({ messages: result.results || [] }, 200, corsHeaders(origin));
+  }
+  const body = await readJson(request);
+  const recipient = Number(body?.userId || 0);
+  if (!recipient || !validMessageBody(body?.body) || !validClientKey(body?.clientKey)) return json({ error: 'Recipient, message body or client key is invalid' }, 400, corsHeaders(origin));
+  try {
+    const result = await env.REVIEWS_DB.prepare("INSERT INTO admin_messages (user_id, sender_role, body, client_key) VALUES (?, 'admin', ?, ?)").bind(recipient, body.body.trim(), body.clientKey).run();
+    return json({ ok: true, id: result.meta?.last_row_id || null }, 201, corsHeaders(origin));
+  } catch (err) {
+    if (String(err?.message || err).toLowerCase().includes('unique')) return json({ ok: true, duplicate: true }, 200, corsHeaders(origin));
+    throw err;
+  }
 }
 
 async function handleRequestPasswordReset(request, env, origin) {
@@ -1030,6 +1092,8 @@ export default {
 
     // ----- contact form -----
     if (pathname === '/api/contact' && request.method === 'POST') return handleContact(request, env, origin);
+    if (pathname === '/api/premium/lead' && request.method === 'POST') return handlePremiumLead(request, env, origin);
+    if (pathname === '/api/messages' && (request.method === 'GET' || request.method === 'POST')) return handleUserMessages(request, env, origin);
 
     // ----- admin content manager (see getAdminUser — gated by is_admin) -----
     // Defense in depth on top of the auth check: also require a
@@ -1053,6 +1117,8 @@ export default {
       return handleAdminModerateReview(request, env, origin, adminReviewAction.reviewId, adminReviewAction.action);
     }
     if (pathname === '/api/admin/newsletter' && request.method === 'GET') return handleAdminListNewsletter(request, env, origin);
+    if (pathname === '/api/admin/premium-leads' && request.method === 'GET') return handleAdminPremiumLeads(request, env, origin);
+    if (pathname === '/api/admin/messages' && (request.method === 'GET' || request.method === 'POST')) return handleAdminMessages(request, env, origin);
     if (pathname === '/api/admin/ga4-status' && request.method === 'GET') return handleGa4Status(request, env, origin);
 
     // ----- exclusive content -----

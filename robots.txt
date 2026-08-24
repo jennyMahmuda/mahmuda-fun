@@ -4,4 +4,146 @@ Disallow: /script/
 Disallow: /_site/
 Disallow: /admin/
 
+# Public text, image, video and story paths remain crawlable.
+Allow: /llms.txt
+Allow: /stories/
+Allow: /assets/
+
+# Explicitly open to major search and AI crawlers — this is a content
+# site and wants to be found. Only build tooling stays disallowed, same
+# as for everyone else above; nothing here is more restrictive than the
+# wildcard rule. If a crawler you use isn't listed by name, it's still
+# allowed by the wildcard rule at the top of this file.
+User-agent: Googlebot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Googlebot-Image
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Googlebot-Video
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Googlebot-News
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Applebot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: YandexBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: CCBot
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /script/
+Disallow: /_site/
+Disallow: /admin/
+
 Sitemap: https://mahmuda.fun/sitemap.xml
