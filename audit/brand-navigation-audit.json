@@ -1,0 +1,876 @@
+[
+  {
+    "file": "account/forgot.html",
+    "title": "Reset your password | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 9
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "account/index.html",
+    "title": "Account | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 10
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "account/reset.html",
+    "title": "Set a new password | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 9
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "account/verify.html",
+    "title": "Confirm your account | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 9
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "advertising.html",
+    "title": "Advertising | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 22
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "become-creator.html",
+    "title": "Become a Creator | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/affair-romance/index.html",
+    "title": "Affair &amp; Cheating Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/age-gap-romance/index.html",
+    "title": "Age Gap Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/agegap/index.html",
+    "title": "Age Gap Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 25
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/alpha-males/index.html",
+    "title": "Alpha Male Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/bad-boys/index.html",
+    "title": "Bad Boy Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/bhabi-romance/index.html",
+    "title": "Bhabi Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/billionaire-romance/index.html",
+    "title": "Billionaire Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/chemistry/index.html",
+    "title": "Chemistry Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/clean-wholesome/index.html",
+    "title": "Clean &amp; Wholesome Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/climax/index.html",
+    "title": "Climax Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 24
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/college/index.html",
+    "title": "College Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/comedy/index.html",
+    "title": "Romantic Comedy Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/cowboy-romance/index.html",
+    "title": "Cowboy Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/dark-romance/index.html",
+    "title": "Dark Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/dirtytalk/index.html",
+    "title": "Dirty Talk Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 26
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/enemies-to-lovers/index.html",
+    "title": "Enemies to Lovers Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/fated-mates/index.html",
+    "title": "Fated Mates Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/forbidden/index.html",
+    "title": "Forbidden Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 24
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/forbidden-romance/index.html",
+    "title": "Forbidden Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 24
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/high-school-romance/index.html",
+    "title": "High School Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/index.html",
+    "title": "Categories | mahmuda.fun – Browse Adult Stories by Desire",
+    "brand": {
+      "mahmuda.fun": 75
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/junior/index.html",
+    "title": "Junior Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/madam/index.html",
+    "title": "Madam Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 23
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/mafia-romance/index.html",
+    "title": "Mafia Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/neighbor/index.html",
+    "title": "Neighbor Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/paranormal-fantasy-romance/index.html",
+    "title": "Paranormal &amp; Fantasy Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/second-chance-romance/index.html",
+    "title": "Second Chance Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/senior/index.html",
+    "title": "Senior Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 23
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/slow-burn/index.html",
+    "title": "Slow Burn Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/spicy/index.html",
+    "title": "Spicy Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 27
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/spicy-romance/index.html",
+    "title": "Spicy Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 27
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/sports/index.html",
+    "title": "Sports Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/tension/index.html",
+    "title": "Tension Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/university/index.html",
+    "title": "University Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "category/vampire-romance/index.html",
+    "title": "Vampire Romance Stories | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "content-removal.html",
+    "title": "Content Removal Request | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 22
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "cookies.html",
+    "title": "Cookies Policy | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 26
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "dmca.html",
+    "title": "DMCA / Copyright &amp; 18 U.S.C. 2257 Notice | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 26
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "eu-dsa.html",
+    "title": "EU Digital Services Act (DSA) Contact | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "faq.html",
+    "title": "FAQ | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "gellery/index.html",
+    "title": "Gallery | mahmuda.fun – Story Scenes & Character Art",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "index.html",
+    "title": "mahmuda.fun | Adult Romance Stories & Mature Fiction",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "new-releases/index.html",
+    "title": "New Releases | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "parental-controls.html",
+    "title": "Parental Controls | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 16
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "premium.html",
+    "title": "Premium Content | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 7
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "privacy-policy.html",
+    "title": "Privacy Policy | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 27
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "series/index.html",
+    "title": "Series | mahmuda.fun – Episode-by-Episode Adult Stories",
+    "brand": {
+      "mahmuda.fun": 38
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/bhabi-wife-cheating-age-gap/index.html",
+    "title": "ভাবির গোপন সম্পর্ক · জামাই বাইরে · এজ-গ্যাপ | mahmuda.fun – Premi",
+    "brand": {
+      "mahmuda.fun": 22
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/bristir-rate/index.html",
+    "title": "বৃষ্টির রাতে – এক নিষিদ্ধ ফ্যান্টাসি | mahmuda.fun – Premium Adul",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/bristir-rate-ep1/index.html",
+    "title": "বৃষ্টির রাতে – পর্ব ১ · প্রথম স্পর্শ | mahmuda.fun – Premium Adul",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/bristir-rate-ep2/index.html",
+    "title": "বৃষ্টির রাতে – পর্ব ৩ · নিষিদ্ধ দুপুর | mahmuda.fun – Premium Adu",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/bristir-rate-ep3/index.html",
+    "title": "বৃষ্টির রাতে – পর্ব ৩ · নিষিদ্ধ দুপুর | mahmuda.fun – Premium Adu",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/gorom-bhabi-orange/index.html",
+    "title": "গরম ভাবি · কমলা শাড়ি · জামাই ঢাকার বাইরে | mahmuda.fun – Premium",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/gorom-bhabi-orange-2/index.html",
+    "title": "গরম ভাবি · পর্ব ২ · রাত লম্বা | mahmuda.fun – Premium Adult Stori",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/gorom-bhabi-orange-3/index.html",
+    "title": "গরম ভাবি · পর্ব ৩ · শেষ রাত | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/gorom-bhabi-orange-4/index.html",
+    "title": "গরম ভাবি · পর্ব ৪ · হার্ড অ্যানাল | mahmuda.fun – Premium Adult S",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/husband-friend-cheating-wife/index.html",
+    "title": "স্বামীর অনুপস্থিতিতে বন্ধুর সঙ্গে স্ত্রী—সেই রাতের গল্প | mahmuda",
+    "brand": {
+      "mahmuda.fun": 8
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/husband-friend-wife-exchange-banglachoti/index.html",
+    "title": "বাংলা চটি স্ত্রী বদলের গোপন রাত, নিষিদ্ধ আকর্ষণে জড়িয়ে পড়ল দুই",
+    "brand": {
+      "mahmuda.fun": 7
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/northsouth-university-senior-apu-viral-video/index.html",
+    "title": "I Try my University senior bd viral 18+ Northsouth University | m",
+    "brand": {
+      "mahmuda.fun": 12
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/office-boss-young-manager/index.html",
+    "title": "অফিস বস · তরুণ ম্যানেজার · আজকের রাত | mahmuda.fun – Premium Adul",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/office-boss-young-manager-2/index.html",
+    "title": "অফিস বস · পর্ব ২ · মিটিংয়ের পর কেবিন | mahmuda.fun – Premium Adul",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/office-boss-young-manager-3/index.html",
+    "title": "অফিস বস · পর্ব ৩ · তিনবার | mahmuda.fun – Premium Adult Stories",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/office-boss-young-manager-4/index.html",
+    "title": "অফিস বস · পর্ব ৪ · নিচে কিছু নেই | mahmuda.fun – Premium Adult St",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ending/index.html",
+    "title": "সিনিয়র আপু · শেষ শট — মেগা এন্ডিং | mahmuda.fun – Premium Adult S",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep01/index.html",
+    "title": "সিনিয়র আপু · পর্ব ১ · নিয়মের প্রথম কথা | mahmuda.fun – Premium Ad",
+    "brand": {
+      "mahmuda.fun": 16
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep02/index.html",
+    "title": "সিনিয়র আপু · পর্ব ২ · সন্ধ্যার কর্নার | mahmuda.fun – Premium Adu",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep03/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৩ · আরও কাছে | mahmuda.fun – Premium Adult Stor",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep04/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৪ · মুখে মুখে | mahmuda.fun – Premium Adult Sto",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep05/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৫ · শেষ সীমানা | mahmuda.fun – Premium Adult St",
+    "brand": {
+      "mahmuda.fun": 16
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep06/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৬ · তিনজনের ছায়া | mahmuda.fun – Premium Adult",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep07/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৭ · হোটেলের চাবি | mahmuda.fun – Premium Adult",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep08/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৮ · আগুনের রানওয়ে | mahmuda.fun – Premium Adult",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep09/index.html",
+    "title": "সিনিয়র আপু · পর্ব ৯ · কর্ণারের আগুন | mahmuda.fun – Premium Adult",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep10/index.html",
+    "title": "সিনিয়র আপু · পর্ব ১০ · শেষ এন্ট্রি, নতুন দরজা | mahmuda.fun – Pre",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep11/index.html",
+    "title": "সিনিয়র আপু · পর্ব ১১ · তিনজনের পার্টি | mahmuda.fun – Premium Adu",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-apu-ep12/index.html",
+    "title": "সিনিয়র আপু · পর্ব ১২ · ধামাকা রাত — শেষ পার্টি | mahmuda.fun – Pr",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-neighbor-one-night-hotel/index.html",
+    "title": "পাশের সিনিয়র · এক রাত চায় · হোটেল | mahmuda.fun – Premium Adult S",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/senior-neighbor-one-night-hotel-2/index.html",
+    "title": "পাশের সিনিয়র · পর্ব ২ · মুখ + পেছন | mahmuda.fun – Premium Adult",
+    "brand": {
+      "mahmuda.fun": 19
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/tin-bondhu-tin-bou-wife-swap-tabu-golpo/index.html",
+    "title": "তিন বন্ধু, তিন সুন্দরী বউ, তাঁবুর সেই গোপন রাত | mahmuda.fun – Pr",
+    "brand": {
+      "mahmuda.fun": 10
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/university-madam-eyes/index.html",
+    "title": "চোখের দেখা · ম্যাম ও স্টুডেন্ট | mahmuda.fun – Premium Adult Stor",
+    "brand": {
+      "mahmuda.fun": 15
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/university-madam-home-offer/index.html",
+    "title": "ইউনিভার্সিটি ম্যাডাম · বাসায় এসো · নম্বর বাড়বে | mahmuda.fun – Pr",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/university-madam-home-offer-2/index.html",
+    "title": "ইউনিভার্সিটি ম্যাডাম · পর্ব ২ · খেলা শুরু | mahmuda.fun – Premium",
+    "brand": {
+      "mahmuda.fun": 16
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/university-madam-invited-me-home-husband-not-home-romance/index.html",
+    "title": "University Madam Invited Me Home While Her Husband Was Away | For",
+    "brand": {
+      "mahmuda.fun": 17,
+      "SecretChapters": 1
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/university-mam-playful/index.html",
+    "title": "ক্লাসের পর ম্যাম আমাকে খেলা শিখাবে বললেন | mahmuda.fun – Premium",
+    "brand": {
+      "mahmuda.fun": 11
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/unsatisfied-women-cox-bazar-cabin/index.html",
+    "title": "কক্সবাজার কেবিন · অসন্তুষ্ট নারী · এক রাত | mahmuda.fun – Premium",
+    "brand": {
+      "mahmuda.fun": 20
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "story/unsatisfied-women-cox-bazar-cabin-2/index.html",
+    "title": "কক্সবাজার কেবিন · পর্ব ২ · স্বামী বাইরে | mahmuda.fun – Premium A",
+    "brand": {
+      "mahmuda.fun": 23
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "terms.html",
+    "title": "Terms of Use | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 27
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "top-rated/index.html",
+    "title": "Top Rated Stories | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 73
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "trending/index.html",
+    "title": "Trending Stories | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 74
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "trust-safety.html",
+    "title": "Trust &amp; Safety | mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 21
+    },
+    "missingLegal": [],
+    "navPremium": true
+  },
+  {
+    "file": "video/index.html",
+    "title": "Video Stories | mahmuda.fun – mahmuda.fun",
+    "brand": {
+      "mahmuda.fun": 28
+    },
+    "missingLegal": [],
+    "navPremium": true
+  }
+]

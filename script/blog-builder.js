@@ -501,7 +501,7 @@ function writeCategoryPages(stories) {
       '    var badge=s.exclusive?"🔒 Members":(s.series?esc(s.series):esc(s.category||s.type||"Story"));\n' +
       '    return "<a class=\\"feed-card\\" href=\\"../../story/"+encodeURIComponent(s.id)+"/\\" style=\\"text-decoration:none\\">"+\n' +
       '      "<div class=\\"feed-card-media\\"><img src=\\""+esc(img)+"\\" alt=\\""+esc(s.title)+"\\" loading=\\"lazy\\" decoding=\\"async\\" onerror=\\"this.style.display=\'none\'\\"></div>"+\n' +
-      '      "<div class=\\"feed-card-header\\"><div class=\\"feed-avatar\\">N</div><div class=\\"feed-meta\\"><div class=\\"feed-author\\">SecretChapters</div><div class=\\"feed-time\\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+\n' +
+      '      "<div class=\\"feed-card-header\\"><div class=\\"feed-avatar\\">N</div><div class=\\"feed-meta\\"><div class=\\"feed-author\\">mahmuda.fun</div><div class=\\"feed-time\\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+\n' +
       '      "<span class=\\"feed-type-badge\\">"+badge+"</span><span data-rating-slot=\\""+esc(s.id)+"\\"></span></div>"+\n' +
       '      "<h2 class=\\"feed-title\\">"+esc(s.title)+"</h2><p class=\\"feed-excerpt\\">"+esc(s.excerpt||"")+"</p></a>";\n' +
       '  }).join("");}\n' +
@@ -671,7 +671,7 @@ function writeStoryPages(stories) {
       '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + escapeXml(titleText) + '"><meta name="twitter:description" content="' + escapeXml(description) + '">' + (image ? '<meta name="twitter:image" content="' + escapeXml(image) + '">' : '') + '\n' +
       '<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/navigation.css"><link rel="stylesheet" href="../../assets/css/blog.css">\n' +
       '<script type="application/ld+json">' + jsonLd + '</script>\n</head>\n<body>\n' +
-      '<header class="site-header"><div class="container"><a href="../../" aria-label="mahmuda.fun home">mahmuda.fun</a></div></header>\n' +
+      '<header class="navbar"><div class="nav-container"><a href="../../" class="logo" aria-label="mahmuda.fun home"><img class="logo-svg" src="../../assets/logo.svg" alt="mahmuda.fun logo" width="160" height="42" fetchpriority="high" decoding="async" /></a><nav class="nav-links" aria-label="Main navigation"><a href="../../" class="nav-item">Home</a><a href="../../video/" class="nav-item">Video</a><a href="../../category/" class="nav-item">Category</a><a href="../../gellery/" class="nav-item">Gallery</a><a href="../../series/" class="nav-item">Series</a><a href="../../premium.html" class="nav-item">Premium</a><a href="../../account/" class="nav-item">Log in</a></nav></div></header>\n' +
       '<main class="container story-page"><article><p class="story-kicker">' + escapeXml(story.category || 'Story') + '</p><h1>' + escapeXml(story.title) + '</h1>' +
       categoryNav +
       (image ? '<img class="story-cover" src="' + escapeXml(image) + '" alt="' + escapeXml(story.coverAlt || story.title) + '" fetchpriority="high">' : '') +
@@ -682,7 +682,7 @@ function writeStoryPages(stories) {
   console.log('✓ clean story pages (' + (stories || []).length + ' pages)');
 }
 function writeStoryFooterHtml() {
-  return '<footer class="footer"><div class="container"><p><a href="../../">mahmuda.fun</a> · <a href="../../premium.html">Premium</a> · <a href="../../sitemap.xml">Sitemap</a></p></div></footer>';
+  return '<footer class="footer"><div class="container"><div class="footer-links" aria-label="Footer"><div class="footer-col"><h4>Explore</h4><a href="../../">Feed</a><a href="../../category/">Categories</a><a href="../../series/">Series</a><a href="../../gellery/">Gallery</a><a href="../../video/">Video</a><a href="../../premium.html">Premium</a></div><div class="footer-col"><h4>Support</h4><a href="../../faq.html">FAQ</a><a href="../../content-removal.html">Content Removal</a><a href="mailto:support@mahmuda.fun">Contact us</a></div><div class="footer-col"><h4>Legal</h4><a href="../../terms.html">Terms of Use</a><a href="../../privacy-policy.html">Privacy Policy</a><a href="../../cookies.html">Cookies Policy</a><a href="../../dmca.html">DMCA / Copyright</a><a href="../../dmca.html#2257">18 U.S.C. 2257</a><a href="../../parental-controls.html">Parental Controls</a><a href="../../eu-dsa.html">EU DSA</a><a href="../../trust-safety.html">Trust &amp; Safety</a><a href="../../sitemap.xml">Sitemap</a></div></div><p>Premium Adult Fiction · 18+ Only · mahmuda.fun</p></div></footer>';
 }
 function buildStory(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8');
@@ -731,7 +731,7 @@ function buildStory(filePath) {
     date: meta.date || getFileDate(filePath),
     readTime: meta.readTime || estimateReadTime(body),
     language: meta.language || 'en',
-    author: meta.author || 'SecretChapters',
+    author: meta.author || 'mahmuda.fun',
     content: injectAdMarkers(htmlContent),
     // Members-only story: full text is stripped from the public JSON (see
     // writeStoryJson/publicStoryJson below) and instead synced into the D1

@@ -39,7 +39,7 @@
     var badge=s.exclusive?"🔒 Members":(s.series?esc(s.series):esc(s.category||s.type||"Story"));
     return "<a class=\"feed-card\" href=\"../../story/"+encodeURIComponent(s.id)+"/\" style=\"text-decoration:none\">"+
       "<div class=\"feed-card-media\"><img src=\""+esc(img)+"\" alt=\""+esc(s.title)+"\" loading=\"lazy\" decoding=\"async\" onerror=\"this.style.display='none'\"></div>"+
-      "<div class=\"feed-card-header\"><div class=\"feed-avatar\">N</div><div class=\"feed-meta\"><div class=\"feed-author\">SecretChapters</div><div class=\"feed-time\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+
+      "<div class=\"feed-card-header\"><div class=\"feed-avatar\">N</div><div class=\"feed-meta\"><div class=\"feed-author\">mahmuda.fun</div><div class=\"feed-time\">"+esc(s.date||"")+" · "+esc(s.readTime||"")+"</div></div>"+
       "<span class=\"feed-type-badge\">"+badge+"</span><span data-rating-slot=\""+esc(s.id)+"\"></span></div>"+
       "<h2 class=\"feed-title\">"+esc(s.title)+"</h2><p class=\"feed-excerpt\">"+esc(s.excerpt||"")+"</p></a>";
   }).join("");}
