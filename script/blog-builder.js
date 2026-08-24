@@ -452,7 +452,7 @@ function writeCategoryPages(stories) {
     // JSON strings and a <script> block, so this is safe either way.
     const cardsJson = JSON.stringify(matches.map(categoryCardData)).replace(/</g, '\\u003c');
     const canonical = SITE_URL + '/category/' + cat.slug + '/';
-    const pageTitle = cat.title + ' | mahmuda.fun – Premium Adult Stories';
+    const pageTitle = cat.title + ' | mahmuda.fun';
     const html = '<!DOCTYPE html>\n<html lang="en" data-theme="dark">\n<head>\n' +
       '<meta charset="UTF-8" />\n' +
       '<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n' +
@@ -638,9 +638,9 @@ function replaceListingSeed(file, id, html) {
   }
   if (endStart < 0) return;
   const end = tokenRe.lastIndex;
-  const openTag = source.slice(start, contentStart);
-  let next = source.slice(0, contentStart) + html + source.slice(endStart, end) + source.slice(end);
-  next = next.replace(/<p>Loading…<\/p>/g, '').replace(/<\/div><\/a><\/article>(?=<article)/g, '<\/div>');
+  const cleanTail = source.slice(end).replace(/^(?:<article\b[\s\S]*?<\/article>)+/i, '');
+  let next = source.slice(0, contentStart) + html + source.slice(endStart, end) + cleanTail;
+  next = next.replace(/<p>Loading(?: stories)?…<\/p>/g, '');
   fs.writeFileSync(file, next, 'utf8');
 }
 function writeListingFirstPaint(stories) {
@@ -654,6 +654,8 @@ function writeListingFirstPaint(stories) {
   replaceListingSeed(path.join(ROOT, 'top-rated/index.html'), 'rankGrid', publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') || '<p class="loading-state">No rated stories are published yet.</p>');
   replaceListingSeed(path.join(ROOT, 'trending/index.html'), 'trendGrid', publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') || '<p class="loading-state">No trending stories are published yet.</p>');
   replaceListingSeed(path.join(ROOT, 'category/index.html'), 'catGrid', publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') || '<p class="loading-state">No stories are published yet.</p>');
+  const releaseHtml = '<div class="release-group"><h2>Latest releases</h2><div class="regular-stories-grid">' + publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, s.type || 'story'); }).join('') + '</div></div>';
+  replaceListingSeed(path.join(ROOT, 'new-releases/index.html'), 'releaseGroups', releaseHtml || '<p class="loading-state">No releases are published yet.</p>');
   const seriesHtml = Object.keys(series.reduce(function (m, s) { (m[s.series] ||= []).push(s); return m; }, {})).map(function (name) {
     const eps = series.filter(function (s) { return s.series === name; }).sort(function (a,b) { return (a.episode || 0) - (b.episode || 0); });
     return '<section class="series-block"><h2>' + escapeXml(name) + '</h2><div class="episode-grid">' + eps.map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') + '</div></section>';

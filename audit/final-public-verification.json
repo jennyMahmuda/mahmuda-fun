@@ -1,0 +1,478 @@
+{
+  "pageCount": 97,
+  "badCount": 47,
+  "bad": [
+    {
+      "file": "account/forgot.html",
+      "titleLength": 33,
+      "descriptionLength": 0,
+      "canonical": "https://mahmuda.fun/account/forgot.html",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": false
+    },
+    {
+      "file": "account/index.html",
+      "titleLength": 21,
+      "descriptionLength": 72,
+      "canonical": "https://mahmuda.fun/account/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "account/reset.html",
+      "titleLength": 32,
+      "descriptionLength": 0,
+      "canonical": "https://mahmuda.fun/account/reset.html",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": false
+    },
+    {
+      "file": "account/verify.html",
+      "titleLength": 34,
+      "descriptionLength": 0,
+      "canonical": "https://mahmuda.fun/account/verify.html",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/affair-romance/index.html",
+      "titleLength": 75,
+      "descriptionLength": 122,
+      "canonical": "https://mahmuda.fun/category/affair-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/age-gap-romance/index.html",
+      "titleLength": 61,
+      "descriptionLength": 147,
+      "canonical": "https://mahmuda.fun/category/age-gap-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/agegap/index.html",
+      "titleLength": 53,
+      "descriptionLength": 152,
+      "canonical": "https://mahmuda.fun/category/agegap/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/alpha-males/index.html",
+      "titleLength": 64,
+      "descriptionLength": 116,
+      "canonical": "https://mahmuda.fun/category/alpha-males/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/bad-boys/index.html",
+      "titleLength": 61,
+      "descriptionLength": 105,
+      "canonical": "https://mahmuda.fun/category/bad-boys/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/bhabi-romance/index.html",
+      "titleLength": 59,
+      "descriptionLength": 137,
+      "canonical": "https://mahmuda.fun/category/bhabi-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/billionaire-romance/index.html",
+      "titleLength": 65,
+      "descriptionLength": 105,
+      "canonical": "https://mahmuda.fun/category/billionaire-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/chemistry/index.html",
+      "titleLength": 55,
+      "descriptionLength": 141,
+      "canonical": "https://mahmuda.fun/category/chemistry/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/clean-wholesome/index.html",
+      "titleLength": 75,
+      "descriptionLength": 130,
+      "canonical": "https://mahmuda.fun/category/clean-wholesome/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/climax/index.html",
+      "titleLength": 52,
+      "descriptionLength": 141,
+      "canonical": "https://mahmuda.fun/category/climax/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/college/index.html",
+      "titleLength": 61,
+      "descriptionLength": 101,
+      "canonical": "https://mahmuda.fun/category/college/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/comedy/index.html",
+      "titleLength": 61,
+      "descriptionLength": 91,
+      "canonical": "https://mahmuda.fun/category/comedy/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/cowboy-romance/index.html",
+      "titleLength": 60,
+      "descriptionLength": 87,
+      "canonical": "https://mahmuda.fun/category/cowboy-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/dark-romance/index.html",
+      "titleLength": 58,
+      "descriptionLength": 124,
+      "canonical": "https://mahmuda.fun/category/dark-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/dirtytalk/index.html",
+      "titleLength": 56,
+      "descriptionLength": 158,
+      "canonical": "https://mahmuda.fun/category/dirtytalk/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/enemies-to-lovers/index.html",
+      "titleLength": 71,
+      "descriptionLength": 111,
+      "canonical": "https://mahmuda.fun/category/enemies-to-lovers/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/fated-mates/index.html",
+      "titleLength": 65,
+      "descriptionLength": 90,
+      "canonical": "https://mahmuda.fun/category/fated-mates/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/forbidden/index.html",
+      "titleLength": 55,
+      "descriptionLength": 143,
+      "canonical": "https://mahmuda.fun/category/forbidden/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/forbidden-romance/index.html",
+      "titleLength": 63,
+      "descriptionLength": 90,
+      "canonical": "https://mahmuda.fun/category/forbidden-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/high-school-romance/index.html",
+      "titleLength": 65,
+      "descriptionLength": 105,
+      "canonical": "https://mahmuda.fun/category/high-school-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/index.html",
+      "titleLength": 57,
+      "descriptionLength": 123,
+      "canonical": "https://mahmuda.fun/category/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": true
+    },
+    {
+      "file": "category/junior/index.html",
+      "titleLength": 52,
+      "descriptionLength": 147,
+      "canonical": "https://mahmuda.fun/category/junior/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/madam/index.html",
+      "titleLength": 51,
+      "descriptionLength": 144,
+      "canonical": "https://mahmuda.fun/category/madam/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/mafia-romance/index.html",
+      "titleLength": 59,
+      "descriptionLength": 107,
+      "canonical": "https://mahmuda.fun/category/mafia-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/neighbor/index.html",
+      "titleLength": 54,
+      "descriptionLength": 153,
+      "canonical": "https://mahmuda.fun/category/neighbor/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/paranormal-fantasy-romance/index.html",
+      "titleLength": 78,
+      "descriptionLength": 124,
+      "canonical": "https://mahmuda.fun/category/paranormal-fantasy-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/second-chance-romance/index.html",
+      "titleLength": 67,
+      "descriptionLength": 80,
+      "canonical": "https://mahmuda.fun/category/second-chance-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/senior/index.html",
+      "titleLength": 52,
+      "descriptionLength": 149,
+      "canonical": "https://mahmuda.fun/category/senior/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/slow-burn/index.html",
+      "titleLength": 63,
+      "descriptionLength": 104,
+      "canonical": "https://mahmuda.fun/category/slow-burn/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/spicy/index.html",
+      "titleLength": 51,
+      "descriptionLength": 144,
+      "canonical": "https://mahmuda.fun/category/spicy/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/spicy-romance/index.html",
+      "titleLength": 59,
+      "descriptionLength": 87,
+      "canonical": "https://mahmuda.fun/category/spicy-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/sports/index.html",
+      "titleLength": 60,
+      "descriptionLength": 99,
+      "canonical": "https://mahmuda.fun/category/sports/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/tension/index.html",
+      "titleLength": 53,
+      "descriptionLength": 146,
+      "canonical": "https://mahmuda.fun/category/tension/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/university/index.html",
+      "titleLength": 56,
+      "descriptionLength": 150,
+      "canonical": "https://mahmuda.fun/category/university/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "category/vampire-romance/index.html",
+      "titleLength": 61,
+      "descriptionLength": 88,
+      "canonical": "https://mahmuda.fun/category/vampire-romance/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": true,
+      "layoutRisk": false
+    },
+    {
+      "file": "cookies.html",
+      "titleLength": 42,
+      "descriptionLength": 60,
+      "canonical": "https://mahmuda.fun/cookies.html",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": false
+    },
+    {
+      "file": "index.html",
+      "titleLength": 52,
+      "descriptionLength": 174,
+      "canonical": "https://mahmuda.fun",
+      "logo": false,
+      "jsonLd": true,
+      "visibleLoading": false,
+      "layoutRisk": false
+    },
+    {
+      "file": "new-releases/index.html",
+      "titleLength": 40,
+      "descriptionLength": 114,
+      "canonical": "https://mahmuda.fun/new-releases/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": true
+    },
+    {
+      "file": "series/index.html",
+      "titleLength": 55,
+      "descriptionLength": 132,
+      "canonical": "https://mahmuda.fun/series/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": true
+    },
+    {
+      "file": "terms.html",
+      "titleLength": 40,
+      "descriptionLength": 45,
+      "canonical": "https://mahmuda.fun/terms.html",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": false
+    },
+    {
+      "file": "top-rated/index.html",
+      "titleLength": 45,
+      "descriptionLength": 141,
+      "canonical": "https://mahmuda.fun/top-rated/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": true
+    },
+    {
+      "file": "trending/index.html",
+      "titleLength": 44,
+      "descriptionLength": 146,
+      "canonical": "https://mahmuda.fun/trending/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": true
+    },
+    {
+      "file": "video/index.html",
+      "titleLength": 41,
+      "descriptionLength": 124,
+      "canonical": "https://mahmuda.fun/video/",
+      "logo": true,
+      "jsonLd": false,
+      "visibleLoading": false,
+      "layoutRisk": true
+    }
+  ],
+  "sitemapLocs": 83,
+  "gitHead": "41fc0be"
+}
