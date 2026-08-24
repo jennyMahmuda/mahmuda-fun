@@ -32,7 +32,8 @@ jobs:
         run: |
           set -eu
           test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Missing MEDIA_GATEWAY_CLOUDFLARE_API_TOKEN'; exit 1; }
-          test "$CLOUDFLARE_ACCOUNT_ID" = '8b331a24ba04dafdab27b8e173666422' || { echo 'The account ID does not match the isolated media account'; exit 1; }
+          account_id=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')
+          test "$account_id" = '8b331a24ba04dafdab27b8e173666422' || { echo 'The account ID does not match the isolated media account'; exit 1; }
           test -n "$MEDIA_GATEWAY_AUTH_SECRET" || { echo 'Missing MEDIA_GATEWAY_AUTH_SECRET'; exit 1; }
           grep -q 'bucket_name = "arifjennymedia"' wrangler.toml || { echo 'Unexpected R2 bucket configuration'; exit 1; }
 
