@@ -247,6 +247,16 @@ function writeSitemap(stories) {
     { path: '/faq.html', changefreq: 'monthly', priority: '0.4' },
     { path: '/premium.html', changefreq: 'monthly', priority: '0.5' },
     { path: '/privacy-policy.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/cookies.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/terms.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/dmca.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/dmca.html#2257', changefreq: 'monthly', priority: '0.2' },
+    { path: '/eu-dsa.html', changefreq: 'monthly', priority: '0.2' },
+    { path: '/parental-controls.html', changefreq: 'monthly', priority: '0.2' },
+    { path: '/content-removal.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/trust-safety.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/become-creator.html', changefreq: 'monthly', priority: '0.3' },
+    { path: '/advertising.html', changefreq: 'monthly', priority: '0.3' },
     { path: '/llms.txt', changefreq: 'monthly', priority: '0.2' }
   ].concat(CATEGORIES.filter(function (c) { return !AUTO_TAG_SLUGS.has(c.slug); }).map(function (c) {
     return { path: '/category/' + c.slug + '/', changefreq: 'weekly', priority: '0.7' };
@@ -634,6 +644,12 @@ function writeListingFirstPaint(stories) {
   replaceListingSeed(path.join(ROOT, 'series/index.html'), 'seriesList', seriesHtml || '<p class="loading-state">No story series are published yet.</p>');
   console.log('✓ listing first-paint seeds (video ' + video.length + ', image ' + image.length + ', series ' + series.length + ')');
 }
+function toAbsoluteMediaUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return SITE_URL + '/' + raw.replace(/^\/+/, '');
+}
 function writeStoryPages(stories) {
   const outRoot = path.join(ROOT, 'story');
   if (!fs.existsSync(outRoot)) fs.mkdirSync(outRoot, { recursive: true });
@@ -645,7 +661,7 @@ function writeStoryPages(stories) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     const canonical = SITE_URL + '/story/' + encodeURIComponent(safeId) + '/';
     const description = String((story.seo && story.seo.description) || story.excerpt || story.title).slice(0, 158);
-    const image = story.cover || (story.images && story.images[0]) || '';
+    const image = toAbsoluteMediaUrl(story.cover || (story.images && story.images[0]) || '');
     const body = story.exclusive
       ? '<div class="locked-story-teaser"><p>This story is available to verified members. Sign in to continue reading.</p><p><a href="../../premium.html">Log in or create an account</a></p></div>'
       : (story.content || '<p>Continue reading this story on mahmuda.fun.</p>');
