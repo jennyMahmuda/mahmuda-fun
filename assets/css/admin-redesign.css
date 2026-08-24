@@ -110,7 +110,15 @@ body:has(.admin-form-card) > .navbar, body:has(.admin-login-form) > .navbar { di
 .admin-field-heading { grid-column:1/-1; color:#fff; font-size:.9rem; font-weight:700; }
 .admin-seo-fields .rr-field:last-child { grid-column:1/-1; }
 .admin-preview-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-top:1rem; }
-.admin-seo-preview, .admin-card-preview { min-width:0; padding:1rem 1.1rem; border:1px solid var(--mrf-line); border-radius:10px; background:#101217; }
+.admin-seo-preview, .admin-card-preview { min-width:0; padding:1rem 1.1rem; border:1px solid var(--mrf-line); border-radius:10px; background:#101217; display:block; visibility:visible; }
+.admin-seo-health#adminSeoReadiness, #adminSeoPreviews { display:block; visibility:visible; scroll-margin-top:90px; }
+#adminSeoPreviews { display:grid; }
+.seo-todo-list { display:grid; gap:.7rem; }
+.seo-todo-row { display:flex; align-items:center; gap:.85rem; padding:.85rem 1rem; border:1px solid var(--mrf-line); border-radius:12px; background:#15171e; }
+.seo-todo-row > div { flex:1; min-width:0; }
+.seo-todo-row strong { color:#fff; }
+.seo-todo-row p { margin:.25rem 0 0; color:var(--mrf-faint); font-size:.82rem; }
+.seo-todo-number { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:rgba(225,29,46,.18); color:#f3c84b; font-weight:800; }
 .admin-card-preview { background:linear-gradient(135deg,#181a20,#0e0f12); }
 .card-preview-label { margin-top:.55rem; color:var(--mrf-bright); font-size:.65rem; font-weight:800; letter-spacing:.14em; }
 .card-preview-title { margin-top:.35rem; color:#fff; font-size:1.15rem; font-weight:750; }
@@ -200,5 +208,6 @@ body.admin-drawer-open { overflow:hidden; }
   .all-content-thumb, .seo-health-thumb { flex-basis:72px; width:72px; height:58px; }
   .live-preview-modal { padding:1.25rem; }
   .admin-category-checks, .admin-seo-fields, .admin-preview-grid { grid-template-columns:1fr; }
+  .seo-todo-row { align-items:flex-start; flex-wrap:wrap; }
   .admin-seo-fields .rr-field:last-child { grid-column:auto; }
  .admin-row { display:grid !important; grid-template-columns:1fr !important; gap:.6rem !important; } .admin-row-actions { justify-content:flex-start !important; } }

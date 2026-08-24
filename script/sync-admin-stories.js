@@ -86,6 +86,8 @@ function buildFrontMatter(row) {
   try { seoKeywords = JSON.parse(row.seo_keywords || '[]'); } catch { seoKeywords = []; }
   if (seoKeywords.length) lines.push('seoKeywords: ' + yamlList(seoKeywords));
   if (row.cover_url || row.thumbnail_url) lines.push('cover: ' + yamlScalar(row.thumbnail_url || row.cover_url));
+  if (row.cover_alt) lines.push('coverAlt: ' + yamlScalar(row.cover_alt));
+  if (row.thumbnail_alt) lines.push('thumbnailAlt: ' + yamlScalar(row.thumbnail_alt));
   if (row.video_url) lines.push('video: ' + yamlScalar(row.video_url));
   if (row.audio_url) lines.push('audio: ' + yamlScalar(row.audio_url));
   if (row.exclusive) lines.push('exclusive: true');

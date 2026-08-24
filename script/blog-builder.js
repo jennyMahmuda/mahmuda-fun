@@ -600,6 +600,8 @@ function buildStory(filePath) {
     series: meta.series || null,
     episode: meta.episode != null ? Number(meta.episode) : null,
     cover: cover ? resolveMediaUrl(cover) : null,
+    coverAlt: meta.coveralt || title,
+    thumbnailAlt: meta.thumbnailalt || meta.coveralt || title,
     audio: audio,
     video: video,
     images: images,

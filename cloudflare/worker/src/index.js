@@ -494,13 +494,30 @@ async function handleAdminPremiumLeads(request, env, origin) {
   return json({ leads: result.results || [] }, 200, corsHeaders(origin));
 }
 
+async function handleAdminUsers(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  const url = new URL(request.url);
+  const q = String(url.searchParams.get('q') || '').trim().toLowerCase();
+  const like = `%${q.replace(/[\\%_]/g, '\\$&')}%`;
+  const result = await env.REVIEWS_DB.prepare(`
+    SELECT u.id AS userId, u.display_name AS name, u.email, u.email_verified AS emailVerified,
+           u.is_admin AS isAdmin,
+           EXISTS (SELECT 1 FROM premium_leads pl WHERE pl.user_id = u.id AND pl.consent = 1) AS isPremium,
+           u.created_at AS createdAt
+    FROM users u
+    WHERE (? = '' OR lower(u.email) LIKE ? ESCAPE '\\' OR lower(u.display_name) LIKE ? ESCAPE '\\' OR CAST(u.id AS TEXT) = ?)
+    ORDER BY u.created_at DESC LIMIT 500
+  `).bind(q, like, like, q).all();
+  return json({ users: result.results || [] }, 200, corsHeaders(origin));
+}
 async function handleAdminMessages(request, env, origin) {
   const admin = await getAdminUser(request, env);
   if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
   const url = new URL(request.url);
   const userId = Number(url.searchParams.get('userId') || 0);
   if (request.method === 'GET') {
-    const sql = userId > 0 ? 'SELECT m.id, m.user_id AS userId, u.email, m.sender_role AS senderRole, m.body, m.read_at AS readAt, m.created_at AS createdAt FROM admin_messages m JOIN users u ON u.id = m.user_id WHERE m.user_id = ? ORDER BY m.created_at ASC LIMIT 200' : 'SELECT m.id, m.user_id AS userId, u.email, m.sender_role AS senderRole, m.body, m.read_at AS readAt, m.created_at AS createdAt FROM admin_messages m JOIN users u ON u.id = m.user_id ORDER BY m.created_at DESC LIMIT 500';
+    const sql = userId > 0 ? 'SELECT m.id, m.user_id AS userId, u.display_name AS name, u.email, m.sender_role AS senderRole, m.body, m.read_at AS readAt, m.created_at AS createdAt FROM admin_messages m JOIN users u ON u.id = m.user_id WHERE m.user_id = ? ORDER BY m.created_at ASC LIMIT 200' : 'SELECT m.id, m.user_id AS userId, u.display_name AS name, u.email, m.sender_role AS senderRole, m.body, m.read_at AS readAt, m.created_at AS createdAt FROM admin_messages m JOIN users u ON u.id = m.user_id ORDER BY m.created_at DESC LIMIT 500';
     const result = userId > 0 ? await env.REVIEWS_DB.prepare(sql).bind(userId).all() : await env.REVIEWS_DB.prepare(sql).all();
     return json({ messages: result.results || [] }, 200, corsHeaders(origin));
   }
@@ -913,7 +930,7 @@ function adminStoryRowToJson(row) {
     category: row.category, categories: (() => { try { const parsed = JSON.parse(row.categories_json || '[]'); return parsed.length ? parsed : [row.category]; } catch { return [row.category]; } })(), tags, series: row.series || null,
     episode: row.episode || null, language: row.language,
     contentType: row.content_type || 'text',
-    coverUrl: row.cover_url || null, thumbnailUrl: row.thumbnail_url || null, videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
+    coverUrl: row.cover_url || null, coverAlt: row.cover_alt || '', thumbnailUrl: row.thumbnail_url || null, thumbnailAlt: row.thumbnail_alt || '', videoUrl: row.video_url || null, audioUrl: row.audio_url || null,
     seoTitle: row.seo_title || '', metaDescription: row.meta_description || '',
     seoKeywords: (() => { try { return JSON.parse(row.seo_keywords || '[]'); } catch { return []; } })(),
     exclusive: !!row.exclusive, status: row.status,
@@ -971,12 +988,12 @@ async function handleAdminCreateStory(request, env, origin) {
   if (existing) return json({ error: 'A story with this id already exists — use the update endpoint instead' }, 409, corsHeaders(origin));
 
   await env.REVIEWS_DB.prepare(
-    `INSERT INTO admin_stories (id, title, excerpt, content, category, categories_json, tags, series, episode, content_type, cover_url, thumbnail_url, video_url, audio_url, seo_title, meta_description, seo_keywords, exclusive, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
+    `INSERT INTO admin_stories (id, title, excerpt, content, category, categories_json, tags, series, episode, content_type, cover_url, cover_alt, thumbnail_url, thumbnail_alt, video_url, audio_url, seo_title, meta_description, seo_keywords, exclusive, status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?)`
   ).bind(
     body.id, body.title.trim(), body.excerpt.trim(), body.content,
     selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []), body.series || null, body.episode || null,
-    body.contentType || 'text', body.coverUrl || null, body.thumbnailUrl || null, body.videoUrl || null, body.audioUrl || null,
+    body.contentType || 'text', body.coverUrl || null, body.coverAlt || null, body.thumbnailUrl || null, body.thumbnailAlt || null, body.videoUrl || null, body.audioUrl || null,
     body.seoTitle || null, body.metaDescription || null, JSON.stringify(body.seoKeywords || []), body.exclusive ? 1 : 0, admin.userId
   ).run();
   return json({ ok: true, id: body.id }, 201, corsHeaders(origin));
@@ -997,12 +1014,12 @@ async function handleAdminUpdateStory(request, env, origin, storyId) {
 
   await env.REVIEWS_DB.prepare(
     `UPDATE admin_stories SET title = ?, excerpt = ?, content = ?, category = ?, categories_json = ?, tags = ?, series = ?, episode = ?,
-     content_type = ?, cover_url = ?, thumbnail_url = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?,
+     content_type = ?, cover_url = ?, cover_alt = ?, thumbnail_url = ?, thumbnail_alt = ?, video_url = ?, audio_url = ?, seo_title = ?, meta_description = ?, seo_keywords = ?, exclusive = ?,
      synced_at = NULL, updated_at = datetime('now')
      WHERE id = ?`
   ).bind(
     body.title.trim(), body.excerpt.trim(), body.content, selectedCategories[0], JSON.stringify(selectedCategories), JSON.stringify(body.tags || []),
-    body.series || null, body.episode || null,     body.contentType || 'text', body.coverUrl || null, body.thumbnailUrl || null, body.videoUrl || null, body.audioUrl || null,
+    body.series || null, body.episode || null,     body.contentType || 'text', body.coverUrl || null, body.coverAlt || null, body.thumbnailUrl || null, body.thumbnailAlt || null, body.videoUrl || null, body.audioUrl || null,
     body.seoTitle || null, body.metaDescription || null, JSON.stringify(body.seoKeywords || []), body.exclusive ? 1 : 0, storyId
   ).run();
   return json({ ok: true, alreadySynced: !!row.synced_at }, 200, corsHeaders(origin));
@@ -1176,6 +1193,7 @@ export default {
     if (mediaMatch && request.method === 'GET') return proxyMediaFromGateway(request, env, origin, decodeURIComponent(mediaMatch[1]));
     if (pathname === '/api/admin/media/upload' && request.method === 'POST') return handleAdminMediaUpload(request, env, origin);
     if (pathname === '/api/admin/premium-leads' && request.method === 'GET') return handleAdminPremiumLeads(request, env, origin);
+    if (pathname === '/api/admin/users' && request.method === 'GET') return handleAdminUsers(request, env, origin);
     if (pathname === '/api/admin/messages' && (request.method === 'GET' || request.method === 'POST')) return handleAdminMessages(request, env, origin);
     if (pathname === '/api/admin/ga4-status' && request.method === 'GET') return handleGa4Status(request, env, origin);
 

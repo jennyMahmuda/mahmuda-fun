@@ -103,11 +103,13 @@
               '<span class="rr-hint" id="contentTypeHelp" style="margin-top:4px;">Choose a type to show only the fields used by that live destination.</span>' +
               '</label>' +
               '<label class="rr-field"><span>Cover image URL (optional)</span><input type="text" name="coverUrl" value="' + escapeHtml(existing && existing.coverUrl ? existing.coverUrl : '') + '"><input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp,image/avif" data-upload-field="coverUrl" style="margin-top:8px"></label>' +
+              '<label class="rr-field"><span>Cover image Alt text <small>(describe the image for accessibility and SEO)</small></span><input type="text" name="coverAlt" maxlength="180" value="' + escapeHtml(existing && existing.coverAlt ? existing.coverAlt : '') + '" placeholder="Example: Main poster for the new episode"></label>' +
               '<label class="rr-field full"><span>SEO title <small>(30–65 characters)</small></span><input type="text" name="seoTitle" maxlength="65" value="' + escapeHtml(existing && existing.seoTitle ? existing.seoTitle : '') + '" placeholder="Search title"></label>' +
               '<label class="rr-field full"><span>Meta description <small>(70–158 characters)</small></span><textarea name="metaDescription" maxlength="158" placeholder="Search description">' + escapeHtml(existing && existing.metaDescription ? existing.metaDescription : '') + '</textarea></label>' +
               '<label class="rr-field full"><span>SEO keywords <small>(comma separated)</small></span><input type="text" name="seoKeywords" value="' + escapeHtml(existing && existing.seoKeywords ? existing.seoKeywords.join(', ') : '') + '" placeholder="primary keyword, related keyword"></label>' +
               '<label class="rr-field" data-editor-type="video"><span>Video URL (required for Video posts; direct .mp4/.webm link)</span><input type="text" name="videoUrl" value="' + escapeHtml(existing && existing.videoUrl ? existing.videoUrl : '') + '"><input type="file" name="videoFile" accept="video/mp4,video/webm,video/quicktime" data-upload-field="videoUrl" style="margin-top:8px"></label>' +
               '<label class="rr-field" data-editor-type="video"><span>Video thumbnail URL (recommended for Video posts)</span><input type="text" name="thumbnailUrl" value="' + escapeHtml(existing && existing.thumbnailUrl ? existing.thumbnailUrl : '') + '"><input type="file" name="thumbnailFile" accept="image/jpeg,image/png,image/webp,image/avif" data-upload-field="thumbnailUrl" style="margin-top:8px"></label>' +
+              '<label class="rr-field" data-editor-type="video"><span>Video thumbnail Alt text <small>(describe the poster image)</small></span><input type="text" name="thumbnailAlt" maxlength="180" value="' + escapeHtml(existing && existing.thumbnailAlt ? existing.thumbnailAlt : '') + '" placeholder="Example: Video poster showing the lead actors"></label>' +
               '<label class="rr-field" data-editor-type="story video premium"><span>Audio URL (optional)</span><input type="text" name="audioUrl" value="' + escapeHtml(existing && existing.audioUrl ? existing.audioUrl : '') + '"></label>' +
               '<label class="rr-checkbox"><input type="checkbox" name="exclusive" ' + (existing && existing.exclusive ? 'checked' : '') + '> Members-only (logged-in + verified readers only)</label>' +
               '<label class="rr-field full"><span>Story text — plain paragraphs (blank line = new paragraph). # / ## for headings, ![alt](url) for images.</span>' +
@@ -193,8 +195,10 @@
           episode: fd.get('episode') ? Number(fd.get('episode')) : null,
           contentType: String(fd.get('contentType') || 'text'),
           coverUrl: String(fd.get('coverUrl') || '').trim() || null,
+          coverAlt: String(fd.get('coverAlt') || '').trim() || null,
           videoUrl: String(fd.get('videoUrl') || '').trim() || null,
           thumbnailUrl: String(fd.get('thumbnailUrl') || '').trim() || null,
+          thumbnailAlt: String(fd.get('thumbnailAlt') || '').trim() || null,
           audioUrl: String(fd.get('audioUrl') || '').trim() || null,
           seoTitle: String(fd.get('seoTitle') || '').trim() || null,
           metaDescription: String(fd.get('metaDescription') || '').trim() || null,

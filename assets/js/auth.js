@@ -206,6 +206,7 @@
     return apiFetch('/api/admin/ga4-status');
   }
   function adminPremiumLeads() { return apiFetch('/api/admin/premium-leads'); }
+  function adminUsers(query) { return apiFetch('/api/admin/users' + (query ? '?q=' + encodeURIComponent(query) : '')); }
   function adminMessages(userId) { return apiFetch('/api/admin/messages' + (userId ? '?userId=' + encodeURIComponent(userId) : '')); }
   function adminSendMessage(userId, body, clientKey) { return apiFetch('/api/admin/messages', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId: userId, body: body, clientKey: clientKey }) }); }
 
@@ -252,6 +253,7 @@
     adminUploadMedia: adminUploadMedia,
     adminGa4Status: adminGa4Status,
     adminPremiumLeads: adminPremiumLeads,
+    adminUsers: adminUsers,
     adminMessages: adminMessages,
     adminSendMessage: adminSendMessage,
   };
