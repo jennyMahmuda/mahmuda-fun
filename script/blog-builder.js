@@ -598,6 +598,41 @@ function removeStaleGeneratedStoryArtifacts(stories) {
     });
   }
 }
+function listingCardHtml(story, base, kind) {
+  const id = encodeURIComponent(story.id || '');
+  const image = story.cover || (story.images && story.images[0]) || '';
+  const label = kind === 'video' ? 'Video' : kind === 'image' ? 'Image' : (story.category || story.type || 'Story');
+  return '<article class="media-pin story-card"><a href="' + base + 'story/' + id + '/" class="media-pin-link story-card-link">' +
+    (image ? '<img class="story-card-image" src="' + escapeAttr(image) + '" alt="' + escapeAttr(story.coverAlt || story.title || '') + '" loading="lazy" decoding="async">' : '') +
+    '<div class="story-card-copy"><span class="media-pin-category">' + escapeXml(label) + '</span><h3>' + escapeXml(story.title || '') + '</h3><p>' + escapeXml(story.excerpt || '') + '</p></div></a></article>';
+}
+function replaceListingSeed(file, id, html) {
+  if (!fs.existsSync(file)) return;
+  let source = fs.readFileSync(file, 'utf8');
+  const re = new RegExp('(<(?:div|section)[^>]*\\bid=["\\\\\\\']' + id + '["\\\\\\\'][^>]*>)[\\s\\S]*?(</(?:div|section)>)', 'i');
+  if (!re.test(source)) return;
+  source = source.replace(re, '$1' + html + '$2');
+  source = source.replace(/<p>Loading…<\/p>/g, '');
+  fs.writeFileSync(file, source, 'utf8');
+}
+function writeListingFirstPaint(stories) {
+  const publicStories = stories.map(publicStoryJson).sort(function (a,b) { return String(b.date||'').localeCompare(String(a.date||'')); });
+  const base = '../';
+  const video = publicStories.filter(function (s) { return s.type === 'video' || s.video; });
+  const image = publicStories.filter(function (s) { return s.type === 'image' || (s.type !== 'text' && s.type !== 'video' && (s.cover || (s.images && s.images.length))); });
+  const series = publicStories.filter(function (s) { return s.series; });
+  replaceListingSeed(path.join(ROOT, 'video/index.html'), 'videoGrid', video.map(function (s) { return listingCardHtml(s, base, 'video'); }).join('') || '<p class="loading-state">No video posts are published yet.</p>');
+  replaceListingSeed(path.join(ROOT, 'gellery/index.html'), 'galleryGrid', image.map(function (s) { return listingCardHtml(s, base, 'image'); }).join('') || '<p class="loading-state">No image galleries are published yet.</p>');
+  replaceListingSeed(path.join(ROOT, 'top-rated/index.html'), 'rankGrid', publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') || '<p class="loading-state">No rated stories are published yet.</p>');
+  replaceListingSeed(path.join(ROOT, 'trending/index.html'), 'trendGrid', publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') || '<p class="loading-state">No trending stories are published yet.</p>');
+  replaceListingSeed(path.join(ROOT, 'category/index.html'), 'catGrid', publicStories.slice(0, 12).map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') || '<p class="loading-state">No stories are published yet.</p>');
+  const seriesHtml = Object.keys(series.reduce(function (m, s) { (m[s.series] ||= []).push(s); return m; }, {})).map(function (name) {
+    const eps = series.filter(function (s) { return s.series === name; }).sort(function (a,b) { return (a.episode || 0) - (b.episode || 0); });
+    return '<section class="series-block"><h2>' + escapeXml(name) + '</h2><div class="episode-grid">' + eps.map(function (s) { return listingCardHtml(s, base, 'story'); }).join('') + '</div></section>';
+  }).join('');
+  replaceListingSeed(path.join(ROOT, 'series/index.html'), 'seriesList', seriesHtml || '<p class="loading-state">No story series are published yet.</p>');
+  console.log('✓ listing first-paint seeds (video ' + video.length + ', image ' + image.length + ', series ' + series.length + ')');
+}
 function writeStoryPages(stories) {
   const outRoot = path.join(ROOT, 'story');
   if (!fs.existsSync(outRoot)) fs.mkdirSync(outRoot, { recursive: true });
@@ -619,21 +654,28 @@ function writeStoryPages(stories) {
       image: image ? [image] : undefined, articleSection: story.category || 'Story',
       keywords: story.tags || [], inLanguage: story.language || 'en'
     }).replace(/</g, '\\u003c');
-    const html = '<!doctype html>\\n<html lang="' + escapeXml(story.language || 'en') + '">\\n<head>\\n' +
-      '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\\n' +
-      '<title>' + escapeXml(story.seo && story.seo.title || story.title) + '</title>\\n' +
-      '<meta name="description" content="' + escapeXml(description) + '">\\n' +
-      '<meta name="robots" content="index, follow, max-image-preview:large">\\n' +
-      '<link rel="canonical" href="' + escapeXml(canonical) + '">\\n' +
-      '<meta property="og:type" content="article"><meta property="og:title" content="' + escapeXml(story.title) + '"><meta property="og:description" content="' + escapeXml(description) + '"><meta property="og:url" content="' + escapeXml(canonical) + '">' +
-      (image ? '<meta property="og:image" content="' + escapeXml(image) + '">' : '') + '\\n' +
-      '<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/navigation.css"><link rel="stylesheet" href="../../assets/css/blog.css">\\n' +
-      '<script type="application/ld+json">' + jsonLd + '</script>\\n</head>\\n<body>\\n' +
-      '<header class="site-header"><div class="container"><a href="../../" aria-label="mahmuda.fun home">mahmuda.fun</a></div></header>\\n' +
+    const titleText = String(story.seo && story.seo.title || story.title).trim();
+    const seoKeywords = Array.isArray(story.seo && story.seo.keywords) ? story.seo.keywords : (story.tags || []);
+    const categorySlugs = Array.from(new Set([story.category].concat(story.categories || []).map(canonicalCategorySlug).filter(Boolean)));
+    const categoryNav = categorySlugs.length ? '<nav class="story-categories" aria-label="Story categories">' + categorySlugs.map(function (slug) { return '<a href="../../category/' + escapeAttr(slug) + '/">' + escapeXml(slug) + '</a>'; }).join(' ') + '</nav>' : '';
+    const html = '<!doctype html>\n<html lang="' + escapeXml(story.language || 'en') + '">\n<head>\n' +
+      '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+      '<title>' + escapeXml(titleText) + '</title>\n' +
+      '<meta name="description" content="' + escapeXml(description) + '">\n' +
+      '<meta name="keywords" content="' + escapeXml(seoKeywords.join(', ')) + '">\n' +
+      '<meta name="robots" content="index, follow, max-image-preview:large">\n' +
+      '<link rel="canonical" href="' + escapeXml(canonical) + '">\n' +
+      '<meta property="og:type" content="article"><meta property="og:title" content="' + escapeXml(titleText) + '"><meta property="og:description" content="' + escapeXml(description) + '"><meta property="og:url" content="' + escapeXml(canonical) + '">' +
+      (image ? '<meta property="og:image" content="' + escapeXml(image) + '">' : '') + '\n' +
+      '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + escapeXml(titleText) + '"><meta name="twitter:description" content="' + escapeXml(description) + '">' + (image ? '<meta name="twitter:image" content="' + escapeXml(image) + '">' : '') + '\n' +
+      '<link rel="stylesheet" href="../../assets/css/style.css"><link rel="stylesheet" href="../../assets/css/navigation.css"><link rel="stylesheet" href="../../assets/css/blog.css">\n' +
+      '<script type="application/ld+json">' + jsonLd + '</script>\n</head>\n<body>\n' +
+      '<header class="site-header"><div class="container"><a href="../../" aria-label="mahmuda.fun home">mahmuda.fun</a></div></header>\n' +
       '<main class="container story-page"><article><p class="story-kicker">' + escapeXml(story.category || 'Story') + '</p><h1>' + escapeXml(story.title) + '</h1>' +
+      categoryNav +
       (image ? '<img class="story-cover" src="' + escapeXml(image) + '" alt="' + escapeXml(story.coverAlt || story.title) + '" fetchpriority="high">' : '') +
-      '<p class="story-excerpt">' + escapeXml(story.excerpt || description) + '</p><div class="story-body">' + body + '</div></article></main>\\n' +
-      writeStoryFooterHtml() + '\\n</body>\\n</html>\\n';
+      '<p class="story-excerpt">' + escapeXml(story.excerpt || description) + '</p><div class="story-body">' + body + '</div></article></main>\n' +
+      writeStoryFooterHtml() + '\n</body>\n</html>\n';
     fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf8');
   });
   console.log('✓ clean story pages (' + (stories || []).length + ' pages)');
@@ -798,6 +840,7 @@ function build() {
 
   console.log('\n✓ stories/index.json (' + stories.length + ' stories)');
   writeCategoryPages(stories);
+  writeListingFirstPaint(stories);
   writeStoryPages(stories);
   writeCategoryBackgroundsManifest();
   writeSitemap(stories);
