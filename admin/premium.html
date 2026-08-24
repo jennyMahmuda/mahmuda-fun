@@ -227,6 +227,7 @@
           status.innerHTML = '<p class="rr-hint rr-error">' + escapeHtml(err.message) + '</p>';
         });
       });
+      if (window.MahmudaAdminPipeline) window.MahmudaAdminPipeline.enhanceEditor();
     }
 
     function init() {
