@@ -9,6 +9,8 @@ ALLOWED_ORIGINS = "https://mahmuda.fun,https://www.mahmuda.fun"
 # assets/js/site-components.js. Pairs with the GA_API_SECRET Worker
 # secret (see cloudflare/README.md) for server-side sign_up/login events.
 GA_MEASUREMENT_ID = "G-1Z0TLKJZ9R"
+MEDIA_GATEWAY_URL = "https://mahmuda-fun-media-gateway.gadget02030.workers.dev"
+# MEDIA_GATEWAY_AUTH_SECRET is configured as a Worker secret, never here.
 
 [[d1_databases]]
 binding = "REVIEWS_DB"

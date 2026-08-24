@@ -190,6 +190,12 @@
   function adminListNewsletter() {
     return apiFetch('/api/admin/newsletter');
   }
+  function adminUploadMedia(file, key) {
+    var form = new FormData();
+    form.append('file', file, file.name || 'media');
+    form.append('key', key);
+    return apiFetch('/api/admin/media/upload', { method: 'POST', body: form });
+  }
 
   // ---- Admin GA4 connection diagnostic ----
   // A live (uncached) check of the Trending/Analytics Google Analytics
@@ -243,6 +249,7 @@
     adminListReviews: adminListReviews,
     adminModerateReview: adminModerateReview,
     adminListNewsletter: adminListNewsletter,
+    adminUploadMedia: adminUploadMedia,
     adminGa4Status: adminGa4Status,
     adminPremiumLeads: adminPremiumLeads,
     adminMessages: adminMessages,

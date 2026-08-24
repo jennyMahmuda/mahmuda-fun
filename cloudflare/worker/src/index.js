@@ -1035,6 +1035,60 @@ async function handleAdminDeleteStory(request, env, origin, storyId) {
   return json({ ok: true, status: 'deleted', liveRemovalQueued: !!row.synced_at }, 200, corsHeaders(origin));
 }
 
+async function proxyMediaFromGateway(request, env, origin, key) {
+  if (!env.MEDIA_GATEWAY_URL || !env.MEDIA_GATEWAY_AUTH_SECRET) return json({ error: 'Media gateway is not configured' }, 503, corsHeaders(origin));
+  if (!/^[A-Za-z0-9][A-Za-z0-9/_-]{0,180}$/.test(key) || key.includes('..') || key.startsWith('/')) return json({ error: 'Invalid media key' }, 400, corsHeaders(origin));
+  const gatewayBase = String(env.MEDIA_GATEWAY_URL).replace(/\/$/, '');
+  const gatewayPath = key.split('/').map(encodeURIComponent).join('/');
+  const response = await fetch(`${gatewayBase}/media/${gatewayPath}`, { headers: { 'Authorization': `Bearer ${env.MEDIA_GATEWAY_AUTH_SECRET}` } });
+  if (!response.ok) return json({ error: response.status === 404 ? 'Media not found' : 'Media gateway request failed' }, response.status === 404 ? 404 : 502, corsHeaders(origin));
+  const headers = new Headers(corsHeaders(origin));
+  const contentType = response.headers.get('content-type');
+  const etag = response.headers.get('etag');
+  if (contentType) headers.set('content-type', contentType);
+  if (etag) headers.set('etag', etag);
+  headers.set('cache-control', 'public, max-age=31536000, immutable');
+  return new Response(response.body, { status: 200, headers });
+}
+
+async function handleAdminMediaUpload(request, env, origin) {
+  const admin = await getAdminUser(request, env);
+  if (!admin) return json({ error: 'Admin login required' }, 401, corsHeaders(origin));
+  if (!env.MEDIA_GATEWAY_URL || !env.MEDIA_GATEWAY_AUTH_SECRET) {
+    return json({ error: 'Media gateway is not configured' }, 503, corsHeaders(origin));
+  }
+  let form;
+  try { form = await request.formData(); } catch (_) {
+    return json({ error: 'Use multipart/form-data' }, 400, corsHeaders(origin));
+  }
+  const file = form.get('file');
+  const requestedKey = String(form.get('key') || '').trim();
+  if (!file || typeof file.stream !== 'function' || !requestedKey) {
+    return json({ error: 'A file and media key are required' }, 400, corsHeaders(origin));
+  }
+  const contentType = String(file.type || '').toLowerCase();
+  const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'video/mp4', 'video/webm', 'video/quicktime']);
+  const size = Number(file.size || 0);
+  if (!allowedTypes.has(contentType)) return json({ error: 'Only approved image/video files are allowed' }, 415, corsHeaders(origin));
+  if (!size || size > 50 * 1024 * 1024) return json({ error: 'File exceeds the 50 MB upload limit' }, 413, corsHeaders(origin));
+  if (!/^[A-Za-z0-9][A-Za-z0-9/_-]{0,180}$/.test(requestedKey) || requestedKey.includes('..') || requestedKey.startsWith('/')) {
+    return json({ error: 'Invalid media key' }, 400, corsHeaders(origin));
+  }
+  const gatewayBase = String(env.MEDIA_GATEWAY_URL).replace(/\/$/, '');
+  const gatewayPath = requestedKey.split('/').map(encodeURIComponent).join('/');
+  const gatewayResponse = await fetch(`${gatewayBase}/media/${gatewayPath}`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${env.MEDIA_GATEWAY_AUTH_SECRET}`, 'Content-Type': contentType, 'Content-Length': String(size) },
+    body: file.stream(),
+  });
+  const text = await gatewayResponse.text();
+  let payload;
+  try { payload = JSON.parse(text); } catch (_) { payload = { error: 'Media gateway returned an invalid response' }; }
+  if (!gatewayResponse.ok) return json({ error: payload.error || 'Media gateway upload failed' }, gatewayResponse.status >= 500 ? 502 : gatewayResponse.status, corsHeaders(origin));
+  const publicBase = new URL(request.url).origin;
+  return json({ ok: true, key: requestedKey, url: `${publicBase}/api/media/${gatewayPath}` }, 201, corsHeaders(origin));
+}
+
 export default {
   async fetch(request, env) {
     const origin = allowedOrigin(request, env);
@@ -1117,6 +1171,9 @@ export default {
       return handleAdminModerateReview(request, env, origin, adminReviewAction.reviewId, adminReviewAction.action);
     }
     if (pathname === '/api/admin/newsletter' && request.method === 'GET') return handleAdminListNewsletter(request, env, origin);
+    const mediaMatch = pathname.match(/^\/api\/media\/(.+)$/);
+    if (mediaMatch && request.method === 'GET') return proxyMediaFromGateway(request, env, origin, decodeURIComponent(mediaMatch[1]));
+    if (pathname === '/api/admin/media/upload' && request.method === 'POST') return handleAdminMediaUpload(request, env, origin);
     if (pathname === '/api/admin/premium-leads' && request.method === 'GET') return handleAdminPremiumLeads(request, env, origin);
     if (pathname === '/api/admin/messages' && (request.method === 'GET' || request.method === 'POST')) return handleAdminMessages(request, env, origin);
     if (pathname === '/api/admin/ga4-status' && request.method === 'GET') return handleGa4Status(request, env, origin);

@@ -96,6 +96,7 @@ jobs:
           GA_PROPERTY_ID: ${{ secrets.GA_PROPERTY_ID }}
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          MEDIA_GATEWAY_AUTH_SECRET: ${{ secrets.MEDIA_GATEWAY_AUTH_SECRET }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
@@ -152,4 +153,10 @@ jobs:
             echo "ADMIN_USERNAME / ADMIN_PASSWORD already configured in the pre-deploy step"
           else
             echo "ADMIN_USERNAME / ADMIN_PASSWORD not set — admin secret login remains disabled"
+          fi
+          if [ -n "$MEDIA_GATEWAY_AUTH_SECRET" ]; then
+            printf '%s' "$MEDIA_GATEWAY_AUTH_SECRET" | npx wrangler secret put MEDIA_GATEWAY_AUTH_SECRET
+            echo "Media gateway shared secret configured without printing its value"
+          else
+            echo "MEDIA_GATEWAY_AUTH_SECRET not set — media uploads remain disabled until configured"
           fi
