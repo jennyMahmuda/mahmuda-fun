@@ -178,7 +178,7 @@
         status.innerHTML = '<p class="rr-hint">Logging in…</p>';
         window.NightsAuth.login(fd.get('email'), fd.get('password')).then(function () {
           var next = new URLSearchParams(window.location.search).get('next');
-          if (next === 'premium') window.location.replace('../premium.html');
+          if (next === 'premium') window.location.replace('../premium.html?member=1&v=55b9f84');
           else window.location.reload();
         }).catch(function (err) {
           status.innerHTML = '<p class="rr-hint rr-error">' + escapeHtml(err.message) + '</p>';
