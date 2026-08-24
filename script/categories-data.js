@@ -127,18 +127,18 @@ const CATEGORIES = [
     theme: 'rose' },
   // Exact publishing destinations requested for the admin dashboard. These
   // aliases intentionally remain separate from the broader genre taxonomy.
-  { slug: 'forbidden', label: 'Forbidden', title: 'Forbidden Stories', description: 'Forbidden stories on mahmuda.fun.', intro: 'Stories tagged Forbidden.', theme: 'accent' },
-  { slug: 'spicy', label: 'Spicy', title: 'Spicy Stories', description: 'Spicy stories on mahmuda.fun.', intro: 'Stories tagged Spicy.', theme: 'rose' },
-  { slug: 'dirtytalk', label: 'Dirtytalk', title: 'Dirtytalk Stories', description: 'Dirtytalk stories on mahmuda.fun.', intro: 'Stories tagged Dirtytalk.', theme: 'danger' },
-  { slug: 'senior', label: 'Senior', title: 'Senior Stories', description: 'Senior stories on mahmuda.fun.', intro: 'Stories tagged Senior.', theme: 'luxury' },
-  { slug: 'climax', label: 'Climax', title: 'Climax Stories', description: 'Climax stories on mahmuda.fun.', intro: 'Stories tagged Climax.', theme: 'rose' },
-  { slug: 'agegap', label: 'Agegap', title: 'Agegap Stories', description: 'Agegap stories on mahmuda.fun.', intro: 'Stories tagged Agegap.', theme: 'rose' },
-  { slug: 'tension', label: 'Tension', title: 'Tension Stories', description: 'Tension stories on mahmuda.fun.', intro: 'Stories tagged Tension.', theme: 'danger' },
-  { slug: 'madam', label: 'Madam', title: 'Madam Stories', description: 'Madam stories on mahmuda.fun.', intro: 'Stories tagged Madam.', theme: 'luxury' },
-  { slug: 'university', label: 'University', title: 'University Stories', description: 'University stories on mahmuda.fun.', intro: 'Stories tagged University.', theme: 'warm' },
-  { slug: 'chemistry', label: 'Chemistry', title: 'Chemistry Stories', description: 'Chemistry stories on mahmuda.fun.', intro: 'Stories tagged Chemistry.', theme: 'accent' },
-  { slug: 'junior', label: 'Junior', title: 'Junior Stories', description: 'Junior stories on mahmuda.fun.', intro: 'Stories tagged Junior.', theme: 'warm' },
-  { slug: 'neighbor', label: 'Neighbor', title: 'Neighbor Stories', description: 'Neighbor stories on mahmuda.fun.', intro: 'Stories tagged Neighbor.', theme: 'earthy' },
+  { slug: 'forbidden', label: 'Forbidden', title: 'Forbidden Stories', description: 'Forbidden adult romance stories on mahmuda.fun, featuring secret relationships, emotional risk and desire that crosses a boundary. 18+ fiction.', intro: 'Stories tagged Forbidden.', theme: 'accent' },
+  { slug: 'spicy', label: 'Spicy', title: 'Spicy Stories', description: 'Spicy adult romance stories on mahmuda.fun, collected for readers who prefer heat-forward fiction, strong chemistry and mature themes. 18+ only.', intro: 'Stories tagged Spicy.', theme: 'rose' },
+  { slug: 'dirtytalk', label: 'Dirtytalk', title: 'Dirty Talk Stories', description: 'Adult romance stories with flirtatious dialogue and intimate tension on mahmuda.fun. All characters and situations are fictional and intended for 18+ readers.', intro: 'Stories tagged Dirtytalk.', theme: 'danger' },
+  { slug: 'senior', label: 'Senior', title: 'Senior Stories', description: 'Senior-themed adult romance stories on mahmuda.fun, featuring mature characters, experience and complicated attraction. Fiction for readers aged 18+.', intro: 'Stories tagged Senior.', theme: 'luxury' },
+  { slug: 'climax', label: 'Climax', title: 'Climax Stories', description: 'Climax-focused adult romance stories on mahmuda.fun, where tension builds toward a decisive emotional or intimate turning point. 18+ fiction.', intro: 'Stories tagged Climax.', theme: 'rose' },
+  { slug: 'agegap', label: 'Age Gap', title: 'Age Gap Stories', description: 'Age gap adult romance stories on mahmuda.fun, exploring attraction across different life experiences. Every character depicted is an adult; 18+ fiction.', intro: 'Stories tagged Age Gap.', theme: 'rose' },
+  { slug: 'tension', label: 'Tension', title: 'Tension Stories', description: 'High-tension adult romance stories on mahmuda.fun, built around anticipation, secrecy, chemistry and choices that carry consequences. 18+ fiction.', intro: 'Stories tagged Tension.', theme: 'danger' },
+  { slug: 'madam', label: 'Madam', title: 'Madam Stories', description: 'Madam-themed adult romance stories on mahmuda.fun, featuring confident women, complicated dynamics and mature fictional relationships. 18+ only.', intro: 'Stories tagged Madam.', theme: 'luxury' },
+  { slug: 'university', label: 'University', title: 'University Stories', description: 'University-setting adult romance stories on mahmuda.fun. All characters depicted are adults, with mature themes and fictional relationships. 18+ only.', intro: 'Stories tagged University.', theme: 'warm' },
+  { slug: 'chemistry', label: 'Chemistry', title: 'Chemistry Stories', description: 'Adult romance stories on mahmuda.fun driven by chemistry, attraction and unresolved feelings between fictional adult characters. 18+ fiction.', intro: 'Stories tagged Chemistry.', theme: 'accent' },
+  { slug: 'junior', label: 'Junior', title: 'Junior Stories', description: 'Junior-themed adult romance stories on mahmuda.fun, focused on fictional adult characters, attraction and changing relationship dynamics. 18+ only.', intro: 'Stories tagged Junior.', theme: 'warm' },
+  { slug: 'neighbor', label: 'Neighbor', title: 'Neighbor Stories', description: 'Neighbor-themed adult romance stories on mahmuda.fun, where proximity, secrecy and unexpected chemistry shape fictional adult relationships. 18+ fiction.', intro: 'Stories tagged Neighbor.', theme: 'earthy' },
 ];
 
 module.exports = { CATEGORIES };

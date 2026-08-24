@@ -232,6 +232,7 @@ function injectAdMarkers(htmlContent) {
   return out;
 }
 
+const AUTO_TAG_SLUGS = new Set(['forbidden','spicy','dirtytalk','senior','climax','agegap','tension','madam','university','chemistry','junior','neighbor']);
 function writeSitemap(stories) {
   const today = new Date().toISOString().slice(0, 10);
   const staticPages = [
@@ -247,7 +248,7 @@ function writeSitemap(stories) {
     { path: '/premium.html', changefreq: 'monthly', priority: '0.5' },
     { path: '/privacy-policy.html', changefreq: 'monthly', priority: '0.3' },
     { path: '/llms.txt', changefreq: 'monthly', priority: '0.2' }
-  ].concat(CATEGORIES.map(function (c) {
+  ].concat(CATEGORIES.filter(function (c) { return !AUTO_TAG_SLUGS.has(c.slug); }).map(function (c) {
     return { path: '/category/' + c.slug + '/', changefreq: 'weekly', priority: '0.7' };
   }));
   const seen = new Set();
@@ -448,7 +449,7 @@ function writeCategoryPages(stories) {
       '<title>' + escapeXml(pageTitle) + '</title>\n' +
       '<meta name="description" content="' + escapeXml(cat.description) + '" />\n' +
       '<meta name="author" content="mahmuda.fun" />\n' +
-      '<meta name="robots" content="index, follow, max-image-preview:large" />\n' +
+      '<meta name="robots" content="' + (AUTO_TAG_SLUGS.has(cat.slug) ? 'noindex, follow' : 'index, follow, max-image-preview:large') + '" />\n' +
       '<meta name="rating" content="adult" />\n' +
       '<meta name="theme-color" content="#050505" />\n' +
       '<link rel="canonical" href="' + escapeXml(canonical) + '" />\n' +
