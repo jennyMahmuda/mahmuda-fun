@@ -63,7 +63,7 @@ excerpt: স্বামী শহরে গেছে। সারা আমা�
 <p style="color:#f5c6a0;font-size:0.9rem;margin-bottom:0.5rem;">▶ প্রিভিউ · আগে এই অংশটা দেখো</p>
 
 <video controls preload="metadata" poster="https://mahmuda.fun/assets/images/gallery/seniorapu.JPG" style="width:100%;max-width:640px;border-radius:8px;">
-  <source src="video-story-post/university-madam-invited-me-home-husband-not-home-romance.mp4" type="video/mp4">
+  <source src="https://mahmuda.fun/video-story-post/i-try-my-junior.webm" type="video/mp4">
 </video>
 
 <p style="margin-top:1rem;color:#ccc;font-size:0.95rem;">সম্পূর্ণ ভিডিও স্টোরি দেখতে চাও?</p>
