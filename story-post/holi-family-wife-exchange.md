@@ -16,10 +16,6 @@ seo:
   keywords: bangla wife exchange, forbidden family romance, holi choti, affair cheating bangla story
 ---
 
-but Tumi first a dubar image link add korbe na eta duibar dekha jay ek sathe now write full 
-Forbidden Romance
-Affair & Cheating Romance
-Ekhon eta image link : https://mahmuda.fun/gallery-post/wife-exchange-part1.jpg
 হোলির দিন আমাদের বাড়িতে খুব মজা হয়। আমাদের ফ্যামিলির সকলেই ওই দিন আমাদের বালিগঞ্জের বাড়িতে উপস্থিত হয়। আমাদের ফ্যামিলির পরিচয়টা একটু জানিয়ে দিই।
 আমার জ্যেঠামসাই রথিন ঘোষাল (৫৫) সিভিল ইঞ্জিনিয়ার। জ্যেঠিমা (৪৮) রমা ঘোষাল ব্যাঙ্কে চাকরি করেন। ওদের একমাত্র মেয়ে অনুশ্রিদি (২৪) রেলে চাকরি করে।
 আমার বাবা রবিন ঘসাল(৫০) ফুড কর্পোরেশন অফিসার। মা মিনতি দেবী (৪৫) ব্যাঙ্কে চাকরি করেন।
