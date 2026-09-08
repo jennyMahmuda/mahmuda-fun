@@ -8,7 +8,7 @@ type: text
 date: 2026-09-09
 language: bn
 author: Mahmudajenny69
-cover: https://mahmuda.fun/gallery-post/i-seduces-husband-friend-husband-don't-know-we-meet-hotel-cover.JPG
+cover: ["https://mahmuda.fun/gallery-post/i-seduces-husband-friend-husband-don't-know-we-meet-hotel-cover.JPG"]
 excerpt: স্বামী অফিসে। তার বন্ধু বাসায় আসে। আমি জানি কী চায় তারা—আর স্বামী কিছুই জানে না।
 seo:
   keywords: bangla cheating wife, husband friends seduction, affair romance, স্বামীর বন্ধু প্রলোভন
