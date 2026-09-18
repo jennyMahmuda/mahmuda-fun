@@ -1,7 +1,7 @@
 ---
 title: হাসবেন্ড এর বন্ধুর সাথে আজকে হোটেলে 
 id: husband-dont-know-i-seduce-his-friends
-slug: husband-dont-know-i-seduce-his-friends
+slug: husband-dont-know-i-seduce-his-friends-then-meet-hotel
 category: Affair
 tags: [Affair, Forbidden, Cheating, Spicy, WifeSeduction]
 type: text
