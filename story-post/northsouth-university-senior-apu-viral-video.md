@@ -6,7 +6,7 @@ type: video
 date: 2026-08-23
 language: bn
 excerpt: "This final-year senior guy had a crush on his sexy Bengali junior girl and always desired to fuck her brains out. The girl also liked her handsome senior.     The guy finally gets his chance to fulfill his dream during the college day. When everyone else was busy celebrating and enjoying at the auditorium, the senior takes his beautiful junior girl to the toilet and there he makes the girl lean towards the wall and bangs the Bengali chick's pussy from behind in doggy style. The hard doggy-style fucking inside the college"
-video: "https://mahmuda.fun/video-story-post/i-try-my-junior.webm"
+video: https://mahmuda.fun/video-story-post/i-try-my-junior.webm
 exclusive: false
 ---
 
